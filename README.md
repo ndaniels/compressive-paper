@@ -1,4 +1,4 @@
-molsearch-paper
+compressive acceleration paper
 ===============
 
-LaTeX source for paper
+This repository is for the LaTeX source for the paper.
