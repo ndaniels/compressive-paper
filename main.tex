@@ -1,0 +1,167 @@
+\documentclass{amsart}
+
+\usepackage{graphicx}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{xca}[theorem]{Exercise}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\numberwithin{equation}{section}
+
+%    Absolute value notation
+\newcommand{\abs}[1]{\lvert#1\rvert}
+
+%    Blank box placeholder for figures (to avoid requiring any
+%    particular graphics capabilities for printing this document).
+\newcommand{\blankbox}[2]{%
+  \parbox{\columnwidth}{\centering
+%    Set fboxsep to 0 so that the actual size of the box will match the
+%    given measurements more closely.
+    \setlength{\fboxsep}{0pt}%
+    \fbox{\raisebox{0pt}[#2]{\hspace{#1}}}%
+  }%
+}
+
+\begin{document}
+
+\title{A compressed data structure with entropy-linear approximate similarity search}
+
+%    Information for first author
+\author{Y. William Yu}
+%    Address of record for the research reported here
+\address{Department of Mathematics, Massachusetts Institute of Technology, Cambridge, Massachusetts 02139}
+%    Current address
+%\curraddr{Department of Mathematics and Statistics,
+%Case Western Reserve University, Cleveland, Ohio 43403}
+\email{ywy@math.mit.edu}
+%    \thanks will become a 1st page footnote.
+\thanks{The first author was supported by a Hertz Foundation Fellowship.}
+
+%    Information for second author
+\author{Noah Daniels}
+%\address{Mathematical Research Section, School of Mathematical Sciences,
+%Australian National University, Canberra ACT 2601, Australia}
+\email{ndaniels@csail.mit.edu}
+%\thanks{Support information for the second author.}
+
+\author{Bonnie Berger}
+\email{bab@mit.edu}
+
+%    General info
+\subjclass[2010]{Primary 68W99}
+
+\date{September 23, 2014}
+
+%\dedicatory{This paper is dedicated to our advisors.}
+
+\keywords{Similarity search, approximate matching, entropy scaling algorithms}
+
+\begin{abstract}
+Much like sorting is a primitive operation in computer science, similarity search (alternately, approximate matching) is a fundamental operation in data science and lies at the heart of many other problems.
+Traditionally, approximate matching has been studied primarily in the context of strings under edit distance metrics (e.g. for spell-checkers).
+In recent years, however, similarity search has become increasingly important for other objects and distance functions (e.g. biological genomes and alignment scores, networks and the Jaccard index).
+
+As available data grows exponentially, algorithms that scale linearly no longer suffice.
+The primary ways the literature addresses this problem (e.g. locality sensitive hashing, vector approximation, space partitioning) involve the construction of data structures that admit a more efficient search operation.
+However, we note that as data increases, very often the redundancy present in the data also increases.
+Existing general purpose methods do not explicitly take advantage of this phenomenon.
+
+In contrast, in the emerging field of ``compressive genomics'', the prevailing algorithmic framework specifically takes advantage of the particularly pronounced redundancy in large biological data sets.
+This has enabled orders of magnitude speedup of existing search algorithms such as BLAST and BLAT, as well as of applications using similarity search as a primitive, such as read mapping and network analysis.
+The key to these improvements is the use of data structures that seemingly scale linearly with the ``entropy'' of the dataset, both in space and time.
+
+In this paper, we present a prototypical compressed data structure for similarity search in Hamming-like spaces and prove the linear entropy-scaling result.
+
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}
+
+Faster approximate string matching over compressed text \cite{navarro2001faster}.
+Approximate Searching on Compressed Text \cite{perez2005approximate}.
+A Text Compression Scheme That Allows Fast Searching Directly In The Compressed File \cite{Manber93atext}.
+\begin{itemize}
+\item Approximate search on compressed data is designed for a linear text, and is specific to edit distances.
+\end{itemize}
+
+Adaptive Cluster Distance Bounding for High-Dimensional Indexing \cite{ramaswamy2011adaptive}
+\begin{itemize}
+\item I don't think their method works well for Hamming-like distances, as
+   their hyperplane separation method seems like it ought to work best
+   in Euclidean-like spaces? They certainly only use very continuous
+   spaces in their examples.
+\item Their "compressed feature vectors" don't actually have anything to do
+   with entropy, as it looks like a constant binning.
+\item Because their distances are Euclidean, they didn't (and most likely
+   couldn't) make a connection we're making between clustering and
+   entropy/compression. Thus, their data structure still uses $O(n)$
+   space, while ours can use $O(H(n))$ space, where $H(n)$ is the "entropy"
+   of the dataset.
+\item They didn't do a full analysis of how much clustering helps them,
+   though they mention that it does and have empirical experiments.
+\item They are working on the k-nearest neighbor problem, not the
+   $\epsilon$-nearest neighbors problem that we are. However, their method
+   certainly can be adapted to $\epsilon$-nearest neighbor, nearly
+   trivially.
+\end{itemize}
+
+\section{Proof}
+Minimum weight spanning trees of the complete distance graph of the
+database point cloud!
+
+Assuming that the number of bits necessary to encode a new point is
+O(d), where d is the distance to the nearest neighbor in the tree, this
+provides the connection we want to entropy. Basically, the minimum
+weight spanning tree almost captures to a constant factor the number of
+bits necessary to encode the database.
+
+The exception is when one point is a concatenation of two other points,
+but in that case, under a more generic edit distance, we assume WLOG
+that it should be better represented as simply two points, one close to
+either of the components.
+
+We can think of our compression accelerated search scheme as
+approximating this minimum weight spanning tree by a 2-level spanning
+tree, with each cluster being a branch of the tree.
+
+Assume for the moment that we have the minimum weight 2-level spanning
+tree (which we don't generally, but is sort of-ish what we're trying to
+do with our compressed representation of the database).  Then the number
+of branches should be a function of the entropy, determining the coarse
+search cost. Thus, we should be able to prove that coarse search is
+linear in the entropy of the dataset.
+
+Fine search is a little bit trickier to analyze because no matter what
+you do, you have to read all the points in the appropriate clusters,
+which (under a reference mutation generative model) will be a constant
+fraction of the total number of points, and thus still kinda linear in
+database size. However, I think the solution is as follows: the scaling
+is kinda linear in database size only insofar as entropy is kinda linear
+in database size. Exact duplicates only help us, because that increases
+database size without increasing entropy. Non-exact duplicates within a
+cluster that need to be read, however, increase the entropy of the
+dataset by their difference from their nearest neighbor. Any new entry
+that falls into a dense cluster thus increases entropy basically by the
+cluster diameter. Finally, new entries that fall outside of branches
+effectively start new branches, and so should be taken care of by the
+coarse search analysis. Thus, fine search also should scale with
+entropy.
+
+
+\bibliographystyle{amsalpha}
+\bibliography{main}
+
+\end{document}
+
+%------------------------------------------------------------------------------
+% End of journal.tex
+%------------------------------------------------------------------------------
+
