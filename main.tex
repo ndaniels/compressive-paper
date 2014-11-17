@@ -45,11 +45,16 @@
 \thanks{The first author was supported by a Hertz Foundation Fellowship.}
 
 %    Information for second author
-\author{Noah Daniels}
+\author{Noah M. Daniels}
 %\address{Mathematical Research Section, School of Mathematical Sciences,
 %Australian National University, Canberra ACT 2601, Australia}
-\email{ndaniels@csail.mit.edu}
+\email{ndaniels@mit.edu}
 %\thanks{Support information for the second author.}
+
+\author{David C. Danko}
+%\address{Mathematical Research Section, School of Mathematical Sciences,
+%Australian National University, Canberra ACT 2601, Australia}
+\email{dcdanko@mit.edu}
 
 \author{Bonnie Berger}
 \email{bab@mit.edu}
@@ -78,6 +83,35 @@ This has enabled orders of magnitude speedup of existing search algorithms such 
 The key to these improvements is the use of data structures that seemingly scale linearly with the ``entropy'' of the dataset, both in space and time.
 
 In this paper, we present a prototypical compressed data structure for similarity search in Hamming-like spaces and prove the linear entropy-scaling result.
+
+%%%%
+% abstract from cablastx manuscript below
+%%%%
+
+A central goal of metagenomics is to categorize the microorganisms present
+in a microbial sample. 
+Metagenomic analysis begins with next generation
+sequencing (NGS) of large amounts of read data, collected directly from the
+environment, and attempts to assign taxonomic labels to short or 
+partially-assembled DNA sequences.
+However, this task is currently computationally 
+infeasible when we do not have reference genomes onto which we can map the
+reads, which is often the case due to the multi-varied nature of microbial
+samples and the
+small functional differences between closely-related strains.
+Thus, researchers have instead turned to mapping such reads or partial
+assemblies to protein databases to identify non-exact matches.
+Here we present a novel technique for performing such mappings and
+demonstrate its efficacy on data from the human gut microbiome.
+In comparison to existing techniques, we are able to provide orders of
+magnitude faster classification of metagenomic sequence data, without loss
+of accuracy. 
+While previous methods have been effective at analyzing metagenomic data
+when a reference is known, this work makes such analysis tractable in the
+absence of a reference genome, impacting genomic medicine and environmental
+studies.
+Our software tool caBLASTX can be downloaded at
+http://csail.mit.edu/cablastx. 
 
 \end{abstract}
 
@@ -155,6 +189,344 @@ effectively start new branches, and so should be taken care of by the
 coarse search analysis. Thus, fine search also should scale with
 entropy.
 
+\section{Compressive Metagenomics}
+
+Metagenomics, the study of genomic data sequenced directly from environmental
+samples, has recently grown in popularity.
+From studies of the human gut microbiome to seawater and soil samples,
+metagenomics has contributed to improved understanding of how ecosystems recover
+from environmental damage~\cite{Tyson:2004}, how the human gut responds to 
+diet
+and infection~\cite{David:2014}, and even some surprising clues as to disorders 
+such as Autism Spectrum Disorder~\cite{MacFabe:2012}.
+
+Massive amounts of metagenomic reads are generated every day from 
+next-generation sequencing (NGS) machines.
+Overall, the rate of NGS sequencing is growing at a greater exponential rate
+than computing power~\cite{Loh}.
+These metagenomic reads must be stored and analyzed to do further downstream
+analysis such as abundance determination (e.g. MetaPhlAn~\cite{Huttenhower}) 
+and functional characterization (e.g. PICRUSt~\cite{Huttenhower}).
+ Months of computing time are often required to process data for novel, 
+large-scale sequencing studies that enable us to catalog genetic variation, 
+provide new insights into our evolutionary history~\cite{8}, and promise to 
+revolutionize the study of cell lineages in higher organisms~\cite{9}. 
+These computational challenges are at present a barrier to widespread use of 
+metagenomic data throughout biotechnology, which impacts genomic medicine and 
+environmental genomics~\cite{blah}.
+
+One approach to making metagenomic analysis tractable is to
+sequence only the 16S ribosomal subunit of the microbiota, which is sufficient
+to identify clades of microbes present in a sample. 
+However, this approach cannot detect small functional differences between 
+closely-related strains. 
+In order to detect such minor functional differences, tools such as BLAST can 
+be used to map metagenomic sequence data onto a database of known genome
+sequences.
+More recently, tools such as Kraken~\cite{kraken} have provided significantly 
+faster methods for this analysis.
+This approach, however, requires a reference genome for any organism to be
+identified.
+
+Alternatively, BLASTX is widely used, both directly for analysis, as well as in 
+pipelines such as MetaPhlAn~\cite{Huttenhower} to map reads to protein 
+databases.
+The advantage of the BLASTX approach is that complete reference genomes are not
+required; BLASTX can identify homologs, particularly in the case where the
+nucleotide sequence identity is low but translated protein sequence identity
+is higher~\cite{Turnbaugh:2006, Kurokawa:2007}.
+However, because BLASTX must search a protein database for possible hits for
+each nucleotide read from a metagenomic sample, it is computationally intensive.
+For example, \citet{Mackelprang:2011} reported that using BLASTX to map 246
+million reads against the KEGG~\cite{kegg} database required 800,000 CPU hours
+at a supercomputing center.
+Moreover, BLASTX's run time requirements scale linearly with the size of the 
+full read dataset, and each year require exponentially more runtime to process 
+the exponentially growing read data. 
+
+
+We present caBLASTX (compressively accelerated BLASTX), an algorithm and 
+software implementation that relies on the techniques of compressive 
+acceleration~\cite{Loh, Daniels} to map metagenomic reads onto a protein 
+database orders of magnitude faster than BLASTX.
+
+CaBLASTX is useful for two of the most common metagenomic analysis tasks. 
+The first of these is mapping assembled or partially-assembled
+nucleotide sequences onto a protein database. 
+When these query sequences have
+little in common with one another, caBLASTX maps each sequence separately. 
+Each sequence is first searched against the compressed database with a 
+relatively permissive E-value threshold, called coarse search. 
+Any resulting hits may represent many original sequences, so these putative 
+hits are expanded, and the search and alignment is refined with a less 
+permissive E-value threshold, called fine search.
+
+The second task caBLASTX can accelerate is that of mapping short nucleotide
+reads (generated by next-generation sequencing technology) to a protein
+database. In this instance, there is typically high coverage of the metagenomes
+being sequenced, typically 30x-200x coverage. CaBLASTX takes advantage of this
+redundancy
+by compressing the read set as well, obtaining an additional speed gain that is
+proportional to the amount of redundancy in the read data.
+
+
+We tested caBLASTX on 200-400nt partially-assembled human gut microbiome
+sequences, as well as on 100nt human gut microbiome reads at ~100x coverage.
+For the partially-assembled sequences, we demonstrate run-time performance
+approximately 10x faster than BLASTX, with negligible loss in sensitivity and
+no loss in specificity. For the short reads, we demonstrate run-time
+performance approximately 700x faster than BLASTX, with less than 5\% loss in
+sensitivity and no loss in specificity.
+
+\subsubsection*{Alphabet Reduction}
+
+Alphabet reduction--reducing the 20-letter standard amino acid alphabet to a
+smaller set, in order to accelerate search or improve homology detection--has
+been proposed and implemented several times~\cite{blah}.
+In particular, \citet{Murphy:2000, Peterson:2009} considered reducing the
+amino-acid alphabet to 17, 10, or even 4 letters.
+More recently, \citet{Zhao:2012} and \citet{Huson:2013} applied a reduction to
+a 4-letter alphabet, termed a ``pseudoDNA'' alphabet, in sequence alignment.
+
+In this work, we extend the compression approach of \citet{Daniels:2013} using
+alphabet reduction.
+We use the alphabet reduction of \citet{Murphy:2000} to map the standard amino
+acid alphabet (along with the four common ambiguous letters ) onto a 4-letter 
+alphabet.
+Specifically, we map F, W, and Y into one cluster; C, I, L, M, V, and J into
+a second cluster, A, G, P, S, and T into a third cluster, and
+D, E, N, Q, K, R, H, B, and Z into a fourth cluster.
+
+\subsubsection*{Database Compression}
+
+Given a protein sequence database to be compressed, we proceed as follows:
+\begin{enumerate}
+        \item First, initialize a table of all possible $k$-mer ``seeds'' of
+        our 4-letter reduced alphabet, as well as a ``coarse'' database of
+        reduced-alphabet sequences, initially containing the alphabet-reduced
+        version of the first sequence in the input database.
+        %
+        \item For each $k$-mer of the first sequence, store its position in the
+        corresponding entry in the seed table.
+        %
+        \item For each subsequent sequence $s$ in the input, slide a window of 
+        size $k$ along the sequence, skipping single-residue repeats of length
+        greater than 10.
+        %
+        \item Look up these $k$ residues in the seed table.
+        For every entry matching to that $k$-mer in the seed table, follow
+        it to a corresponding subsequence in the coarse database and attempt
+        \textit{extension}.
+        If no subsequences from this window can be extended, move the window
+        by $m$ residues, where $m$ defaults to 10.
+        \item If a match was found via extension, move the $k$-mer window to
+        the first $k$-mer in $s$ after the match, and repeat the extension
+        process.
+\end{enumerate}
+        
+Given a $k$ match between sequence $s$ and a subsequence $s'$ pointed to by the
+seed table, first attempt \textit{ungapped} extension:
+\begin{enumerate}
+        \item Within each window of 10 alphabet-reduced residues, if identical 
+        4-mers in $s$ and $s'$ can be found, and at least 2 additional matching 
+        residues can be found, then there is an ungapped match within that
+        10-mer window between $s$ and $s'$ that exhibits at least 60\% sequence
+        identity.
+        \item Continue ungapped matching using 10-mer windows until no more
+        10-mers of at least 60\% sequence identity are found.
+        \item The result of ungapped extension is that there is an alignment 
+        between $s$ and $s'$ where the only differences are substitutions,
+        at least 60\% of the positions contain exact matches.
+\end{enumerate}
+        
+When ungapped extension terminates, attempt \textit{gapped} extension.
+From the end of the aligned regions thus far, align 25-mer windows of both
+$s$ and $s'$ using the Needleman-Wunsch~\cite{Needleman:1970gm} algorithm using
+an identity matrix.
+Note that the original caBLASTP~\cite{Daniels:2013} used BLOSUM62 as it was
+operating in amino acid space; as we are now operating in a reduced-alphabet
+space, an identity matrix is appropriate, just as it is for nucleotide space.
+After gapped extension on a window length of 25, attempt ungapped extension
+again.
+
+If neither gapped nor ungapped extension can continue, end the extension phase.
+If the resulting alignment has less than 70\% sequence identity (in the 
+reduced-alphabet space), or is shorter than 40 residues, discard it, and 
+attempt extension on the next entry in the seed table for the original $k$-mer,
+continuing on to the next $k$-mer if there are no more entries.
+
+If the resulting alignment does have at least 70\% sequence identity in the
+reduced-alphabet space, and is at least 40 residues long, then create a link
+from the entry for $s'$ in the coarse database to the subsequence of $s$
+corresponding to the alignment.
+If there are unaligned ends of $s$ shorter than 30 residues, append them to the
+match.
+Longer unaligned ends that did not match any subsequences reachable from the
+seed table are added into the coarse database themselves, following the same
+$k$-mer indexing procedure as the first sequence.
+
+Finally, in order to be able to recover the original sequence with its original
+amino acid identities, a \textit{difference script} is associated with each
+link.
+This difference script is a representation of the insertions, deletions, and
+substitutions resulting from the Needleman-Wunsch alignment, along with the
+offset in each reduced-alphabet cluster needed to recover the original alphabet.
+Thus, for example, a valine (V) is in the cluster containing C, I, L, M, V, and 
+J.
+Since it is the 4th entry in that 5-entry cluster, we can represent it with
+the offset 4.
+Since the largest cluster contains 9 elements, only four bits are needed to
+store one entry in the difference script.
+More balanced clusters would have allowed 3-bit storage, but at the expense of
+clusters that less faithfully represented the BLOSUM62 matrix and the
+physicochemical properties of the constituent amino acids.
+
+\subsubsection*{Query Compression}
+
+Metagenomic reads are themselves nucleotide sequences, so no alphabet reduction
+is performed on them directly.
+Instead, metagenomic reads are compressed using the same approach as the
+protein database, without the alphabet reduction step and with a number of
+different parameters.
+The difference scripts for metagenomic reads do not rely on the cluster offsets,
+but simply store the substituted nucleotides.
+Furthermore, unlike protein databases, where most typical sequences range in 
+length from 100 to over 1000 amino acids, next-generation sequencing reads are 
+typically short and usually of fixed length, which is known in advance.
+Thus, the minimum alignment length required for a match, and the maximum
+length unaligned fragment to append to a match, require different values based
+on the read length.
+
+\subsubsection*{Search}
+
+Given a compressed protein database and a compressed query read set, search
+comprises two phases.
+The first, \emph{coarse search}, considers only the coarse sequences--the
+representatives--resulting from compression of the protein database and the
+query set.
+Just as with standard BLASTX, each coarse nucleotide read is transformed into 
+each of the six possible amino acid sequences that could result from it (three 
+reading frames for both the sequence and its reverse complement).
+Then, each of these amino acid sequences is then reduced back to a four-letter
+alphabet using the same mapping as for protein database compression.
+For convenience, the four-letter alphabet is represented using the standard
+nucleotide bases, though this has no particular biological significance.
+This is done so that the coarse search can rely on BLASTN (nucleotide BLAST) to
+search these sequences against the compressed protein database.
+
+This coarse search uses an E-value threshold that is relaxed from the one a user
+specifies for the overall search, though the user can specify this coarse 
+E-value threshold.
+Coarse search identifies \emph{possible} hits for each query representative from
+among the representative sequences in the database.
+Of course, due to the reduced alphabet, some of these hits may turn out to be
+poor quality when the original amino acid alphabet is considered.
+Each of these coarse hits represents one or more original sequences from the
+protein database; likewise, each coarse query represents one or more original
+reads from the metagenomic data set.
+For each coarse query representative, the set of coarse hits is used to
+reconstruct all corresponding sequences from the original database by following
+links to original sequence matches and applying their difference scripts.
+The resulting \emph{candidates} are thus original sequences from the protein
+database, in their original amino acid alphabet.
+The query representative is also used to reconstruct all corresponding sequences
+from the original read set.
+Thus, for each coarse query representative, there is now a subset of the
+metagenomic read set (the reads represented by that coarse query) and also a
+subset of the protein database (the candidates).
+
+The second phase, \emph{fine search}, uses standard BLASTX to translate each
+of these reads associated with a coarse query representative and search for
+hits only in the subset of the database comprising the candidates.
+This fine search phase relies on a user-specified E-value threshold (defaulting
+to BLASTX's default of 10) to filter hits.
+To ensure that E-value calculation is correct, BLASTX uses a corrected database
+size which is the size of the original, uncompressed protein database.
+
+\subsection*{Benchmarking}
+
+To evaluate the run-time performance of caBLASTX, we tested it against
+BLASTX in two scenarios, and against PAUDA and Kraken in one.
+BLASTX is often used to align assemblies thought to be exons to a protein
+database, in which case metagenomic reads have already been assembled.
+In this instance, the query-side compression of caBLASTX is not applicable, so
+the performance gains are more modest.
+We benchmarked caBLASTX vs. BLASTX on a dataset consisting of XX assemblies
+from human gut microbiota, 3.1 megabases in total, searching against the NCBI's
+``NR'' non-redundant protein database.
+The running time of BLASTX was XX minutes, compared to XX minutes for caBLASTX.
+
+When aligning next-generation sequencing reads to a protein database, the
+query-side compression aspect of caBLASTX becomes applicable.
+We benchmarked caBLASTX against BLASTX and PAUDA on a Siberian
+permafrost dataset from~\cite{blah}, which consists of XX megabases of
+100-nucleotide reads.
+Results appear in Table~\ref{qsbench}.
+
+
+
+\subsection*{Validation}
+
+Because the ground truth for any metagenomic data set is still unknown,
+we took two approaches to evaluating the accuracy of caBLASTX.
+First, we treated BLASTX as a gold standard; since caBLASTX accelerates BLASTX
+using compression, false positives with respect to BLASTX should not be
+possible, but false negatives certainly are.
+We evaluated the hits from BLASTX and caBLASTX on the same human gut
+assemblies used for benchmarking, in order to evaluate the accuracy when
+query-side compression is not used.
+For query-side compression, we also evaluated the hits from BLASTX and caBLASTX
+on the Siberian permafrost dataset from~\cite{blah}.
+Results appear in Table~\ref{bxacc}.
+
+To compare accuracy PAUDA, we relied on simulated data so that the
+underlying ground truth was known.
+We began with 1000 bacterial protein sequences from NR, and their corresponding
+nucleotide sequences from Genbank.
+We generated simulated 100-nucleotide and 300-nucleotide single-end reads from
+the nucleotide sequences at 100x coverage with error rates of 0\%, 1\%, and 5\%.
+We then used caBLASTX and PAUDA to search NR for matching protein sequences,
+and evaluated the accuracy of classification.
+Results appear in Table~\ref{pacc}.
+
+\section*{Discussion}
+
+We have introduced a compression-accelerated search algorithm that boosts the
+speed of BLASTX while maintaining its accuracy.
+Our approach scales sublinearly with both the size of the database being
+searched, and the size of the query set when analyzing metagenomic reads.
+
+One notable contrast to metagenomic classification tools such as PAUDA and
+Kraken is that caBLASTX does not require a complete reference genome for the
+targeted organisms.
+CaBLASTX relies on a protein database, such as NCBI's ``NR,'' but there are
+individual protein sequences for many organisms present in this database whose
+complete genomes are not available.
+In this sense, caBLASTX is also capable of identifying species in metagenomic
+samples when those species cannot be \emph{a priori} narrowed down to a small
+set of genomes.
+
+An area of particular interest to human health is \emph{functional 
+metagenomics}, the analysis of metabolic pathways present in a microbial
+community at large.
+One approach to functional metagenomics is to first identify clades of
+microbes present, and then to consider their metabolic pathways~\cite{blah}.
+Another approach is to search a protein database to identify proteins involved
+in known metabolic pathways.
+CaBLASTX is particularly useful here, as it can accelerate the search for
+homologous, or even remotely homologous proteins that may be likely to be
+involved in metabolic pathways.
+This capability gives caBLASTX capabilities beyond those of tools, that require
+complete reference genomes.
+
+CaBLASTX is a drop-in replacement for BLASTX in any pipeline.
+As such, it can be used to accelerate other metagenomic analysis tools, such
+as MetaPhlAn~\cite{blah}.
+Moreover, many of these analysis tools have, for performance reasons, required
+users to construct a targeted protein database, which is a time-consuming and
+possibly error-prone task.
+However, caBLASTX makes it feasible to use the entire NCBI ``NR'' database for
+analysis.
 
 \bibliographystyle{amsalpha}
 \bibliography{main}
