@@ -616,8 +616,8 @@ compressed space.
 We designed this compression and search framework around one of the standard techniques for high-throughput
 screening of potential drug compounds, the use of maximum common subgraph (MCS) to identify similar motifs among
 molecules.
-Many existing MCS-based tools, such as SMSD~\cite{} and 
-fmcsR~\cite{} compute the maximum common subgraph on fully labeled graphs; vertices are labeled with
+Many existing MCS-based tools, such as SMSD~\cite{thornton} and 
+fmcsR~\cite{girke} compute the maximum common subgraph on fully labeled graphs; vertices are labeled with
 chemical elements, and edges are labeled with bond types (such as single or double bonds).
 The `f' in fmcsR, which stands for ``flexible,'' indicates that some bounded number of vertex or edge label
 mismatches are permitted, at significant computational cost.
@@ -644,7 +644,7 @@ For example, as shown in Figure~\ref{}, bicyclohexyl and dicyclohexylamine would
 
 After this transformation is applied to each molecule in a database to be compressed, we identify all clusters
 of fully-isomorphic transformed molecular graphs.
-Isomorphism detection is performed using the VF2~\cite{} algorithm; a simple hash computed from the
+Isomorphism detection is performed using the VF2~\cite{Cordella} algorithm; a simple hash computed from the
 number of vertices and edges in each transformed molecular graph is first used to filter molecular graphs that
 cannot possibly be isomorphic.
 A representative from each such cluster is stored in SDF format; collectively, these representatives form a 
@@ -655,12 +655,12 @@ as a pointer to a set of vertices and edges that have been removed or unlabeled.
 \subsection*{Search}
 
 We implemented a variant of a maximum common subgraph (MCS) algorithm, known as \emph{flexible} maximum
-common subgraph (fMCS), as detailed by Cao, et al.~\cite{}.
+common subgraph (fMCS), as detailed by Cao, et al.~\cite{cao}.
 Our implementation allows a user to specify whether any atom mismatches or bond-type mismatches should be 
 allowed in the maximum common subgraph of two molecules.
 If zero mismatches are allowed, fMCS is just MCS.
 
-As in~\cite{}, our compression-accelerated search approach relies on a two-stage process.
+As in~\cite{loh}, our compression-accelerated search approach relies on a two-stage process.
 First, a \emph{coarse} search is performed in compressed space, by searching the coarse database.
 The query molecule is unlabeled and transformed in exactly the same manner as the molecular database
 during compression, and this transformed query graph is matched against the coarse database.
