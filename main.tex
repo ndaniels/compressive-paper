@@ -69,20 +69,39 @@
 \keywords{Similarity search, approximate matching, entropy scaling algorithms}
 
 \begin{abstract}
-Much like sorting is a primitive operation in computer science, similarity search (alternately, approximate matching) is a fundamental operation in data science and lies at the heart of many other problems.
-Traditionally, approximate matching has been studied primarily in the context of strings under edit distance metrics (e.g. for spell-checkers).
-In recent years, however, similarity search has become increasingly important for other objects and distance functions (e.g. biological genomes and alignment scores, networks and the Jaccard index).
+Much like sorting is a primitive operation in computer science, similarity
+search (alternately, approximate matching) is a fundamental operation in data
+science and lies at the heart of many other problems.
+Traditionally, approximate matching has been studied primarily in the context
+of strings under edit distance metrics (e.g. for spell-checkers).
+In recent years, however, similarity search has become increasingly important
+for other objects and distance functions (e.g. biological genomes and alignment
+scores, networks and the Jaccard index).
 
-As available data grows exponentially, algorithms that scale linearly no longer suffice.
-The primary ways the literature addresses this problem (e.g. locality sensitive hashing, vector approximation, space partitioning) involve the construction of data structures that admit a more efficient search operation.
-However, we note that as data increases, very often the redundancy present in the data also increases.
-Existing general purpose methods do not explicitly take advantage of this phenomenon.
+As available data grows exponentially, algorithms that scale linearly no longer
+suffice.
+The primary ways the literature addresses this problem (e.g. locality sensitive
+hashing, vector approximation, space partitioning) involve the construction of
+data structures that admit a more efficient search operation.
+However, we note that as data increases, very often the redundancy present in
+the data also increases.
+Existing general purpose methods do not explicitly take advantage of this
+phenomenon.
 
-In contrast, in the emerging field of ``compressive genomics'', the prevailing algorithmic framework specifically takes advantage of the particularly pronounced redundancy in large biological data sets.
-This has enabled orders of magnitude speedup of existing search algorithms such as BLAST and BLAT, as well as of applications using similarity search as a primitive, such as read mapping and network analysis.
-The key to these improvements is the use of data structures that seemingly scale linearly with the ``entropy'' of the dataset, both in space and time.
 
-In this paper, we present a prototypical compressed data structure for similarity search in Hamming-like spaces and prove the linear entropy-scaling result.
+In contrast, in the emerging field of ``compressive genomics'', the prevailing
+algorithmic framework specifically takes advantage of the particularly
+pronounced redundancy in large biological data sets.
+This has enabled orders of magnitude speedup of existing search algorithms such
+as BLAST and BLAT, as well as of applications using similarity search as a
+primitive, such as read mapping and network analysis.
+The key to these improvements is the use of data structures that seemingly
+scale linearly with the ``entropy'' of the dataset, both in space and time.
+
+In this paper, we present a prototypical compressed data structure for
+similarity search in Hamming-like spaces and prove the linear entropy-scaling
+result.
+We also provide software implementations ....
 
 %%%%
 % abstract from cablastx manuscript below
@@ -147,7 +166,9 @@ Adaptive Cluster Distance Bounding for High-Dimensional Indexing \cite{ramaswamy
    trivially.
 \end{itemize}
 
-\section{Proof}
+\section*{Results}
+
+\subsection*{Proof}
 Minimum weight spanning trees of the complete distance graph of the
 database point cloud!
 
@@ -189,7 +210,7 @@ effectively start new branches, and so should be taken care of by the
 coarse search analysis. Thus, fine search also should scale with
 entropy.
 
-\section{Compressive Metagenomics}
+\subsection*{Metagenomics}
 
 Metagenomics, the study of genomic data sequenced directly from environmental
 samples, has recently grown in popularity.
@@ -289,7 +310,7 @@ More recently, \citet{Zhao:2012} and \citet{Huson:2013} applied a reduction to
 a 4-letter alphabet, termed a ``pseudoDNA'' alphabet, in sequence alignment.
 
 In this work, we extend the compression approach of \citet{Daniels:2013} using
-alphabet reduction.
+a reversible alphabet reduction.
 We use the alphabet reduction of \citet{Murphy:2000} to map the standard amino
 acid alphabet (along with the four common ambiguous letters ) onto a 4-letter 
 alphabet.
@@ -443,7 +464,7 @@ to BLASTX's default of 10) to filter hits.
 To ensure that E-value calculation is correct, BLASTX uses a corrected database
 size which is the size of the original, uncompressed protein database.
 
-\subsection*{Benchmarking}
+\subsubsection*{Benchmarking}
 
 To evaluate the run-time performance of caBLASTX, we tested it against
 BLASTX in two scenarios, and against PAUDA and Kraken in one.
@@ -465,7 +486,7 @@ Results appear in Table~\ref{qsbench}.
 
 
 
-\subsection*{Validation}
+\subsubsection*{Validation}
 
 Because the ground truth for any metagenomic data set is still unknown,
 we took two approaches to evaluating the accuracy of caBLASTX.
@@ -488,6 +509,98 @@ the nucleotide sequences at 100x coverage with error rates of 0\%, 1\%, and 5\%.
 We then used caBLASTX and PAUDA to search NR for matching protein sequences,
 and evaluated the accuracy of classification.
 Results appear in Table~\ref{pacc}.
+
+
+
+\subsection*{High-throughput Drug Screening}
+
+- introductory info about small-molecule search in drug repurposing and discovery
+- growth of PubChem over time
+- cite Girke and Thornton
+
+\subsubsection*{Compression}
+
+We introduce a framework for compressing molecular databases that use the popular SDF
+molecular structure format, such as PubChem, and for searching for similar molecular structures in
+compressed space.
+We designed this compression and search framework around one of the standard techniques for high-throughput
+screening of potential drug compounds, the use of maximum common subgraph (MCS) to identify similar motifs among
+molecules.
+Many existing MCS-based tools, such as SMSD~\cite{} and 
+fmcsR~\cite{} compute the maximum common subgraph on fully labeled graphs; vertices are labeled with
+chemical elements, and edges are labeled with bond types (such as single or double bonds).
+The `f' in fmcsR, which stands for ``flexible,'' indicates that some bounded number of vertex or edge label
+mismatches are permitted, at significant computational cost.
+The key observation underlying our approach is that \emph{unlabeled} variants of these graphs can reduce the
+search space of similar molecules, and that any two molecules that are deemed similar in \emph{labeled} space
+will also appear similar in unlabeled space.
+
+Our compression approach relies on a clustering according to structural similarity, after structures have
+been delabeled and simplified.
+Each cluster can then be represented by a single molecular structure, along with pointers to \emph{difference
+sets} between that structure and each of the full molecules it represents.
+The molecular structures in a database are delabeled and simplified by several approaches.
+First, we remove hydrogen atoms from the molecules; hydrogens can be easily recovered by inferring their 
+presence.
+Next, each molecule's graph structure is converted to an unlabeled one; each atom label is removed, and each
+bond type is represented as just a single bond.
+The removed information--atom and bond type--is stored in an auxiliary data structure, indexed by the molecule's
+PubChem ID and the atom or bond number.
+Next, any vertex or edge that is not part of a simple cycle or a tree is removed, and any edge that is part
+of a tree is removed.
+This preserves the node count, but not the topology, of tree-like structures, and preserves simple cycles,
+which represent rings in chemical compounds.
+For example, as shown in Figure~\ref{}, bicyclohexyl and dicyclohexylamine would appear identical.
+
+After this transformation is applied to each molecule in a database to be compressed, we identify all clusters
+of fully-isomorphic transformed molecular graphs.
+Isomorphism detection is performed using the VF2~\cite{} algorithm; a simple hash computed from the
+number of vertices and edges in each transformed molecular graph is first used to filter molecular graphs that
+cannot possibly be isomorphic.
+A representative from each such cluster is stored in SDF format; collectively, these representatives form a 
+``coarse'' database.
+Along with each representative, we preserve the information necessary to reconstruct each original molecule,
+as a pointer to a set of vertices and edges that have been removed or unlabeled.
+
+\subsubsection*{Search}
+
+We implemented a variant of a maximum common subgraph (MCS) algorithm, known as \emph{flexible} maximum
+common subgraph (fMCS), as detailed by Cao, et al.~\cite{}.
+Our implementation allows a user to specify whether any atom mismatches or bond-type mismatches should be 
+allowed in the maximum common subgraph of two molecules.
+If zero mismatches are allowed, fMCS is just MCS.
+
+As in~\cite{}, our compression-accelerated search approach relies on a two-stage process.
+First, a \emph{coarse} search is performed in compressed space, by searching the coarse database.
+The query molecule is unlabeled and transformed in exactly the same manner as the molecular database
+during compression, and this transformed query graph is matched against the coarse database.
+To preserve sensitivity, this coarse search is performed with a permissive similarity score.
+The idea behind coarse search is to identify \emph{possible} hits.
+Since the compressed molecule database contains only unlabeled molecular graphs, there is no need to
+allow bond or atom mismatches during coarse search; the search at this level is purely MCS.
+
+Any possible hits--molecular graphs from the compressed database whose MCS to the transformed
+query molecule was within the similarity score threshold--are then decompressed, by following
+pointers to the removed atom and bond information, and reconstructing the original molecules.
+Typically, only a small fraction of the compressed database must be decompressed.
+
+Next, the \emph{fine search} is performed against these decompressed possible hits.
+Fine search is performed using fMCS, with user-defined parameters for bond and atom mismatches and
+similarity-score threshold.
+
+\subsubsection*{Benchmarking}
+
+\subsubsection*{Validation}
+
+\subsection*{Protein Structure Search}
+
+\subsubsection*{Compression}
+
+\subsubsection*{Search}
+
+\subsubsection*{Benchmarking}
+
+\subsubsection*{Validation}
 
 \section*{Discussion}
 
