@@ -684,6 +684,25 @@ similarity-score threshold.
 
 \section*{Protein Structure Search}
 
+Given a protein of solved (or predicted) structure but unknown function, the efficient identification
+of structurally similar proteins in the Protein Data Bank is critical to function and structure prediction.
+One approach to structural neighbor finding is FragBag~\cite{budowski}, which describes each protein as a
+``bag of fragments,'' where each fragment is a small structural motif; the bag of fragments is essentially
+a term frequency vector representing the number of occurrences of each structural motif within the protein.
+While FragBag does not generate structural alignments the way standard aligners do, it provides an excellent
+filter for computing proteins that are likely to have close alignments; those alignments could then be computed
+with a standard aligner.
+FragBag's accuracy has been reported as comparable to structural aligners such as STRUCTAL~\cite{blah} and
+ICE~\cite{blah}.
+FragBag is already quite fast, much faster than these standard aligners.
+However, FragBag turns out to be an excellent proof-of-concept for entropy-scaling data structures.
+
+We intentionally approached the application of entropy-scaling data structures to FragBag in a blind manner,
+without using substantial domain-specific knowledge.
+Instead, we used the very same representation (bag of fragments) and distance metric (Euclidean distance)
+as FragBag, \textbf{k-centers clustering} (what did we use in the end?), and vector difference to generate a
+compressed representation.
+
 \subsection*{Compression}
 
 \subsection*{Search}
