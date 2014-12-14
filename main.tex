@@ -580,27 +580,21 @@ Results appear in Table~\ref{qsbench}.
 
 \subsection*{Validation}
 
-Because the ground truth for any metagenomic data set is still unknown,
-we took two approaches to evaluating the accuracy of caBLASTX.
-First, we treated BLASTX as a gold standard; since caBLASTX accelerates BLASTX
+In order to validate caBLASTX's accuracy, we treated BLASTX as a gold standard. 
+Since caBLASTX accelerates BLASTX
 using compression, false positives with respect to BLASTX should not be
 possible, but false negatives certainly are.
 We evaluated the hits from BLASTX and caBLASTX on the same human gut
 assemblies used for benchmarking, in order to evaluate the accuracy when
 query-side compression is not used.
 For query-side compression, we also evaluated the hits from BLASTX and caBLASTX
-on the Siberian permafrost dataset from~\cite{blah}.
+on a set of 151-nucleotide MiSeq reads from the American Gut Project,
+(ERP003820) from~\cite{blah}.
+We also ran DIAMOND and RapSearch2 on this same data set.
 Results appear in Table~\ref{bxacc}.
 
-To compare accuracy PAUDA, we relied on simulated data so that the
-underlying ground truth was known.
-We began with 1000 bacterial protein sequences from NR, and their corresponding
-nucleotide sequences from Genbank.
-We generated simulated 100-nucleotide and 300-nucleotide single-end reads from
-the nucleotide sequences at 100x coverage with error rates of 0\%, 1\%, and 5\%.
-We then used caBLASTX and PAUDA to search NR for matching protein sequences,
-and evaluated the accuracy of classification.
-Results appear in Table~\ref{pacc}.
+Note: Due to query-side compression, the output order from caBLASTX does not
+match that of BLASTX.
 
 \section*{High-throughput Drug Screening}
 
