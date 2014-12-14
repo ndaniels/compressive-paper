@@ -33,3 +33,4 @@
 *.fls
 main.pdf
 .main.lb
+*.tex.swp

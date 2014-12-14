@@ -2,6 +2,11 @@
 
 \usepackage{graphicx}
 \usepackage{natbib}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage{color}
+\usepackage{soul}
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
@@ -139,129 +144,134 @@ http://csail.mit.edu/cablastx.
 
 \chapter{Introduction}
 Throughout all areas of data science, scientists are being confronted by a veritable explosion of available data.
-In many fields, and in particular molecular biology, this increase is exponential in nature, even outpacing Moore’s and Kryder’s laws on the respective doublings of transistors on a chip and long-term data storage density.
+In many fields, and in particular molecular biology, this increase is exponential in nature, even outpacing Moore's and Kryder's laws on the respective doublings of transistors on a chip and long-term data storage density \hl{[cite]}.
 As such, the challenges posed by the massive influx of data cannot be solved by waiting for faster and larger capacity computers, but require instead the development of data structures and representations that exploit and simplify complexity in the data set.
 
-Without loss of generality, let us consider the situation in which the data collected is non-uniformly distributed in a high-dimensional discrete space—note that the non-uniformness is nearly required for the distribution to admit any non-trivial inference and/or reasoning, and all data stored on a modern computer lives in some sense in a high-dimensional discrete space; in other words, this situation applies for nearly all large data sets.
-Under this model, it is obvious that the `entropy'—which we will use to denote some signal of total information content—of the underlying data set is much lower than that suggested by a naïve encoding of the data.
-We propose the development of novel data structures and algorithmic analysis tools to exploit that low-entropy nature such that the complexity of algorithms is measured not in total database or input size, but rather in the amount of non-redundant information present.
+Here, we focus our attention on similarity search (alternately, approximate matching), where the task at hand is to find all entries in some database that are `similar' to some query item.
+Much like sorting is a primitive operation in computer science, similarity search is a fundamental operation in data science and lies at the heart of many other problems.
+Traditionally, approximate matching has been studied primarily in the context of strings under edit distance metrics (e.g., for spell-checkers) \cite{ukkonen1985algorithms}.
+However, similarity search has also demonstrated increasing importance in other domains, including local alignment of sequences, chemical graphs, and protein structures \cite{altschul1990basic, kent2002blat, schaeffer2007graph, budowski2010fragbag}.
+%In recent years, however, similarity search has become increasingly important for other objects and distance functions (e.g., biological genomes and alignment scores, networks and the Jaccard index) [Altschul et al, 1990; Kent, 2002; Schaeffer, 2007].
 
-Such data structures can then be used to organize nearly any large data set for faster and more space-efficient analysis.
-We have demonstrated this proof of concept through the case of similarity search in problems from computational biology (including BLAST searches and gene-protein disease networks), our area of expertise, but in this project, we look to formalize and generalize these approaches to be applicable to other fields.
-
-To illustrate the power of this approach, we analyze some of our previously published work and present three new applications from from all corners of molecular biology (genomics, small molcule search, and protein structure) that use similarity search, where the use of entropy-linear data structures—those that scale linearly in the entropy of the data— has exhibited several orders of magnitude better performance than the previously-employed methods.
-
-Much like sorting is a primitive operation in computer science, similarity search (alternately, approximate matching) is a fundamental operation in data science and lies at the heart of many other problems.
-Traditionally, approximate matching has been studied primarily in the context of strings under edit distance metrics (e.g., for spell-checkers) [Ukkonen, 1985].
-In recent years, however, similarity search has become increasingly important for other objects and distance functions (e.g., biological genomes and alignment scores, networks and the Jaccard index) [Altschul et al, 1990; Kent, 2002; Schaeffer, 2007].
+\begin{figure}[tbp]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{computeVsData}
+        \caption{}
+    \end{subfigure}%
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{storageVsData}
+        \caption{}
+    \end{subfigure}
+    \caption{Genomic data available has grown at a faster exponential rate than computer processing power and disk storage.}
+    \label{fig:expdata}
+\end{figure}
 
 As available data grows exponentially (e.g., genomic data in Figure 1), algorithms that scale linearly no longer suffice.
 The primary ways the literature addresses this problem (e.g.
-locality sensitive hashing [Indyk \& Motwani, 1998], vector approximation [Ferhatosmanoglu et al, 2000], space partitioning [Weber, Schek, Blott, 1998]) involve the construction of data structures that admit a more efficient search operation.
+locality sensitive hashing \cite{indyk1998approximate}, vector approximation \cite{ferhatosmanoglu2000vector}, space partitioning \cite{weber1998quantitative}) involve the construction of data structures that admit a more efficient search operation.
 However, we note that as data increases, very often the redundancy present in the data also increases.
-Existing general purpose methods do not explicitly exploit this phenomenon.
+Existing general purpose methods do not explicitly exploit this particular feature of biological data.
 
-Figure 1: Genomic data available has grown at a faster exponential rate than computer processing power.
+In the specific context of local alignment in genomics, however, the emerging field of ``compressive genomics'' has shown that existing tools such as BLAST and BLAT can be ``compressively accelerated'' by taking advantage of high redundancy between related genomes using link pointers and edit scripts to a database of unique sequences \cite{loh2012compressive}.
+Similar results have been demonstrated for local alignment in proteomics, using much the same strategies \cite{daniels2013compressive}.
+Empirically, this compressive acceleration appears to scale almost linearly in the entropy of the database, often resulting in orders of magnitude better performance.
 
-In contrast, in the emerging field of “compressive genomics,” which PI Berger and her students invented, the prevailing algorithmic framework specifically takes advantage of the particularly pronounced redundancy in large biological data sets.
-Let us view the r-nearest neighbors search as the construction of a bipartite graph between queries and a database, with edges for all pairs within distance r.
-The naïve approach for solving this problem in genomic local alignment using existing search algorithms such as BLAST and BLAT then takes O(mn) time, where m is the number of queries and n is the database size.
-
-On the other hand, PI Berger’s more sophisticated approach using link pointers and edit scripts to a unique database of sequences enables orders of magnitude speedup of existing genomic search algorithms such as BLAST and BLAT [Loh, Baym, Berger, 2012] (Figure 2).
-By generalizing that approach to generic similarity search, not only is the current proposal of data structures that scale with entropy a theoretical possibility, but also a practical one as evidenced by production quality implementations that are publicly available (http://cast.csail.mit.edu).
-The key to these improvements is the use of data structures that seemingly scale linearly with the “entropy” of the data set, both in space and time.
-
-\section{Random text}
-
-Faster approximate string matching over compressed text \cite{navarro2001faster}.
-Approximate Searching on Compressed Text \cite{perez2005approximate}.
-A Text Compression Scheme That Allows Fast Searching Directly In The Compressed File \cite{Manber93atext}.
-\begin{itemize}
-\item Approximate search on compressed data is designed for a linear text, and is specific to edit distances.
-\end{itemize}
-
-Adaptive Cluster Distance Bounding for High-Dimensional Indexing \cite{ramaswamy2011adaptive}
-\begin{itemize}
-\item I don't think their method works well for Hamming-like distances, as
-   their hyperplane separation method seems like it ought to work best
-   in Euclidean-like spaces? They certainly only use very continuous
-   spaces in their examples.
-\item Their "compressed feature vectors" don't actually have anything to do
-   with entropy, as it looks like a constant binning.
-\item Because their distances are Euclidean, they didn't (and most likely
-   couldn't) make a connection we're making between clustering and
-   entropy/compression. Thus, their data structure still uses $O(n)$
-   space, while ours can use $O(H(n))$ space, where $H(n)$ is the "entropy"
-   of the dataset.
-\item They didn't do a full analysis of how much clustering helps them,
-   though they mention that it does and have empirical experiments.
-\item They are working on the k-nearest neighbor problem, not the
-   $\epsilon$-nearest neighbors problem that we are. However, their method
-   certainly can be adapted to $\epsilon$-nearest neighbor, nearly
-   trivially.
-\end{itemize}
+In this paper, we generalize this approach and introduce a practical data structure for similarity search that provably scales almost linearly with entropy of the database.
+Specifically, if similarity is defined by some metric-like distance function and the database exhibits both low `entropy' and low `fractal dimension', this data structure performs much better than na\"ive methods.
+We will define `entropy' and `fractal dimension' more precisely later, but intuitively, they are respectively measures of the total information content and scaling behavior of number of points contained in spheres of varying radii.
+Although these `entropy-linear data structures' can in principle be used to organize nearly any large data set for faster and more space-efficient analysis,
+we demonstrate their applicability on similarity search problems drawn from the three major Big Data challenges in computational biology: genomics, pharmaceuticals, and protein structure \hl{(NB: reword)} \cite{marx2013biology}.
 
 \chapter{Results}
 \section{Entropy-scaling data structure for similarity search}
+\subsection{Data structure}
+\begin{figure}[btp]
+    \centering
+    \includegraphics[width=1\textwidth]{dataStructure}
+    \caption{ Compressive acceleration of similarity search. %
+            (a) The naïve approach tests each query against each database entry to find entries within distance  of the query. %
+            (b) By selecting appropriate cluster centers with maximum radius  to partition the database, we can (c) first do a coarse search to find all cluster centers within distance  of a query, and then the (d) triangle inequality guarantees that a fine search over all corresponding cluster entries will suffice.}
+    \label{fig:dataStructure}
+\end{figure}
 
-Here we provide the setup for entropy-centric analysis.
-``Entropy'' is of course a characteristic of a distribution, not a data set.
-More precisely, we use ``entropy'' here as a marker of the number of bits needed to encode a new point given an existing set of points.
+Let us now define our entropy-scaling similarity search data structure (Figure \ref{fig:dataStructure}).
+For ease of analysis, we will work in a high-dimensional metric space and consider the database as a set of $n$ unique points in that metric space.
+The data structure in its most basic incarnation simply involves clustering the points in the set by assigning them to their nearest `cluster center'.
+$k$ cluster centers are chosen such that no cluster has radius greater than a user-specified parameter $r_c$.
+For a given similarity search query of all items within distance $r$ of a query $q$, this data structure breaks the query into coarse and fine search stages.
+The coarse search is over the list of cluster centers, returning all clusters centers within distance $r + r_c$ of $q$.
+For the fine search, each cluster returned from the coarse search is expanded and those items are compared against $q$ to find all items within radius $r$.
 
+We will prove in this section that this data structure allows for similarity search queries in time roughly linear (provided the fractal dimension of the database is low) to the entropy of the database
+Additionally, if desired, the data structure can be stored in a compressed form that uses space also linear in the entropy of the database.
+However, to do this, we will first need to build additional mathematical machinery and make precise our notions of `entropy' and `fractal dimension'.
 
-Assume that the number of bits necessary to encode a new point is $\theta(d)$, where $d$ is the ‘distance’ to the nearest neighbor in the set.
-Given the additional assumption that the data cloud is sparse, this distance assumption is clearly true the majority of the time for Hamming distance, and can also be shown for edit distances and more general similarity measures.
-
-Then let us consider the spanning trees of the complete distance graph between points in the set.
-The number of bits needed to encode the entire set according to the relationships specified in the spanning tree is then linear in the weight of that tree.
-Thus, the weight of a spanning tree corresponds to the entropy of the distribution over all data sets that are in accordance with the pairwise distances specified in that tree.
-One measure of the entropy of a data set would be the entropy of this distribution over a minimum weight spanning tree of the complete distance graph.
-
-Alternately, as the above can be expensive to compute, we can also specify a set of k privileged points using which we encode all other points.
-With the additional selection of an arbitrary root node from those privileged points, this encoding corresponds to a 2-level spanning tree of the complete distance graph, with pre-selected branches, but leaves selected to minimize total weight.
-The distribution over all data sets in accordance with this 2-level spanning tree has a strictly higher entropy than the one corresponding to the minimum spanning tree of course, but this quantity is easier to work with for our next analysis.
-Generally, entropy-scaling data structures and algorithms are data structures whose time- and space- complexity can be bounded by entropy.
-
-Note that entropy-scaling data structures are distinct from both succinct data structures and compressed data structures.
+As an aside, note that entropy-scaling data structures are distinct from both succinct data structures and compressed data structures.
 Succinct data structures are ones that use space close to the information-theoretic limit in the worst case while permitting efficient queries; i.e.
-succinct data structures do not depend on the actual entropy of the underlying data set, but have size-dependence on the potential worst-case entropy of the data set [Jacobson, 1999].
-Compressed data structures, on the other hand, bound the amount of the space used by the entropy of the data set while permitting efficient queries [Grossi \& Vitter, 2005; Ferragina \& Manzini, 2000], much like entropy-scaling data structures.
-Unlike entropy-scaling data structures though, they do not measure query time in terms of the entropy.
-The primary theoretical advance of entropy-scaling data structures is that they bound both space and time as functions of the data set entropy.
+succinct data structures do not depend on the actual entropy of the underlying data set, but have size-dependence on the potential worst-case entropy of the data set \cite{jacobson1988succinct}.
+Compressed data structures, on the other hand, bound the amount of the space used by the entropy of the data set while permitting efficient queries \cite{grossi2005compressed, ferragina2000opportunistic}, much like entropy-scaling data structures.
+Unlike entropy-scaling data structures though, they do not measure time-complexity in terms of the entropy.
+\textbf{The primary theoretical advance of entropy-scaling data structures is that they bound both space and time as functions of the data set entropy.}
 
+\subsection{Theoretical setup: entropy}
+Here we provide the setup for entropy-centric analysis.
+Information-theoretic ``entropy'' is of course a measure of the uncertainty of a distribution or random variable, and is not well-defined for a database.
+However, the term is often used in data compression as a shorthand for the number of bits needed to encode the database, a measure of the randomness of that database.
+We use ``entropy'' in the latter sense; precisely, we define the entropy of a database as the number of bits needed to encode the database under some encoding scheme.
+Equivalently, the entropy of a database is the entropy measured in bits of a random variable whose instances are databases that match our database on some structural condition, which we will define later.
+Of course, each encoding scheme thus results in a different definition of entropy, but this simply corresponds to the compressed size of the database under different compression methods.
 
-Figure 3: Compressive acceleration of similarity search.
-(a) The naïve approach tests each query against each database entry to find entries within distance  of the query.
-(b) By selecting appropriate cluster centers with maximum radius  to partition the database, we can (c) first do a coarse search to find all cluster centers within distance  of a query, and then the (d) triangle inequality guarantees that a fine search over all corresponding cluster entries will suffice.
+Assume that the number of bits necessary to encode a point $p$ as a function of $q$ (and vice versa) is $\theta(d)$, where $d = ||p -q||$ the distance from $p$ to $q$.
+Effecitvely, we are imposing the condition that the distance is a measure of entropy added by a new point (`pairwise marginal entropy').
+That distance bounds pairwise marginal entropy is clearly true for Hamming distance, and can also be shown for edit distances and more general similarity measures.
 
-Proposed entropy-centric analysis of compressed similarity search
+Let us consider the spanning trees of the complete distance graph between points in the set.
+The number of bits needed to encode the entire set according to the relationships specified in the spanning tree is then linear in the weight of that tree.
+Thus, the weight of a spanning tree almost corresponds to the entropy of the distribution over all data sets that are in accordance with the pairwise distances specified in that tree.
+One measure of the entropy of a data set would be the entropy of this distribution over a minimum weight spanning tree of the complete distance graph.
+However, we have neglected the number of bits needed to encode the tree itself; as this is an arbitrary tree, every node must encode its parent, so the entropy of the tree itself is $O(n \log n)$ bits.
+Thus, this model of set entropy is not practical as encoding the tree is already super-linear in data set size.
 
-Note that this compression accelerated similarity search data structure can be thought of as a 2-level spanning tree, with each cluster being a branch of the tree.
-Given that our distance function is bounded by the greater of the pairwise marginal entropies between two points, this tree is almost exactly the one used in the 2-level spanning tree definition of data set entropy given in our proposed framework.
-Trivially then, by encoding entries within clusters by their differences from the cluster center, we see that the memory required by the data structure is proportional to entropy—in practice, it is often just as, if not more, space-efficient to simply gzip each cluster individually.
-Proving time-complexity of similarity search as a function of entropy takes rather more work though.
+Alternately, we can also specify a set of $k$ privileged points using which we encode all other points.
+With the additional selection of an arbitrary (or zero) root node, this encoding corresponds to a 2-level spanning tree of the complete distance graph, with pre-selected branches, but leaves selected to minimize total weight.
+The distribution over all data sets in accordance with this 2-level spanning tree has a strictly higher entropy than the one corresponding to the minimum spanning tree of course, but encoding the tree itself uses only $O(k)$ bits.
+This model of entropy also has the advantage of being much more amenable for proving bounds about the time- and space-complexity of the similarity search data structure we introduce below.
 
-Here we also formalize the strong structural assumption we need on the database: intuitively, we want the fractal dimension d of the database to be low, so that increases to a search radius do not significantly blow up the number of hits.
-Given the connections to entropy, one might think to use the upper Minkowski dimension (also known as the entropy dimension) [Falconer, 2013].
-Recall the definition of upper Minkowski dimension of a set  using the intrinsic ball-covering number:
+\subsection{Theoretical setup: fractal dimension}
+Here we formalize the `fractal dimension' condition we alluded to: intuitively, we want the fractal dimension $d$ of the database to be low, so that increases to a search radius do not significantly blow up the number of hits.
+This is crucial because the coarse search radius is the sum of the fine search radius and the maximum cluster radius.
+Roughly speaking, the number of hits returned by the coarse search radius is exponential in the fractal dimension of the database in the search radius regime, so we need fractal dimension to be low.
 
+Given the connections to entropy, one might think to use the upper Minkowski dimension (also known as the entropy dimension) \cite{falconer2013fractal}.
+Recall the definition of upper Minkowski dimension of a set $S$ using the intrinsic ball-covering number:
+\[
+    \dim_{Minkowski}(S) := \limsup_{\epsilon \to 0} \frac{\log N(\epsilon)}{\log 1/\epsilon}
+\]
 
-
-where  is the minimal number of open balls of radius ϵ with centers in  needed to cover .
-Unfortunately, as the database is finite and the space might be discrete, the given definition always results in .
+where $N(\epsilon)$ is the minimal number of open balls of radius $\epsilon$ with centers in $S$ needed to cover $S$.
+Unfortunately, as the database is finite and the space might be discrete, the given definition always results in $\dim_{Minkowski}(S) = 0$.
 Thus, we need a more appropriate definition while still capturing the dimensional scaling properties of the upper Minkowski dimension.
 
-One commonly used and more easily measured fractal dimension that is more easily adapted for discrete spaces is the correlation dimension [Grassberger \& Procaccia, 1983].
+One commonly used and more easily measured fractal dimension that is more easily adapted for discrete spaces is the correlation dimension \cite{grassberger1984dimensions}.
 Define the correlation integral
+\[
+    C(\epsilon) = \lim_{N \to \infty} \frac{g(\epsilon)}{N^2}
+\]
+where $g(\epsilon)$ is the number of pairs of points within distance $\epsilon$ of each other.
+Then the correlation dimension $d$ is defined by $C(\epsilon) \sim \epsilon^d$ for small $\epsilon$.
+We adapt this for our database by considering $\epsilon \sim r$, where $r$ is our search radius, and stopping the limit at $N \to n$.
+As mentioned, we want to ensure that $d$ is a small constant.
 
-
-
-where  is the number of pairs of points within distance  of each other.
-Then the correlation dimension  is defined by  for small .
-We adapt this for our database by considering , where  is our search radius, and stopping the limit at .
-The strong structural assumption is simply that  is a small constant.
-
+\subsection{Proving complexity bounds}
 We are now finally ready to analyze the performance of similarity search on this data structure.
+
+Note that this compression accelerated similarity search data structure can be thought of as a 2-level spanning tree, with each cluster being a branch of the tree.
+Given that our distance function is bounded by the greater of the pairwise marginal entropies between two points, this tree is exactly the one used in the 2-level spanning tree definition of data set entropy given in our proposed framework.
+Trivially then, by encoding entries within clusters by their differences from the cluster center, we see that the memory required by the data structure is proportional to entropy---in practice, it is often just as, if not more, space-efficient to simply gzip each cluster individually; or, alternately, the compression can be entirely omitted if disk space is not an issue.
+Proving time-complexity of similarity search as a function of entropy takes rather more work though.
+
+
 Recall that  entries are selected as cluster centers for partitioning the database to result in clusters with maximum radius .
 We will set  .
 Given any query , the coarse search over the clusters always requires  operations.
@@ -283,7 +293,7 @@ Conversely, an adversary could also add arbitrarily large amounts of entropy, wh
 Luckily, Mother Nature is not adversarial in either way, so we can often make the additional assumption that the new entries fall randomly inside the ball surrounding the cluster center, and thus the expected additional entropy from adding to an existing cluster is .
 Therefore, we have enough entropy to pay for the increases in search time, and similarity search here is linear in entropy.
 
-Caveats and Extensions
+\subsection{Caveats and Extensions}
 
 We had to make several strong assumptions on the structure of the database, most notably the low fractal dimension assumption, which kept the number of clusters that need to be searched from blowing up with .
 It would be nice if we could extend the analysis to do without that assumption and instead work directly with the entropy of the database.
@@ -808,8 +818,42 @@ Then the similarity search algorithm is to do a ‘coarse search’ on the clust
 \chapter{Discussion}
 
 
-\bibliographystyle{plainnat}
+\bibliographystyle{plain}
 \bibliography{main}
+
+\appendix
+\chapter{Extraneous}
+\section{Random text}
+
+Faster approximate string matching over compressed text \cite{navarro2001faster}.
+Approximate Searching on Compressed Text \cite{perez2005approximate}.
+A Text Compression Scheme That Allows Fast Searching Directly In The Compressed File \cite{manber93atext}.
+\begin{itemize}
+\item Approximate search on compressed data is designed for a linear text, and is specific to edit distances.
+\end{itemize}
+
+Adaptive Cluster Distance Bounding for High-Dimensional Indexing \cite{ramaswamy2011adaptive}
+\begin{itemize}
+\item I don't think their method works well for Hamming-like distances, as
+   their hyperplane separation method seems like it ought to work best
+   in Euclidean-like spaces? They certainly only use very continuous
+   spaces in their examples.
+\item Their "compressed feature vectors" don't actually have anything to do
+   with entropy, as it looks like a constant binning.
+\item Because their distances are Euclidean, they didn't (and most likely
+   couldn't) make a connection we're making between clustering and
+   entropy/compression. Thus, their data structure still uses $O(n)$
+   space, while ours can use $O(H(n))$ space, where $H(n)$ is the "entropy"
+   of the dataset.
+\item They didn't do a full analysis of how much clustering helps them,
+   though they mention that it does and have empirical experiments.
+\item They are working on the k-nearest neighbor problem, not the
+   $\epsilon$-nearest neighbors problem that we are. However, their method
+   certainly can be adapted to $\epsilon$-nearest neighbor, nearly
+   trivially.
+\end{itemize}
+
+
 
 \end{document}
 
