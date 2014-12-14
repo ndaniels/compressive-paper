@@ -1,7 +1,10 @@
 \documentclass{amsbook}
 
 \usepackage{graphicx}
-\usepackage{natbib}
+%\usepackage{natbib}
+
+\usepackage{color}
+\usepackage{soul}
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
@@ -148,31 +151,28 @@ Traditionally, approximate matching has been studied primarily in the context of
 However, similarity search has also demonstrated increasing importance in other domains, including local alignment of sequences, chemical graphs, and protein structures \cite{altschul1990basic, kent2002blat, schaeffer2007graph, budowski2010fragbag}.
 %In recent years, however, similarity search has become increasingly important for other objects and distance functions (e.g., biological genomes and alignment scores, networks and the Jaccard index) [Altschul et al, 1990; Kent, 2002; Schaeffer, 2007].
 
-Although this problem is difficult in general for high-dimensional spaces, real-world instantiations, especially in molecular biology, exhibit additional structure we can exploit.
+Figure 1: Genomic data available has grown at a faster exponential rate than computer processing power.
 
-Specifically, if similarity is defined by some metric-like distance function and the database exhibits both low `entropy' and low `fractal dimension', we can do much better than na\"ive methods, with similarity search times proportional to the entropy of the database.
-We will define `entropy' and `fractal dimension' more precisely later, but intuitively, they are respectively measures of the total information content and scaling behavior of points in spheres as the radius changes.
-In this paper, we introduce a data structure designed to 
+As available data grows exponentially (e.g., genomic data in Figure 1), algorithms that scale linearly no longer suffice.
+The primary ways the literature addresses this problem (e.g.
+locality sensitive hashing \cite{indyk1998approximate}, vector approximation \cite{ferhatosmanoglu2000vector}, space partitioning \cite{weber1998quantitative}) involve the construction of data structures that admit a more efficient search operation.
+However, we note that as data increases, very often the redundancy present in the data also increases.
+Existing general purpose methods do not explicitly exploit this particular feature of biological data.
 
-Such data structures can then be used to organize nearly any large data set for faster and more space-efficient analysis.
-We have demonstrated this proof of concept through the case of similarity search in problems from computational biology (including BLAST searches and gene-protein disease networks), our area of expertise, but in this project, we look to formalize and generalize these approaches to be applicable to other fields.
+In the specific context of local alignment in genomics, however, the emerging field of ``compressive genomics'' has shown that existing tools such as BLAST and BLAT can be ``compressively accelerated'' by taking advantage of high redundancy between related genomes using link pointers and edit scripts to a database of unique sequences \cite{loh2012compressive}.
+Similar results have been demonstrated for local alignment in proteomics, using much the same strategies \cite{daniels2013compressive}.
+Empirically, this compressive acceleration appears to scale almost linearly in the entropy of the database.
+
+In this paper, we generalize this approach and introduce a practical data structure for similarity search that scales almost linearly with entropy of the database.
+Specifically, if similarity is defined by some metric-like distance function and the database exhibits both low `entropy' and low `fractal dimension', this data structure performs much better than na\"ive methods.
+We will define `entropy' and `fractal dimension' more precisely later, but intuitively, they are respectively measures of the total information content and scaling behavior of number of points contained in spheres of varying radii.
+
+Although this data structure can in principle be used to organize nearly any large data set for faster and more space-efficient analysis,
+we demonstrate this applicability on three similarity search problems drawn from the three major Big Data challenges in computational biology: genomics, pharmaceuticals, and protein structure \hl{(NB: reword)} \cite{marx2013biology}.
 
 To illustrate the power of this approach, we analyze some of our previously published work and present three new applications from from all corners of molecular biology (genomics, small molcule search, and protein structure) that use similarity search, where the use of entropy-linear data structures—those that scale linearly in the entropy of the data— has exhibited several orders of magnitude better performance than the previously-employed methods.
 
 
-As available data grows exponentially (e.g., genomic data in Figure 1), algorithms that scale linearly no longer suffice.
-The primary ways the literature addresses this problem (e.g.
-locality sensitive hashing [Indyk \& Motwani, 1998], vector approximation [Ferhatosmanoglu et al, 2000], space partitioning [Weber, Schek, Blott, 1998]) involve the construction of data structures that admit a more efficient search operation.
-However, we note that as data increases, very often the redundancy present in the data also increases.
-Existing general purpose methods do not explicitly exploit this phenomenon.
-
-Figure 1: Genomic data available has grown at a faster exponential rate than computer processing power.
-
-In contrast, in the emerging field of “compressive genomics,” which PI Berger and her students invented, the prevailing algorithmic framework specifically takes advantage of the particularly pronounced redundancy in large biological data sets.
-Let us view the r-nearest neighbors search as the construction of a bipartite graph between queries and a database, with edges for all pairs within distance r.
-The naïve approach for solving this problem in genomic local alignment using existing search algorithms such as BLAST and BLAT then takes O(mn) time, where m is the number of queries and n is the database size.
-
-On the other hand, PI Berger’s more sophisticated approach using link pointers and edit scripts to a unique database of sequences enables orders of magnitude speedup of existing genomic search algorithms such as BLAST and BLAT [Loh, Baym, Berger, 2012] (Figure 2).
 By generalizing that approach to generic similarity search, not only is the current proposal of data structures that scale with entropy a theoretical possibility, but also a practical one as evidenced by production quality implementations that are publicly available (http://cast.csail.mit.edu).
 The key to these improvements is the use of data structures that seemingly scale linearly with the “entropy” of the data set, both in space and time.
 
@@ -355,7 +355,7 @@ nucleotide sequence identity is low but translated protein sequence identity
 is higher~\cite{Turnbaugh:2006, Kurokawa:2007}.
 However, because BLASTX must search a protein database for possible hits for
 each nucleotide read from a metagenomic sample, it is computationally intensive.
-For example, \citet{Mackelprang:2011} reported that using BLASTX to map 246
+For example, \cite{Mackelprang:2011} reported that using BLASTX to map 246
 million reads against the KEGG~\cite{kegg} database required 800,000 CPU hours
 at a supercomputing center.
 Moreover, BLASTX's run time requirements scale linearly with the size of the 
@@ -401,14 +401,14 @@ sensitivity and no loss in specificity.
 Alphabet reduction--reducing the 20-letter standard amino acid alphabet to a
 smaller set, in order to accelerate search or improve homology detection--has
 been proposed and implemented several times~\cite{blah}.
-In particular, \citet{Murphy:2000, Peterson:2009} considered reducing the
+In particular, \cite{Murphy:2000, Peterson:2009} considered reducing the
 amino-acid alphabet to 17, 10, or even 4 letters.
-More recently, \citet{Zhao:2012} and \citet{Huson:2013} applied a reduction to
+More recently, \cite{Zhao:2012} and \cite{Huson:2013} applied a reduction to
 a 4-letter alphabet, termed a ``pseudoDNA'' alphabet, in sequence alignment.
 
-In this work, we extend the compression approach of \citet{Daniels:2013} using
+In this work, we extend the compression approach of \cite{Daniels:2013} using
 a reversible alphabet reduction.
-We use the alphabet reduction of \citet{Murphy:2000} to map the standard amino
+We use the alphabet reduction of \cite{Murphy:2000} to map the standard amino
 acid alphabet (along with the four common ambiguous letters ) onto a 4-letter 
 alphabet.
 Specifically, we map F, W, and Y into one cluster; C, I, L, M, V, and J into
@@ -819,7 +819,7 @@ Then the similarity search algorithm is to do a ‘coarse search’ on the clust
 \chapter{Discussion}
 
 
-\bibliographystyle{plainnat}
+\bibliographystyle{amsalpha}
 \bibliography{main}
 
 \end{document}
