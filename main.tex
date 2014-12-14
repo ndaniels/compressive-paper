@@ -175,28 +175,19 @@ Existing general purpose methods do not explicitly exploit this particular featu
 
 In the specific context of local alignment in genomics, however, the emerging field of ``compressive genomics'' has shown that existing tools such as BLAST and BLAT can be ``compressively accelerated'' by taking advantage of high redundancy between related genomes using link pointers and edit scripts to a database of unique sequences \cite{loh2012compressive}.
 Similar results have been demonstrated for local alignment in proteomics, using much the same strategies \cite{daniels2013compressive}.
-Empirically, this compressive acceleration appears to scale almost linearly in the entropy of the database.
+Empirically, this compressive acceleration appears to scale almost linearly in the entropy of the database, often resulting in orders of magnitude better performance.
 
-In this paper, we generalize this approach and introduce a practical data structure for similarity search that scales almost linearly with entropy of the database.
+In this paper, we generalize this approach and introduce a practical data structure for similarity search that provably scales almost linearly with entropy of the database.
 Specifically, if similarity is defined by some metric-like distance function and the database exhibits both low `entropy' and low `fractal dimension', this data structure performs much better than na\"ive methods.
 We will define `entropy' and `fractal dimension' more precisely later, but intuitively, they are respectively measures of the total information content and scaling behavior of number of points contained in spheres of varying radii.
-
-Although this data structure can in principle be used to organize nearly any large data set for faster and more space-efficient analysis,
-we demonstrate this applicability on three similarity search problems drawn from the three major Big Data challenges in computational biology: genomics, pharmaceuticals, and protein structure \hl{(NB: reword)} \cite{marx2013biology}.
-
-To illustrate the power of this approach, we analyze some of our previously published work and present three new applications from from all corners of molecular biology (genomics, small molcule search, and protein structure) that use similarity search, where the use of entropy-linear data structures—those that scale linearly in the entropy of the data— has exhibited several orders of magnitude better performance than the previously-employed methods.
-
-
-By generalizing that approach to generic similarity search, not only is the current proposal of data structures that scale with entropy a theoretical possibility, but also a practical one as evidenced by production quality implementations that are publicly available (http://cast.csail.mit.edu).
-The key to these improvements is the use of data structures that seemingly scale linearly with the “entropy” of the data set, both in space and time.
+Although these `entropy-linear data structures' can in principle be used to organize nearly any large data set for faster and more space-efficient analysis,
+we demonstrate their applicability on similarity search problems drawn from the three major Big Data challenges in computational biology: genomics, pharmaceuticals, and protein structure \hl{(NB: reword)} \cite{marx2013biology}.
 
 \chapter{Results}
 \section{Entropy-scaling data structure for similarity search}
-
 Here we provide the setup for entropy-centric analysis.
 ``Entropy'' is of course a characteristic of a distribution, not a data set.
 More precisely, we use ``entropy'' here as a marker of the number of bits needed to encode a new point given an existing set of points.
-
 
 Assume that the number of bits necessary to encode a new point is $\theta(d)$, where $d$ is the ‘distance’ to the nearest neighbor in the set.
 Given the additional assumption that the data cloud is sparse, this distance assumption is clearly true the majority of the time for Hamming distance, and can also be shown for edit distances and more general similarity measures.
