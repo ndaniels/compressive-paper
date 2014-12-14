@@ -139,21 +139,26 @@ http://csail.mit.edu/cablastx.
 
 \chapter{Introduction}
 Throughout all areas of data science, scientists are being confronted by a veritable explosion of available data.
-In many fields, and in particular molecular biology, this increase is exponential in nature, even outpacing Moore’s and Kryder’s laws on the respective doublings of transistors on a chip and long-term data storage density.
+In many fields, and in particular molecular biology, this increase is exponential in nature, even outpacing Moore’s and Kryder’s laws on the respective doublings of transistors on a chip and long-term data storage density [cite].
 As such, the challenges posed by the massive influx of data cannot be solved by waiting for faster and larger capacity computers, but require instead the development of data structures and representations that exploit and simplify complexity in the data set.
 
-Without loss of generality, let us consider the situation in which the data collected is non-uniformly distributed in a high-dimensional discrete space—note that the non-uniformness is nearly required for the distribution to admit any non-trivial inference and/or reasoning, and all data stored on a modern computer lives in some sense in a high-dimensional discrete space; in other words, this situation applies for nearly all large data sets.
-Under this model, it is obvious that the `entropy'—which we will use to denote some signal of total information content—of the underlying data set is much lower than that suggested by a naïve encoding of the data.
-We propose the development of novel data structures and algorithmic analysis tools to exploit that low-entropy nature such that the complexity of algorithms is measured not in total database or input size, but rather in the amount of non-redundant information present.
+Here, we focus our attention on similarity search (alternately, approximate matching), where the task at hand is to find all entries in some database that are `similar' to some query item.
+Much like sorting is a primitive operation in computer science, similarity search is a fundamental operation in data science and lies at the heart of many other problems.
+Traditionally, approximate matching has been studied primarily in the context of strings under edit distance metrics (e.g., for spell-checkers) \cite{ukkonen1985algorithms}.
+However, similarity search has also demonstrated increasing importance in other domains, including local alignment of sequences, chemical graphs, and protein structures \cite{altschul1990basic, kent2002blat, schaeffer2007graph, budowski2010fragbag}.
+%In recent years, however, similarity search has become increasingly important for other objects and distance functions (e.g., biological genomes and alignment scores, networks and the Jaccard index) [Altschul et al, 1990; Kent, 2002; Schaeffer, 2007].
+
+Although this problem is difficult in general for high-dimensional spaces, real-world instantiations, especially in molecular biology, exhibit additional structure we can exploit.
+
+Specifically, if similarity is defined by some metric-like distance function and the database exhibits both low `entropy' and low `fractal dimension', we can do much better than na\"ive methods, with similarity search times proportional to the entropy of the database.
+We will define `entropy' and `fractal dimension' more precisely later, but intuitively, they are respectively measures of the total information content and scaling behavior of points in spheres as the radius changes.
+In this paper, we introduce a data structure designed to 
 
 Such data structures can then be used to organize nearly any large data set for faster and more space-efficient analysis.
 We have demonstrated this proof of concept through the case of similarity search in problems from computational biology (including BLAST searches and gene-protein disease networks), our area of expertise, but in this project, we look to formalize and generalize these approaches to be applicable to other fields.
 
 To illustrate the power of this approach, we analyze some of our previously published work and present three new applications from from all corners of molecular biology (genomics, small molcule search, and protein structure) that use similarity search, where the use of entropy-linear data structures—those that scale linearly in the entropy of the data— has exhibited several orders of magnitude better performance than the previously-employed methods.
 
-Much like sorting is a primitive operation in computer science, similarity search (alternately, approximate matching) is a fundamental operation in data science and lies at the heart of many other problems.
-Traditionally, approximate matching has been studied primarily in the context of strings under edit distance metrics (e.g., for spell-checkers) [Ukkonen, 1985].
-In recent years, however, similarity search has become increasingly important for other objects and distance functions (e.g., biological genomes and alignment scores, networks and the Jaccard index) [Altschul et al, 1990; Kent, 2002; Schaeffer, 2007].
 
 As available data grows exponentially (e.g., genomic data in Figure 1), algorithms that scale linearly no longer suffice.
 The primary ways the literature addresses this problem (e.g.
