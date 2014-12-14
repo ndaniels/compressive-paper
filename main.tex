@@ -1,7 +1,9 @@
 \documentclass{amsbook}
 
 \usepackage{graphicx}
-%\usepackage{natbib}
+\usepackage{natbib}
+\usepackage{caption}
+\usepackage{subcaption}
 
 \usepackage{color}
 \usepackage{soul}
@@ -151,7 +153,19 @@ Traditionally, approximate matching has been studied primarily in the context of
 However, similarity search has also demonstrated increasing importance in other domains, including local alignment of sequences, chemical graphs, and protein structures \cite{altschul1990basic, kent2002blat, schaeffer2007graph, budowski2010fragbag}.
 %In recent years, however, similarity search has become increasingly important for other objects and distance functions (e.g., biological genomes and alignment scores, networks and the Jaccard index) [Altschul et al, 1990; Kent, 2002; Schaeffer, 2007].
 
-Figure 1: Genomic data available has grown at a faster exponential rate than computer processing power.
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{computeVsData}
+        \caption{}
+    \end{subfigure}%
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{storageVsData}
+        \caption{}
+    \end{subfigure}
+    \caption{Genomic data available has grown at a faster exponential rate than computer processing power and disk storage.}
+    \label{fig:expdata}
+\end{figure}
 
 As available data grows exponentially (e.g., genomic data in Figure 1), algorithms that scale linearly no longer suffice.
 The primary ways the literature addresses this problem (e.g.
@@ -355,7 +369,7 @@ nucleotide sequence identity is low but translated protein sequence identity
 is higher~\cite{Turnbaugh:2006, Kurokawa:2007}.
 However, because BLASTX must search a protein database for possible hits for
 each nucleotide read from a metagenomic sample, it is computationally intensive.
-For example, \cite{Mackelprang:2011} reported that using BLASTX to map 246
+For example, \citet{Mackelprang:2011} reported that using BLASTX to map 246
 million reads against the KEGG~\cite{kegg} database required 800,000 CPU hours
 at a supercomputing center.
 Moreover, BLASTX's run time requirements scale linearly with the size of the 
@@ -401,14 +415,14 @@ sensitivity and no loss in specificity.
 Alphabet reduction--reducing the 20-letter standard amino acid alphabet to a
 smaller set, in order to accelerate search or improve homology detection--has
 been proposed and implemented several times~\cite{blah}.
-In particular, \cite{Murphy:2000, Peterson:2009} considered reducing the
+In particular, \citet{Murphy:2000, Peterson:2009} considered reducing the
 amino-acid alphabet to 17, 10, or even 4 letters.
-More recently, \cite{Zhao:2012} and \cite{Huson:2013} applied a reduction to
+More recently, \citet{Zhao:2012} and \citet{Huson:2013} applied a reduction to
 a 4-letter alphabet, termed a ``pseudoDNA'' alphabet, in sequence alignment.
 
-In this work, we extend the compression approach of \cite{Daniels:2013} using
+In this work, we extend the compression approach of \citet{Daniels:2013} using
 a reversible alphabet reduction.
-We use the alphabet reduction of \cite{Murphy:2000} to map the standard amino
+We use the alphabet reduction of \citet{Murphy:2000} to map the standard amino
 acid alphabet (along with the four common ambiguous letters ) onto a 4-letter 
 alphabet.
 Specifically, we map F, W, and Y into one cluster; C, I, L, M, V, and J into
@@ -819,7 +833,7 @@ Then the similarity search algorithm is to do a ‘coarse search’ on the clust
 \chapter{Discussion}
 
 
-\bibliographystyle{amsalpha}
+\bibliographystyle{plain}
 \bibliography{main}
 
 \end{document}
