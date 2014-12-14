@@ -144,7 +144,7 @@ http://csail.mit.edu/cablastx.
 
 \chapter{Introduction}
 Throughout all areas of data science, scientists are being confronted by a veritable explosion of available data.
-In many fields, and in particular molecular biology, this increase is exponential in nature, even outpacing Moore’s and Kryder’s laws on the respective doublings of transistors on a chip and long-term data storage density [cite].
+In many fields, and in particular molecular biology, this increase is exponential in nature, even outpacing Moore's and Kryder's laws on the respective doublings of transistors on a chip and long-term data storage density \hl{[cite]}.
 As such, the challenges posed by the massive influx of data cannot be solved by waiting for faster and larger capacity computers, but require instead the development of data structures and representations that exploit and simplify complexity in the data set.
 
 Here, we focus our attention on similarity search (alternately, approximate matching), where the task at hand is to find all entries in some database that are `similar' to some query item.
@@ -153,7 +153,7 @@ Traditionally, approximate matching has been studied primarily in the context of
 However, similarity search has also demonstrated increasing importance in other domains, including local alignment of sequences, chemical graphs, and protein structures \cite{altschul1990basic, kent2002blat, schaeffer2007graph, budowski2010fragbag}.
 %In recent years, however, similarity search has become increasingly important for other objects and distance functions (e.g., biological genomes and alignment scores, networks and the Jaccard index) [Altschul et al, 1990; Kent, 2002; Schaeffer, 2007].
 
-\begin{figure}
+\begin{figure}[tbp]
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
         \includegraphics[width=1\textwidth]{computeVsData}
@@ -189,36 +189,6 @@ To illustrate the power of this approach, we analyze some of our previously publ
 
 By generalizing that approach to generic similarity search, not only is the current proposal of data structures that scale with entropy a theoretical possibility, but also a practical one as evidenced by production quality implementations that are publicly available (http://cast.csail.mit.edu).
 The key to these improvements is the use of data structures that seemingly scale linearly with the “entropy” of the data set, both in space and time.
-
-\section{Random text}
-
-Faster approximate string matching over compressed text \cite{navarro2001faster}.
-Approximate Searching on Compressed Text \cite{perez2005approximate}.
-A Text Compression Scheme That Allows Fast Searching Directly In The Compressed File \cite{Manber93atext}.
-\begin{itemize}
-\item Approximate search on compressed data is designed for a linear text, and is specific to edit distances.
-\end{itemize}
-
-Adaptive Cluster Distance Bounding for High-Dimensional Indexing \cite{ramaswamy2011adaptive}
-\begin{itemize}
-\item I don't think their method works well for Hamming-like distances, as
-   their hyperplane separation method seems like it ought to work best
-   in Euclidean-like spaces? They certainly only use very continuous
-   spaces in their examples.
-\item Their "compressed feature vectors" don't actually have anything to do
-   with entropy, as it looks like a constant binning.
-\item Because their distances are Euclidean, they didn't (and most likely
-   couldn't) make a connection we're making between clustering and
-   entropy/compression. Thus, their data structure still uses $O(n)$
-   space, while ours can use $O(H(n))$ space, where $H(n)$ is the "entropy"
-   of the dataset.
-\item They didn't do a full analysis of how much clustering helps them,
-   though they mention that it does and have empirical experiments.
-\item They are working on the k-nearest neighbor problem, not the
-   $\epsilon$-nearest neighbors problem that we are. However, their method
-   certainly can be adapted to $\epsilon$-nearest neighbor, nearly
-   trivially.
-\end{itemize}
 
 \chapter{Results}
 \section{Entropy-scaling data structure for similarity search}
@@ -835,6 +805,40 @@ Then the similarity search algorithm is to do a ‘coarse search’ on the clust
 
 \bibliographystyle{plain}
 \bibliography{main}
+
+\appendix
+\chapter{Extraneous}
+\section{Random text}
+
+Faster approximate string matching over compressed text \cite{navarro2001faster}.
+Approximate Searching on Compressed Text \cite{perez2005approximate}.
+A Text Compression Scheme That Allows Fast Searching Directly In The Compressed File \cite{manber93atext}.
+\begin{itemize}
+\item Approximate search on compressed data is designed for a linear text, and is specific to edit distances.
+\end{itemize}
+
+Adaptive Cluster Distance Bounding for High-Dimensional Indexing \cite{ramaswamy2011adaptive}
+\begin{itemize}
+\item I don't think their method works well for Hamming-like distances, as
+   their hyperplane separation method seems like it ought to work best
+   in Euclidean-like spaces? They certainly only use very continuous
+   spaces in their examples.
+\item Their "compressed feature vectors" don't actually have anything to do
+   with entropy, as it looks like a constant binning.
+\item Because their distances are Euclidean, they didn't (and most likely
+   couldn't) make a connection we're making between clustering and
+   entropy/compression. Thus, their data structure still uses $O(n)$
+   space, while ours can use $O(H(n))$ space, where $H(n)$ is the "entropy"
+   of the dataset.
+\item They didn't do a full analysis of how much clustering helps them,
+   though they mention that it does and have empirical experiments.
+\item They are working on the k-nearest neighbor problem, not the
+   $\epsilon$-nearest neighbors problem that we are. However, their method
+   certainly can be adapted to $\epsilon$-nearest neighbor, nearly
+   trivially.
+\end{itemize}
+
+
 
 \end{document}
 
