@@ -202,7 +202,7 @@ Define $B_S(q,r) = \{ p \in S | ||q-p||<r \}$. The similarity search problem is 
 The data structure in its most basic incarnation simply involves clustering the points in the set by assigning them to their nearest `cluster center'.
 A set $C$ of cluster centers are chosen such that no cluster has radius greater than a user-specified parameter $r_c$.
 Overloading notation a bit, we will identify each cluster with its center, so $C$ is also the set of clusters.
-We will additionally require that each cluster contain at least $\frac{n}{k \alpha}$ items, for some constant $\alpha \ge 1$ (i.e. that the clusters are balanced).
+%We will additionally require that each cluster contain at least $\frac{n}{k \alpha}$ items, for some constant $\alpha \ge 1$ (i.e. that the clusters are balanced).
 For a given similarity search query of all items within distance $r$ of a query $q$, this data structure breaks the query into coarse and fine search stages.
 The coarse search is over the list of cluster centers, returning $B_C(q,r + r_c)$.
 Let \[\displaystyle F = \bigcup_{c \in B_C(q,r+r_c)} c , \] the union of all the returned clusters.
@@ -228,7 +228,9 @@ We use ``entropy'' in the latter sense; precisely, we define the entropy of a da
 Equivalently, the entropy of a database is the entropy measured in bits of a random variable whose instances are databases that match our database on some structural condition, which we will define later.
 Of course, each encoding scheme thus results in a different definition of entropy, but this simply corresponds to the compressed size of the database under different compression methods.
 
-Assume that the number of bits necessary to encode a point $p$ as a function of $q$ (and vice versa) is $\theta(d)$, where $d = ||p -q||$ the distance from $p$ to $q$.
+Let $l$ be the number of bits necessary to encode a point $p$ in the space \textit{de novo} without any other information.
+Without any compression, a set of size $n$ then requires $nl$ bits to store.
+Assume that the number of bits necessary to encode a point $p$ as a function of $q$ (and vice versa) is $\theta(d) \le l$, where $d = ||p -q||$ the distance from $p$ to $q$.
 Effecitvely, we are imposing the condition that the distance is a measure of entropy added by a new point (`pairwise marginal entropy').
 That distance bounds pairwise marginal entropy is clearly true for Hamming distance, and can also be shown for edit distances and more general similarity measures.
 
@@ -236,12 +238,12 @@ Let us consider the spanning trees of the complete distance graph between points
 The number of bits needed to encode the entire set according to the relationships specified in the spanning tree is then linear in the weight of that tree.
 Thus, the weight of a spanning tree almost corresponds to the entropy of the distribution over all data sets that are in accordance with the pairwise distances specified in that tree.
 One measure of the entropy of a data set would be the entropy of this distribution over a minimum weight spanning tree of the complete distance graph.
-However, we have neglected the number of bits needed to encode the tree itself; as this is an arbitrary tree, every node must encode its parent, so the entropy of the tree itself is $O(n \log n)$ bits.
+However, we have neglected the number of bits needed to encode the tree itself; as this is an arbitrary tree, every node must encode its parent, so the entropy of the tree itself is $n \log n$ bits.
 Thus, this model of set entropy is not practical as encoding the tree is already super-linear in data set size.
 
 Alternately, we can also specify a set of $k$ privileged points using which we encode all other points.
 With the additional selection of an arbitrary (or zero) root node, this encoding corresponds to a 2-level spanning tree of the complete distance graph, with pre-selected branches, but leaves selected to minimize total weight.
-The distribution over all data sets in accordance with this 2-level spanning tree has a strictly higher entropy than the one corresponding to the minimum spanning tree of course, but encoding the tree itself uses only $O(k)$ bits.
+The distribution over all data sets in accordance with this 2-level spanning tree has a strictly higher entropy than the one corresponding to the minimum spanning tree of course, but encoding the tree itself uses only $kl$ bits.
 This model of entropy also has the advantage of being much more amenable for proving bounds about the time- and space-complexity of the similarity search data structure we introduce below.
 
 \subsection{Theoretical setup: fractal dimension}
@@ -277,33 +279,75 @@ Trivially then, by encoding entries within clusters by their differences from th
 Proving time-complexity of similarity search as a function of entropy takes rather more work though.
 
 Recall that $k$ entries are selected as cluster centers for partitioning the database to result in clusters with maximum radius $r_c$.
-We will set $r_c = \theta(\frac{1}{k})$.
+%We will set $r_c = \theta(\frac{1}{k})$.
 Given any query $q$, the coarse search over the clusters always requires $k$ operations.
 Additionally, the fine search is over the set $F$, which is the union of clusters with centers within distance $r+r_c$ from $q$.
 As the time-complexity of similarity search is just the total of the coarse and fine searches, this implies that the total search time is $O(k + |F|)$.
 
 By the triangle inequality, $F \subset B_D(q,r+r_c)$,
 so we can bound $|F| \le |B_D(q,r+r_c)|$.
-Because we assumed a small constant fractal dimension $d$, $ |B_D(q, r+r_c)| \approx |B_D(q,r)|\left(\frac{r+r_c}{r}\right)^d$.
+We require that in the regime of the radii $r$ and $r+r_c$ the fractal dimension $d$ is a small constant bounded by
+\[
+%    d \le \log \left( \frac{n}{|F|} \cdot \frac{l}{r_c} \right) \Biggm/ \log \left( \frac{r+r_c}{r} \right),
+    1 \le d \le \log \left( \frac{n}{|F|} \cdot \frac{1}{r_c} \right), 
+\]
+implying that
+\[
+    r_c \ge \frac{|F|}{n} e^d \ge \frac{|F|}{n} ,
+\]
+which will come into play in the entropy analysis below.
+%Without expanding $d$, note that
+%\[
+%    \left|B_D(q, r+r_c)\right| \approx \left|B_D(q,r)\right|\left(\frac{r+r_c}{r}\right)^d % \le \left|B_D(q,r)\right| \left( \frac{n l}{|F| r_c} \right) ,
+%\]
+%so the total number of comparison operations is 
+%\[
+%    \le k + |B_D(q,r)| \left( \frac{r+r_c}{r} \right)^d 
+%\]
+%for the coarse + fine search, where we should recall that $B_D(q,r)$ is the output size.
+
+Note first, however, that
+\[
+    \left|B_D(q, r+r_c)\right| \approx \left|B_D(q,r)\right|\left(\frac{r+r_c}{r}\right)^d % \le \left|B_D(q,r)\right| \left( \frac{n }{|F| r_c} \right) ,
+\]
+so the total number of comparison operations is 
+\[
+    \le k + |B_D(q,r)| \left( \frac{r+r_c}{r} \right)^d %  \le k + |B_D(q,r)| \left( \frac{n}{|F|r_c} \right)
+\]
+for the coarse + fine search, where we should recall that $B_D(q,r)$ is the output size.
+
 %Additionally, recall our balance condition that each cluster had size at least $\frac{n}{k\alpha}$ and $F$ is the union of disjoint clusters, which implies that the number of clusters making up $F$
 %\[
 %    |B_C(q,r+r_c)| \le |F|\cdot \frac{k\alpha}{n} \le |B_D(q,r)| \left(\frac{r+r_c}{r}\right)^d \cdot \frac{k\alpha}{n}
 %\]
-Recall our balance condition that each cluster had size at least $\frac{n}{k\alpha}$, which implies that
-Non-cluster centers will only have to be checked $\frac{|F|}{n}$ proportion of the time, for $C = \left(\frac{r+r_c}{r}\right)^d$.
-Thus, expected search time is $k + \theta \left( \frac{n-k}{k} \right)$ for coarse + fine search time.
+%Recall our balance condition that each cluster had size at least $\frac{n}{k\alpha}$, which implies that
 
-As we insert non-duplicate entries, search time increases with entropy (defined as mentioned as the weight of the 2-level distance spanning tree):
+%Non-cluster centers will only have to be checked $\frac{|F|}{n}$ proportion of the time, for $C = \left(\frac{r+r_c}{r}\right)^d$.
+%Thus, expected search time is $k + \theta \left( \frac{n-k}{k} \right)$ for coarse + fine search time.
+
+Assume that as we insert non-duplicate entries, the entries fall `randomly' in the following sense:
 \begin{itemize}
-    \item Points that fall into existing clusters increase entropy by $O(r_c)$ and search times by $(\theta \left( \frac{1}{k} \right)$.
-    \item Points that do not fall into existing clusters increase entropy by $O(1)$  and search time by $O(1)$.
+    \item Points that fall into existing clusters have probability no greater than $|F|/n$ to fall into $F$.
+    \item Points that fall into existing clusters fall uniformly in the region of space delineated by the cluster boundaries.
+\end{itemize}
+Then search time increases in expectation with entropy by the following argument:
+\begin{itemize}
+    \item Points that do not fall into existing clusters increase entropy by $l = O(1)$  and search time by $1$.
+    \item Points that fall into existing clusters increase entropy by $\theta(r_c)$ and search times by
+        \begin{itemize}
+            \item $1$ if the point falls into $F$.
+            \item $0$ if the point does not fall into $F$.
+        \end{itemize}
+        Thus, in expectation, we need an additional $|F|/n \le r_c$ search operations per point.
 \end{itemize}
 
 Since we are characterizing search performance with respect to entropy, we would like to use increases in entropy to pay for the increased search times in the style of amortized analysis.
-In the second case, we obviously get enough entropy to pay for the increased search time.
-However, in the first case, we get $O(r_c) = O\left( \frac{1}{k} \right)$ entropy, but increase search times by $\theta\left(\frac{1}{k}\right)$, which is a problem because an adversary could force the increased entropy to be arbitrarily close to zero, breaking the entropy scaling guarantee.
-Conversely, an adversary could also add arbitrarily large amounts of entropy, which would greatly increase runtime, but which would not break the entropy scaling guarantee because the added entropy would pay for the increased runtime.
-Luckily, Mother Nature is not adversarial in either way, so we can often make the additional assumption that the new entries fall randomly inside the ball surrounding the cluster center, and thus the expected additional entropy from adding to an existing cluster is $\theta\left(\frac{1}{k}\right)$.
+%In the first case, we obviously get enough entropy to pay for the increased search time.
+%However, in the second case, we get $O(r_c) = O\left( \frac{|F|}{n} \right)$ entropy, but increase search times by $\theta\left(\frac{1}{k}\right)$,
+In both cases, we obviously get enough entropy to pay for the increased search time.
+Note that without the randomness assumption, an adversary could force the increased entropy to be arbitrarily close to zero, breaking the entropy scaling guarantee.
+Conversely, an adversary could also add arbitrarily large amounts of entropy, which would greatly increase runtime, but which would not break the entropy scaling guarantee so long as the fractal dimension bound held, because the added entropy would pay for the increased runtime.
+Luckily, Mother Nature is not adversarial in either way, so we can often make these additional assumptions. 
 Therefore, we have enough entropy to pay for the increases in search time, and similarity search here is linear in entropy.
 
 \section*{Metagenomics}
