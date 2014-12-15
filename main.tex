@@ -279,17 +279,18 @@ Proving time-complexity of similarity search as a function of entropy takes rath
 Recall that $k$ entries are selected as cluster centers for partitioning the database to result in clusters with maximum radius $r_c$.
 We will set $r_c = \theta(\frac{1}{k})$.
 Given any query $q$, the coarse search over the clusters always requires $k$ operations.
-Recall that by the triangle inequality, only the clusters with centers within distance $r+r_c$ from $q$ contain entries within distance $r$ of $q$.
-Additionally by the triangle inequality, the union of those clusters $F \subset B_D(q,r+r_c)$.
-We can then bound $|F| \le |B_D(q,r+r_c)|$.
-Because we assumed a small constant fractal dimension $d$, $ |B_D(q, r+r_c)| \approx |B_D(q,r)|\left(\frac{r+r_c}{r}\right)^d$.
-Additionally, recall our balance condition that each cluster had size at least $\frac{n}{k\alpha}$ and $F$ is the union of disjoint clusters, which implies that the number of clusters making up $F$
-\[
-    |B_C(q,r+r_c)| \le |F|\cdot \frac{k\alpha}{n} \le |B_D(q,r)| \left(\frac{r+r_c}{r}\right)^d \cdot \frac{k\alpha}{n}
-\]
+Additionally, the fine search is over the set $F$, which is the union of clusters with centers within distance $r+r_c$ from $q$.
+As the time-complexity of similarity search is just the total of the coarse and fine searches, this implies that the total search time is $O(k + |F|)$.
 
-in expectation, only a constant number of clusters will need to be checked.
-Thus, non-cluster centers will only have to be checked $\frac{C}{k}$ proportion of the time, for $C = \left(\frac{r+r_c}{r}\right)^d$.
+By the triangle inequality, $F \subset B_D(q,r+r_c)$,
+so we can bound $|F| \le |B_D(q,r+r_c)|$.
+Because we assumed a small constant fractal dimension $d$, $ |B_D(q, r+r_c)| \approx |B_D(q,r)|\left(\frac{r+r_c}{r}\right)^d$.
+%Additionally, recall our balance condition that each cluster had size at least $\frac{n}{k\alpha}$ and $F$ is the union of disjoint clusters, which implies that the number of clusters making up $F$
+%\[
+%    |B_C(q,r+r_c)| \le |F|\cdot \frac{k\alpha}{n} \le |B_D(q,r)| \left(\frac{r+r_c}{r}\right)^d \cdot \frac{k\alpha}{n}
+%\]
+Recall our balance condition that each cluster had size at least $\frac{n}{k\alpha}$, which implies that
+Non-cluster centers will only have to be checked $\frac{|F|}{n}$ proportion of the time, for $C = \left(\frac{r+r_c}{r}\right)^d$.
 Thus, expected search time is $k + \theta \left( \frac{n-k}{k} \right)$ for coarse + fine search time.
 
 As we insert non-duplicate entries, search time increases with entropy (defined as mentioned as the weight of the 2-level distance spanning tree):
