@@ -638,12 +638,23 @@ However, FragBag turns out to be an excellent proof-of-concept for entropy-scali
 We intentionally approached the application of entropy-scaling data structures to FragBag in a blind manner,
 without using substantial domain-specific knowledge.
 Instead, we used the very same representation (bag of fragments) and distance metric (Euclidean distance)
-as FragBag, \textbf{k-centers clustering} (what did we use in the end?), and vector difference to generate a
-compressed representation.
+as FragBag, a greedy k-centers algorithm, and vector difference to generate a
+the clustered representation.
 
-\subsection*{Compression}
+\subsection*{Clustering}
+For the cluster generation, we used a randomized greedy 2-pass approach.
+First, all proteins in the PDB were randomly ordered.
+Then in the first pass, proteins were selected as cluster centers if and only if they were not within a user-specified distance $r_c$ from an existing center.
+In the second pass, every protein was assigned to the nearest cluster center.
 
 \subsection*{Search}
+Similarity search here is exactly as described in the data structure section previous.
+For a given search query $q$ and search radius $r$,
+\begin{itemize}
+    \item A coarse search was performed to find all cluster centers within distance $r+r_c$ of $q$.
+    \item All corresponding clusters were unioned into a set $F$.
+    \item A fine search was performed over the set $F$ to find all proteins within distance $r$ of $q$.
+\end{itemize}
 
 \subsection*{Benchmarking}
 
@@ -690,58 +701,53 @@ analysis.
 
 \chapter{Online Methods}
 
-\section{Novel illustration of proposed framework applied to similarity search}
-
-Technical details and motivation
-
+\section{Technical details and motivation for the similarity search data structure}
 Let us provide a bit more motivation and rigorous analysis for the general entropy-scaling similarity search data structure.
-Consider the cost of querying a database of size  for all entries within some distance  of some query item .
-All database entries and the query are drawn from a universe  of possible elements, and we impose on the database both a sparsity assumption and a strong structural assumption (described below).
-For ease of analysis, we will also assume here that the distance function is a metric, but this metricity assumption can be relaxed.
+Consider the cost of querying a database of size $n$ for all entries within some distance $r$ of some query item $q$.
+All database entries and the query are drawn from a universe $U$ of possible elements, and we impose on the database both a sparsity assumption and a strong structural assumption (described below).
+%For ease of analysis, we will also assume here that the distance function is a metric, but this metricity assumption can be relaxed.
 
-The quantitative form of knowledge we are most interested in encoding is pairwise distance from the query.
-Of course, that knowledge is already implicitly available in the database through computing pairwise distance from the query as needed.
-Indeed, this is the most commonly used naive method, but it turns out to be an expensive endeavor, scaling linearly with the size of the database.
+%The quantitative form of knowledge we are most interested in encoding is pairwise distance from the query.
+%Of course, that knowledge is already implicitly available in the database through computing pairwise distance from the query as needed.
+%Indeed, this is the most commonly used naive method, but it turns out to be an expensive endeavor, scaling linearly with the size of the database.
+The most commonly used na\"ive method is to simply compute pairwise distance from the query as needed.
+This is easy, but requires a linear scan through the entire database, which itself uses also linear space.
+Unfortunately, this can often be prohibitively slow.
 
 One other naive approach is to pre-compute and sort all pairwise distances between database entries and potential queries into a rainbow table.
-If we are given the guarantee that the space of potential queries is small, this approach might be feasible, as then a query requires only a single lookup and effectively constant time to traverse the list of sorted distances until all database entries within r of the query are recovered.
-However, in practice, we do not know in advance the queries expected, and thus constructing such a table requires memory  and time , which is undesirable as the database in sparse in , so .
+If we are given the guarantee that the space of potential queries is small, this approach might be feasible, as then a query requires only a single lookup and effectively constant time to traverse the list of sorted distances until all database entries within $r$ of the query are recovered.
+However, in practice, we do not know in advance the queries expected, and thus constructing such a table requires memory $O(n|U|)$ and time $O(n \log n |U|)$, which is undesirable as the database in sparse in $U$, so $|U| >>n$.
 
-Unlike cryptographic hash functions (for which rainbow tables are actually used [Oechslin, 2003]), the outputs for similar queries in similarity search are strongly correlated.
+Unlike cryptographic hash functions (for which rainbow tables are actually used \cite{oechslin2003making}, the outputs for similar queries in similarity search are strongly correlated.
 We can easily take advantage of these correlations by instead storing the pairwise distances among just the database entries in a self-similarity table.
 Then, if we are really lucky and the query is a database entry, we only have to do the same constant-time lookup as in the rainbow table.
 Most of the time, however, we will not be so lucky, and the query will not be a database entry.
 
-
-For the general case when the query is not a database entry, let us label the database entries .
-WLOG, all of these are a priori equivalent; say we first compare  to  by looking at the first row of the table.
-Then by the triangle inequality, all database entries within radius  of  must be within distance  of .
-Thus, if  is close to , we need only check some small fraction of the database.
-If  is far from , we can instead progressively try other rows, starting with , , etc.
-(note that we will call  the central element of row ).
-Without going into detail, it is intuitively obvious that the closer together (more redundant) database entries are, the better the performance of similarity search on this data structure, and thus scales with entropy.
-However, constructing this data structure still requires memory-complexity of  and time-complexity , which we aim to reduce in this proposal.
+For the general case when the query is not a database entry, let us label the database entries $d_1, \ldots, d_n$.
+WLOG, all of these are \textit{a priori} equivalent; say we first compare $q$ to $d_1$ by looking at the first row of the table.
+Then by the triangle inequality, all database entries within radius $r$ of $q$ must be within distance $||q-d_1|| +r$ of $d_1$.
+Thus, if $q$ is close to $d_1$, we need only check some small fraction of the database.
+If $d_1$ is far from $q$, we can instead progressively try other rows, starting with $d_2, d_3$, etc.
+(note that we will call $d_i$ the central element of row $i$).
+Without going into detail, it is intuitively obvious that the closer together (more redundant) database entries are, the better the performance of similarity search on this data structure, and thus we begin to scale with entropy.
+However, constructing this data structure still requires memory-complexity of $O(n^2)$ and time-complexity $O(n^2 \log n)$, which is still not ideal.
 
 Note that there are still three major sources of extraneous information in the pairwise distances table:
 
-1.
-We have  copies of the database, one copy for each database entry.
+\begin{enumerate}
+    \item We have $n$ copies of the database, one copy for each database entry.
 However, the algorithm will almost never get to the end of the table, because it will likely contain a sufficiently close starting database entry before then, so the last rows are probably unnecessary.
+    \item Similarly, the last columns of each row are also probably unnecessary, as the algorithm only cares about entries that are close to the central entry of the row.
+    \item The sorting information within each row is used to check only if entries fall within a particular radius and not used beyond that.
+\end{enumerate}
 
-2.
-Similarly, the last columns of each row are also probably unnecessary, as the algorithm only cares about entries that are close to the central entry of the row.
-
-3.
-The sorting information within each row is used to check only if entries fall within a particular radius and not used beyond that.
-
-By eliminating extraneous information, we can construct a generalization of the compressively accelerated genomics local alignment data structure for similarity search (Figure 3).
-
-More precisely, we reduce the table to  rows.
-Then, we remove all the “distant” entries from every row, so that every database entry appears in only one row, the one to whose central element it is closest to.
+It is by eliminating this extraneous information that we constructed a generalized data structure we introduced in the paper.
+More precisely, we reduce the table to $k$ rows.
+Then, we remove all the ``distant'' entries from every row, so that every database entry appears in only one row, the one to whose central element it is closest.
 Additionally, we do not need the full sorting information, since each entry only appears with its closest row center.
 Note that the data structure is no longer a table, but rather instead a partition of the original database, thus instead of rows, we refer to clusters and cluster centers.
-Say that the maximum cluster radius is .
-Then the similarity search algorithm is to do a ‘coarse search’ on the cluster centers for all centers within distance  of , expand those clusters, and do a ‘fine search’ on all entries in those clusters for those entries within distance  of  (Figure 3).
+Say that the maximum cluster radius is $r_c$.
+Then the similarity search algorithm is to do a `coarse search' on the cluster centers for all centers within distance $r+r_c$ of $q$, expand those clusters, and do a ‘fine search’ on all entries in those clusters for those entries within distance $r$ of $q$, as stated earlier.
 
 \section{Cablastx}
 
