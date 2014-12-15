@@ -196,12 +196,18 @@ we demonstrate their applicability on similarity search problems drawn from the 
 \end{figure}
 
 Let us now define our entropy-scaling similarity search data structure (Figure \ref{fig:dataStructure}).
-For ease of analysis, we will work in a high-dimensional metric space and consider the database as a set of $n$ unique points in that metric space.
+For ease of analysis, we will work in a high-dimensional metric space and consider the database as a set $D$ of $n$ unique points in that metric space.
+Define $B_S(q,r) = \{ p \in S | ||q-p||<r \}$. The similarity search problem is thus to compute $B_D(q,r)$ for a query $q$ and radius $r$.
+
 The data structure in its most basic incarnation simply involves clustering the points in the set by assigning them to their nearest `cluster center'.
-$k$ cluster centers are chosen such that no cluster has radius greater than a user-specified parameter $r_c$.
+A set $C$ of cluster centers are chosen such that no cluster has radius greater than a user-specified parameter $r_c$.
+Overloading notation a bit, we will identify each cluster with its center, so $C$ is also the set of clusters.
+We will additionally require that each cluster contain at least $\frac{n}{k \alpha}$ items, for some constant $\alpha \ge 1$ (i.e. that the clusters are balanced).
 For a given similarity search query of all items within distance $r$ of a query $q$, this data structure breaks the query into coarse and fine search stages.
-The coarse search is over the list of cluster centers, returning all clusters centers within distance $r + r_c$ of $q$.
-For the fine search, each cluster returned from the coarse search is expanded and those items are compared against $q$ to find all items within radius $r$.
+The coarse search is over the list of cluster centers, returning $B_C(q,r + r_c)$.
+Let \[\displaystyle F = \bigcup_{c \in B_C(q,r+r_c)} c , \] the union of all the returned clusters.
+Then by the triangle inequality, $B_F(q,r) = B_D(q,r)$.
+Thus, a fine search over the set $F$ can return all items within radius $r$ of $q$.
 
 We will prove in this section that this data structure allows for similarity search queries in time roughly linear (provided the fractal dimension of the database is low) to the entropy of the database
 Additionally, if desired, the data structure can be stored in a compressed form that uses space also linear in the entropy of the database.
@@ -261,36 +267,42 @@ Define the correlation integral
 where $g(\epsilon)$ is the number of pairs of points within distance $\epsilon$ of each other.
 Then the correlation dimension $d$ is defined by $C(\epsilon) \sim \epsilon^d$ for small $\epsilon$.
 We adapt this for our database by considering $\epsilon \sim r$, where $r$ is our search radius, and stopping the limit at $N \to n$.
-As mentioned, we want to ensure that $d$ is a small constant.
+As mentioned, we require to ensure that $d$ is a small constant.
 
 \subsection{Proving complexity bounds}
-We are now finally ready to analyze the performance of similarity search on this data structure.
-
-Note that this compression accelerated similarity search data structure can be thought of as a 2-level spanning tree, with each cluster being a branch of the tree.
-Given that our distance function is bounded by the greater of the pairwise marginal entropies between two points, this tree is exactly the one used in the 2-level spanning tree definition of data set entropy given in our proposed framework.
+We are now finally ready to bound the time- and space-complexity of this data structure.
+Note that this data structure can be thought of as a 2-level spanning tree, with each cluster being a branch of the tree.
+Given that our distance function is bounded by the greater of the pairwise marginal entropies between two points, this tree is exactly the one used in the 2-level spanning tree definition of data set entropy given previously.
 Trivially then, by encoding entries within clusters by their differences from the cluster center, we see that the memory required by the data structure is proportional to entropy---in practice, it is often just as, if not more, space-efficient to simply gzip each cluster individually; or, alternately, the compression can be entirely omitted if disk space is not an issue.
 Proving time-complexity of similarity search as a function of entropy takes rather more work though.
 
+Recall that $k$ entries are selected as cluster centers for partitioning the database to result in clusters with maximum radius $r_c$.
+We will set $r_c = \theta(\frac{1}{k})$.
+Given any query $q$, the coarse search over the clusters always requires $k$ operations.
+Recall that by the triangle inequality, only the clusters with centers within distance $r+r_c$ from $q$ contain entries within distance $r$ of $q$.
+Additionally by the triangle inequality, the union of those clusters $F \subset B_D(q,r+r_c)$.
+We can then bound $|F| \le |B_D(q,r+r_c)|$.
+Because we assumed a small constant fractal dimension $d$, $ |B_D(q, r+r_c)| \approx |B_D(q,r)|\left(\frac{r+r_c}{r}\right)^d$.
+Additionally, recall our balance condition that each cluster had size at least $\frac{n}{k\alpha}$ and $F$ is the union of disjoint clusters, which implies that the number of clusters making up $F$
+\[
+    |B_C(q,r+r_c)| \le |F|\cdot \frac{k\alpha}{n} \le |B_D(q,r)| \left(\frac{r+r_c}{r}\right)^d \cdot \frac{k\alpha}{n}
+\]
 
-Recall that  entries are selected as cluster centers for partitioning the database to result in clusters with maximum radius .
-We will set  .
-Given any query , the coarse search over the clusters always requires  operations.
-Then by the triangle inequality, only clusters with centers within distance  from  contain entries within distance  of .
-Because we assumed a small fractal dimension , in expectation, only a constant number of clusters will need to be checked.
-Thus, non-cluster centers will only have to be checked  proportion of the time, for some constant .
-Thus, expected search time is  for coarse + fine search time.
+in expectation, only a constant number of clusters will need to be checked.
+Thus, non-cluster centers will only have to be checked $\frac{C}{k}$ proportion of the time, for $C = \left(\frac{r+r_c}{r}\right)^d$.
+Thus, expected search time is $k + \theta \left( \frac{n-k}{k} \right)$ for coarse + fine search time.
 
 As we insert non-duplicate entries, search time increases with entropy (defined as mentioned as the weight of the 2-level distance spanning tree):
-
-Points that fall into existing clusters increase entropy by  and search times by .
-
-Points that do not fall into existing clusters increase entropy by  and search time by .
+\begin{itemize}
+    \item Points that fall into existing clusters increase entropy by $O(r_c)$ and search times by $(\theta \left( \frac{1}{k} \right)$.
+    \item Points that do not fall into existing clusters increase entropy by $O(1)$  and search time by $O(1)$.
+\end{itemize}
 
 Since we are characterizing search performance with respect to entropy, we would like to use increases in entropy to pay for the increased search times in the style of amortized analysis.
 In the second case, we obviously get enough entropy to pay for the increased search time.
-However, in the first case, we get  entropy, but increase search times by , which is a problem because an adversary could force the increased entropy to be arbitrarily close to zero, breaking the entropy scaling guarantee.
+However, in the first case, we get $O(r_c) = O\left( \frac{1}{k} \right)$ entropy, but increase search times by $\theta\left(\frac{1}{k}\right)$, which is a problem because an adversary could force the increased entropy to be arbitrarily close to zero, breaking the entropy scaling guarantee.
 Conversely, an adversary could also add arbitrarily large amounts of entropy, which would greatly increase runtime, but which would not break the entropy scaling guarantee because the added entropy would pay for the increased runtime.
-Luckily, Mother Nature is not adversarial in either way, so we can often make the additional assumption that the new entries fall randomly inside the ball surrounding the cluster center, and thus the expected additional entropy from adding to an existing cluster is .
+Luckily, Mother Nature is not adversarial in either way, so we can often make the additional assumption that the new entries fall randomly inside the ball surrounding the cluster center, and thus the expected additional entropy from adding to an existing cluster is $\theta\left(\frac{1}{k}\right)$.
 Therefore, we have enough entropy to pay for the increases in search time, and similarity search here is linear in entropy.
 
 \subsection{Caveats and Extensions}
