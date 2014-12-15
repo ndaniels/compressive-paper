@@ -414,108 +414,9 @@ no loss in specificity. For the short reads, we demonstrate run-time
 performance approximately 700x faster than BLASTX, with less than 5\% loss in
 sensitivity and no loss in specificity.
 
-\subsection*{Alphabet Reduction}
+\subsection*{Compressed representation}
 
-Alphabet reduction--reducing the 20-letter standard amino acid alphabet to a
-smaller set, in order to accelerate search or improve homology detection--has
-been proposed and implemented several times~\cite{blah}.
-In particular, \citet{Murphy:2000, Peterson:2009} considered reducing the
-amino-acid alphabet to 17, 10, or even 4 letters.
-More recently, \citet{Zhao:2012} and \citet{Huson:2013} applied a reduction to
-a 4-letter alphabet, termed a ``pseudoDNA'' alphabet, in sequence alignment.
 
-In this work, we extend the compression approach of \citet{Daniels:2013} using
-a reversible alphabet reduction.
-We use the alphabet reduction of \citet{Murphy:2000} to map the standard amino
-acid alphabet (along with the four common ambiguous letters ) onto a 4-letter 
-alphabet.
-Specifically, we map F, W, and Y into one cluster; C, I, L, M, V, and J into
-a second cluster, A, G, P, S, and T into a third cluster, and
-D, E, N, Q, K, R, H, B, and Z into a fourth cluster.
-
-\subsection*{Database Compression}
-
-Given a protein sequence database to be compressed, we proceed as follows:
-\begin{enumerate}
-        \item First, initialize a table of all possible $k$-mer ``seeds'' of
-        our 4-letter reduced alphabet, as well as a ``coarse'' database of
-        reduced-alphabet sequences, initially containing the alphabet-reduced
-        version of the first sequence in the input database.
-        %
-        \item For each $k$-mer of the first sequence, store its position in the
-        corresponding entry in the seed table.
-        %
-        \item For each subsequent sequence $s$ in the input, slide a window of 
-        size $k$ along the sequence, skipping single-residue repeats of length
-        greater than 10.
-        %
-        \item Look up these $k$ residues in the seed table.
-        For every entry matching to that $k$-mer in the seed table, follow
-        it to a corresponding subsequence in the coarse database and attempt
-        \textit{extension}.
-        If no subsequences from this window can be extended, move the window
-        by $m$ residues, where $m$ defaults to 10.
-        \item If a match was found via extension, move the $k$-mer window to
-        the first $k$-mer in $s$ after the match, and repeat the extension
-        process.
-\end{enumerate}
-        
-Given a $k$ match between sequence $s$ and a subsequence $s'$ pointed to by the
-seed table, first attempt \textit{ungapped} extension:
-\begin{enumerate}
-        \item Within each window of 10 alphabet-reduced residues, if identical 
-        4-mers in $s$ and $s'$ can be found, and at least 2 additional matching 
-        residues can be found, then there is an ungapped match within that
-        10-mer window between $s$ and $s'$ that exhibits at least 60\% sequence
-        identity.
-        \item Continue ungapped matching using 10-mer windows until no more
-        10-mers of at least 60\% sequence identity are found.
-        \item The result of ungapped extension is that there is an alignment 
-        between $s$ and $s'$ where the only differences are substitutions,
-        at least 60\% of the positions contain exact matches.
-\end{enumerate}
-        
-When ungapped extension terminates, attempt \textit{gapped} extension.
-From the end of the aligned regions thus far, align 25-mer windows of both
-$s$ and $s'$ using the Needleman-Wunsch~\cite{Needleman:1970gm} algorithm using
-an identity matrix.
-Note that the original caBLASTP~\cite{Daniels:2013} used BLOSUM62 as it was
-operating in amino acid space; as we are now operating in a reduced-alphabet
-space, an identity matrix is appropriate, just as it is for nucleotide space.
-After gapped extension on a window length of 25, attempt ungapped extension
-again.
-
-If neither gapped nor ungapped extension can continue, end the extension phase.
-If the resulting alignment has less than 70\% sequence identity (in the 
-reduced-alphabet space), or is shorter than 40 residues, discard it, and 
-attempt extension on the next entry in the seed table for the original $k$-mer,
-continuing on to the next $k$-mer if there are no more entries.
-
-If the resulting alignment does have at least 70\% sequence identity in the
-reduced-alphabet space, and is at least 40 residues long, then create a link
-from the entry for $s'$ in the coarse database to the subsequence of $s$
-corresponding to the alignment.
-If there are unaligned ends of $s$ shorter than 30 residues, append them to the
-match.
-Longer unaligned ends that did not match any subsequences reachable from the
-seed table are added into the coarse database themselves, following the same
-$k$-mer indexing procedure as the first sequence.
-
-Finally, in order to be able to recover the original sequence with its original
-amino acid identities, a \textit{difference script} is associated with each
-link.
-This difference script is a representation of the insertions, deletions, and
-substitutions resulting from the Needleman-Wunsch alignment, along with the
-offset in each reduced-alphabet cluster needed to recover the original alphabet.
-Thus, for example, a valine (V) is in the cluster containing C, I, L, M, V, and 
-J.
-Since it is the 4th entry in that 5-entry cluster, we can represent it with
-the offset 4.
-Since the largest cluster contains 9 elements, only four bits are needed to
-store one entry in the difference script.
-More balanced clusters would have allowed 3-bit storage, but at the expense of
-clusters that less faithfully represented the BLOSUM62 matrix and the
-physicochemical properties of the constituent amino acids.
 
 \subsection*{Query Compression}
 
@@ -532,6 +433,12 @@ typically short and usually of fixed length, which is known in advance.
 Thus, the minimum alignment length required for a match, and the maximum
 length unaligned fragment to append to a match, require different values based
 on the read length.
+
+We note that unlike the compression of the database, which can be amortized 
+over future queries, the time spent clustering and compressing the queries 
+cannot be amortized.
+Thus, we would not refer to the query compression as entropy-scaling, but it
+still provides a practical benefit.
 
 \subsection*{Search}
 
@@ -603,27 +510,21 @@ Results appear in Table~\ref{qsbench}.
 
 \subsection*{Validation}
 
-Because the ground truth for any metagenomic data set is still unknown,
-we took two approaches to evaluating the accuracy of caBLASTX.
-First, we treated BLASTX as a gold standard; since caBLASTX accelerates BLASTX
+In order to validate caBLASTX's accuracy, we treated BLASTX as a gold standard. 
+Since caBLASTX accelerates BLASTX
 using compression, false positives with respect to BLASTX should not be
 possible, but false negatives certainly are.
 We evaluated the hits from BLASTX and caBLASTX on the same human gut
 assemblies used for benchmarking, in order to evaluate the accuracy when
 query-side compression is not used.
 For query-side compression, we also evaluated the hits from BLASTX and caBLASTX
-on the Siberian permafrost dataset from~\cite{blah}.
+on a set of 151-nucleotide MiSeq reads from the American Gut Project,
+(ERP003820) from~\cite{blah}.
+We also ran DIAMOND and RapSearch2 on this same data set.
 Results appear in Table~\ref{bxacc}.
 
-To compare accuracy PAUDA, we relied on simulated data so that the
-underlying ground truth was known.
-We began with 1000 bacterial protein sequences from NR, and their corresponding
-nucleotide sequences from Genbank.
-We generated simulated 100-nucleotide and 300-nucleotide single-end reads from
-the nucleotide sequences at 100x coverage with error rates of 0\%, 1\%, and 5\%.
-We then used caBLASTX and PAUDA to search NR for matching protein sequences,
-and evaluated the accuracy of classification.
-Results appear in Table~\ref{pacc}.
+Note: Due to query-side compression, the output order from caBLASTX does not
+match that of BLASTX.
 
 \section*{High-throughput Drug Screening}
 
@@ -633,47 +534,36 @@ Results appear in Table~\ref{pacc}.
 
 \subsection*{Compression}
 
-We introduce a framework for compressing molecular databases that use the popular SDF
-molecular structure format, such as PubChem, and for searching for similar molecular structures in
-compressed space.
-We designed this compression and search framework around one of the standard techniques for high-throughput
-screening of potential drug compounds, the use of maximum common subgraph (MCS) to identify similar motifs among
-molecules.
+We introduce a framework for compressing molecular databases that use the 
+popular SDF molecular structure format, such as PubChem, and for searching for 
+similar molecular structures in compressed space.
+We designed this compression and search framework around one of the standard 
+techniques for high-throughput screening of potential drug compounds, the use 
+of maximum common subgraph (MCS) to identify similar motifs among molecules.
 Many existing MCS-based tools, such as SMSD~\cite{thornton} and 
-fmcsR~\cite{girke} compute the maximum common subgraph on fully labeled graphs; vertices are labeled with
-chemical elements, and edges are labeled with bond types (such as single or double bonds).
-The `f' in fmcsR, which stands for ``flexible,'' indicates that some bounded number of vertex or edge label
-mismatches are permitted, at significant computational cost.
-The key observation underlying our approach is that \emph{unlabeled} variants of these graphs can reduce the
-search space of similar molecules, and that any two molecules that are deemed similar in \emph{labeled} space
-will also appear similar in unlabeled space.
+fmcsR~\cite{girke} compute the maximum common subgraph on fully labeled graphs; 
+vertices are labeled with chemical elements, and edges are labeled with bond 
+types (such as single or double bonds).
+The `f' in fmcsR, which stands for ``flexible,'' indicates that some bounded 
+number of vertex or edge label mismatches are permitted, at significant 
+computational cost.
 
-Our compression approach relies on a clustering according to structural similarity, after structures have
-been delabeled and simplified.
-Each cluster can then be represented by a single molecular structure, along with pointers to \emph{difference
-sets} between that structure and each of the full molecules it represents.
-The molecular structures in a database are delabeled and simplified by several approaches.
-First, we remove hydrogen atoms from the molecules; hydrogens can be easily recovered by inferring their 
-presence.
-Next, each molecule's graph structure is converted to an unlabeled one; each atom label is removed, and each
-bond type is represented as just a single bond.
-The removed information--atom and bond type--is stored in an auxiliary data structure, indexed by the molecule's
-PubChem ID and the atom or bond number.
-Next, any vertex or edge that is not part of a simple cycle or a tree is removed, and any edge that is part
-of a tree is removed.
-This preserves the node count, but not the topology, of tree-like structures, and preserves simple cycles,
-which represent rings in chemical compounds.
-For example, as shown in Figure~\ref{}, bicyclohexyl and dicyclohexylamine would appear identical.
+In order to boost the effectiveness of clustering, we employ an approach
+somewhat analogous to the reversible alphabet reduction discussed in the section
+on metagenomics.
+Specifically, we leave carbon atoms labeled as `C,' and we label all non-carbon
+atoms as `N' (for non-carbon).
+Similarly, we leave single-bond edges labeled as `1,' and we label all 
+non-single bond edges as `2.'
+We call this approach \emph{label simplification}
 
-After this transformation is applied to each molecule in a database to be compressed, we identify all clusters
-of fully-isomorphic transformed molecular graphs.
-Isomorphism detection is performed using the VF2~\cite{Cordella} algorithm; a simple hash computed from the
-number of vertices and edges in each transformed molecular graph is first used to filter molecular graphs that
-cannot possibly be isomorphic.
-A representative from each such cluster is stored in SDF format; collectively, these representatives form a 
-``coarse'' database.
-Along with each representative, we preserve the information necessary to reconstruct each original molecule,
-as a pointer to a set of vertices and edges that have been removed or unlabeled.
+Our compression approach relies on a clustering according to structural 
+similarity, after structures have had their labels simplified.
+Each cluster can then be represented by a single molecular structure, along 
+with pointers to \emph{difference sets} between that structure and each of the 
+full molecules it represents.
+
+
 
 \subsection*{Search}
 
@@ -830,7 +720,136 @@ Then the similarity search algorithm is to do a ‘coarse search’ on the clust
 
 \section{Cablastx}
 
+\subsection*{Alphabet Reduction}
+
+Alphabet reduction--reducing the 20-letter standard amino acid alphabet to a
+smaller set, in order to accelerate search or improve homology detection--has
+been proposed and implemented several times~\cite{blah}.
+In particular, \citet{Murphy:2000, Peterson:2009} considered reducing the
+amino-acid alphabet to 17, 10, or even 4 letters.
+More recently, \citet{Zhao:2012} and \citet{Huson:2013} applied a reduction to
+a 4-letter alphabet, termed a ``pseudoDNA'' alphabet, in sequence alignment.
+
+In this work, we extend the compression approach of \citet{Daniels:2013} using
+a reversible alphabet reduction.
+We use the alphabet reduction of \citet{Murphy:2000} to map the standard amino
+acid alphabet (along with the four common ambiguous letters ) onto a 4-letter 
+alphabet.
+Specifically, we map F, W, and Y into one cluster; C, I, L, M, V, and J into
+a second cluster, A, G, P, S, and T into a third cluster, and
+D, E, N, Q, K, R, H, B, and Z into a fourth cluster.
+By storing the offset within each cluster of the original letter, the original
+sequence can be reconstructed, making this a reversible reduction.
+
+\subsection*{Database Compression}
+
+Given a protein sequence database to be compressed, we proceed as follows:
+\begin{enumerate}
+        \item First, initialize a table of all possible $k$-mer ``seeds'' of
+        our 4-letter reduced alphabet, as well as a ``coarse'' database of
+        reduced-alphabet sequences, initially containing the alphabet-reduced
+        version of the first sequence in the input database.
+        %
+        \item For each $k$-mer of the first sequence, store its position in the
+        corresponding entry in the seed table.
+        %
+        \item For each subsequent sequence $s$ in the input, slide a window of 
+        size $k$ along the sequence, skipping single-residue repeats of length
+        greater than 10.
+        %
+        \item Look up these $k$ residues in the seed table.
+        For every entry matching to that $k$-mer in the seed table, follow
+        it to a corresponding subsequence in the coarse database and attempt
+        \textit{extension}.
+        If no subsequences from this window can be extended, move the window
+        by $m$ residues, where $m$ defaults to 10.
+        \item If a match was found via extension, move the $k$-mer window to
+        the first $k$-mer in $s$ after the match, and repeat the extension
+        process.
+\end{enumerate}
+        
+Given a $k$ match between sequence $s$ and a subsequence $s'$ pointed to by the
+seed table, first attempt \textit{ungapped} extension:
+\begin{enumerate}
+        \item Within each window of 10 alphabet-reduced residues, if identical 
+        4-mers in $s$ and $s'$ can be found, and at least 2 additional matching 
+        residues can be found, then there is an ungapped match within that
+        10-mer window between $s$ and $s'$ that exhibits at least 60\% sequence
+        identity.
+        \item Continue ungapped matching using 10-mer windows until no more
+        10-mers of at least 60\% sequence identity are found.
+        \item The result of ungapped extension is that there is an alignment 
+        between $s$ and $s'$ where the only differences are substitutions,
+        at least 60\% of the positions contain exact matches.
+\end{enumerate}
+        
+When ungapped extension terminates, attempt \textit{gapped} extension.
+From the end of the aligned regions thus far, align 25-mer windows of both
+$s$ and $s'$ using the Needleman-Wunsch~\cite{Needleman:1970gm} algorithm using
+an identity matrix.
+Note that the original caBLASTP~\cite{Daniels:2013} used BLOSUM62 as it was
+operating in amino acid space; as we are now operating in a reduced-alphabet
+space, an identity matrix is appropriate, just as it is for nucleotide space.
+After gapped extension on a window length of 25, attempt ungapped extension
+again.
+
+If neither gapped nor ungapped extension can continue, end the extension phase.
+If the resulting alignment has less than 70\% sequence identity (in the 
+reduced-alphabet space), or is shorter than 40 residues, discard it, and 
+attempt extension on the next entry in the seed table for the original $k$-mer,
+continuing on to the next $k$-mer if there are no more entries.
+
+If the resulting alignment does have at least 70\% sequence identity in the
+reduced-alphabet space, and is at least 40 residues long, then create a link
+from the entry for $s'$ in the coarse database to the subsequence of $s$
+corresponding to the alignment.
+If there are unaligned ends of $s$ shorter than 30 residues, append them to the
+match.
+Longer unaligned ends that did not match any subsequences reachable from the
+seed table are added into the coarse database themselves, following the same
+$k$-mer indexing procedure as the first sequence.
+
+Finally, in order to be able to recover the original sequence with its original
+amino acid identities, a \textit{difference script} is associated with each
+link.
+This difference script is a representation of the insertions, deletions, and
+substitutions resulting from the Needleman-Wunsch alignment, along with the
+offset in each reduced-alphabet cluster needed to recover the original alphabet.
+Thus, for example, a valine (V) is in the cluster containing C, I, L, M, V, and 
+J.
+Since it is the 4th entry in that 5-entry cluster, we can represent it with
+the offset 4.
+Since the largest cluster contains 9 elements, only four bits are needed to
+store one entry in the difference script.
+More balanced clusters would have allowed 3-bit storage, but at the expense of
+clusters that less faithfully represented the BLOSUM62 matrix and the
+physicochemical properties of the constituent amino acids.
+
 \section{Ammolite}
+
+\subsection*{Simplification and compression}
+
+First, we remove hydrogen atoms from the molecules; hydrogens can be easily recovered by inferring their 
+presence.
+Next, each molecule's graph structure is converted to an unlabeled one; each atom label is removed, and each
+bond type is represented as just a single bond.
+The removed information--atom and bond type--is stored in an auxiliary data structure, indexed by the molecule's
+PubChem ID and the atom or bond number.
+Next, any vertex or edge that is not part of a simple cycle or a tree is removed, and any edge that is part
+of a tree is removed.
+This preserves the node count, but not the topology, of tree-like structures, and preserves simple cycles,
+which represent rings in chemical compounds.
+For example, as shown in Figure~\ref{}, bicyclohexyl and dicyclohexylamine would appear identical.
+
+After this transformation is applied to each molecule in a database to be compressed, we identify all clusters
+of fully-isomorphic transformed molecular graphs.
+Isomorphism detection is performed using the VF2~\cite{Cordella} algorithm; a simple hash computed from the
+number of vertices and edges in each transformed molecular graph is first used to filter molecular graphs that
+cannot possibly be isomorphic.
+A representative from each such cluster is stored in SDF format; collectively, these representatives form a 
+``coarse'' database.
+Along with each representative, we preserve the information necessary to reconstruct each original molecule,
+as a pointer to a set of vertices and edges that have been removed or unlabeled.
 
 \section{Fragbag}
 
