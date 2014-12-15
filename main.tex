@@ -306,25 +306,6 @@ Conversely, an adversary could also add arbitrarily large amounts of entropy, wh
 Luckily, Mother Nature is not adversarial in either way, so we can often make the additional assumption that the new entries fall randomly inside the ball surrounding the cluster center, and thus the expected additional entropy from adding to an existing cluster is $\theta\left(\frac{1}{k}\right)$.
 Therefore, we have enough entropy to pay for the increases in search time, and similarity search here is linear in entropy.
 
-\subsection{Caveats and Extensions}
-
-We had to make several strong assumptions on the structure of the database, most notably the low fractal dimension assumption, which kept the number of clusters that need to be searched from blowing up with .
-It would be nice if we could extend the analysis to do without that assumption and instead work directly with the entropy of the database.
-One approach for doing so would be to bound fractal dimension by entropy, which is not unreasonable given that the numerator in the definition of upper Minkowski dimension corresponds in a sense to the number of bits needed to specify position within a set to within radius ϵ.
-
-Additionally, although d is assumed to be small, the number of clusters that need to be searched still grows with .
-Empirical results have shown that not all of those clusters actually need to be searched to get the vast majority of correct results.
-This makes sense, as the further away a cluster is from the query, the smaller the number of hits in that cluster.
-For cost reasons, actual implementations such as the one given for compressively accelerated BLAST and BLAT do not search all clusters within distance , but rather some smaller radius, and still manage to get >99% of the desired hits.
-Formalizing this notion, as we plan to do in this project, while unnecessary theoretically, is of tremendous practical value.
-
-Furthermore, as mentioned before, a strict metricity assumption is not needed on the distance function.
-So long as the distance function is almost a metric in the precise sense that the triangle inequality holds for most pairs of points, this kind of data structure will work for the majority of desired search hits.
-
-Lastly, this entire section was an illustration of the application of our entropy-scaling theoretical framework only to similarity search.
-Although similarity search is found as a primitive through-out data science, it is by no means the only primitive query type.
-Augmenting this data structure or designing new data structures to permit other query types while maintaining theoretical guarantees will necessitate the development of new analysis tools, beyond the ones show-cased in this section.
-
 \section*{Metagenomics}
 
 Metagenomics, the study of genomic data sequenced directly from environmental
@@ -891,6 +872,25 @@ Adaptive Cluster Distance Bounding for High-Dimensional Indexing \cite{ramaswamy
    trivially.
 \end{itemize}
 
+
+\section{Caveats and Extensions}
+
+We had to make several strong assumptions on the structure of the database, most notably the low fractal dimension assumption, which kept the number of clusters that need to be searched from blowing up with .
+It would be nice if we could extend the analysis to do without that assumption and instead work directly with the entropy of the database.
+One approach for doing so would be to bound fractal dimension by entropy, which is not unreasonable given that the numerator in the definition of upper Minkowski dimension corresponds in a sense to the number of bits needed to specify position within a set to within radius ϵ.
+
+Additionally, although d is assumed to be small, the number of clusters that need to be searched still grows with .
+Empirical results have shown that not all of those clusters actually need to be searched to get the vast majority of correct results.
+This makes sense, as the further away a cluster is from the query, the smaller the number of hits in that cluster.
+For cost reasons, actual implementations such as the one given for compressively accelerated BLAST and BLAT do not search all clusters within distance , but rather some smaller radius, and still manage to get >99% of the desired hits.
+Formalizing this notion, as we plan to do in this project, while unnecessary theoretically, is of tremendous practical value.
+
+Furthermore, as mentioned before, a strict metricity assumption is not needed on the distance function.
+So long as the distance function is almost a metric in the precise sense that the triangle inequality holds for most pairs of points, this kind of data structure will work for the majority of desired search hits.
+
+Lastly, this entire section was an illustration of the application of our entropy-scaling theoretical framework only to similarity search.
+Although similarity search is found as a primitive through-out data science, it is by no means the only primitive query type.
+Augmenting this data structure or designing new data structures to permit other query types while maintaining theoretical guarantees will necessitate the development of new analysis tools, beyond the ones show-cased in this section.
 
 
 \end{document}
