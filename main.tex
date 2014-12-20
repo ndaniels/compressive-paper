@@ -638,27 +638,29 @@ However, FragBag turns out to be an excellent proof-of-concept for entropy-scali
 We intentionally approached the application of entropy-scaling data structures to FragBag in a blind manner,
 without using substantial domain-specific knowledge.
 Instead, we used the very same representation (bag of fragments) and distance metric (Euclidean distance)
-as FragBag, a greedy k-centers algorithm, and vector difference to generate a
+as FragBag, a greedy k-centers algorithm, and vector difference to generate
 the clustered representation.
 
 \subsection*{Clustering}
 For the cluster generation, we used a randomized greedy 2-pass approach.
 First, all proteins in the PDB were randomly ordered.
-Then in the first pass, proteins were selected as cluster centers if and only if they were not within a user-specified distance $r_c$ from an existing center.
+Then in the first pass, proteins were selected as cluster centers if and only if they were not within a user-specified Euclidean distance $r_c$ from an existing center (i.e. the first protein is always selected, and the second if further away than $r_c$ from the first, etc.).
 In the second pass, every protein was assigned to the nearest cluster center.
 
 \subsection*{Search}
-Similarity search here is exactly as described in the data structure section previous.
+Similarity search here is performed exactly as described in the data structure section, with no modifications.
 For a given search query $q$ and search radius $r$,
 \begin{itemize}
-    \item A coarse search was performed to find all cluster centers within distance $r+r_c$ of $q$.
+    \item A coarse search is used to find all cluster centers within distance $r+r_c$ of $q$.
     \item All corresponding clusters were unioned into a set $F$.
     \item A fine search was performed over the set $F$ to find all proteins within distance $r$ of $q$.
 \end{itemize}
 
 \subsection*{Benchmarking}
 
+
 \subsection*{Validation}
+As here we use a single metric distance, the entropy-scaling data structure gives 100\% concordance with the na\"ive linear search.
 
 \chapter*{Discussion}
 
