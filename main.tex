@@ -660,10 +660,18 @@ Empirically, however, for all of the queries we performed, we achieve $\sim 99.9
 
 \subsection*{Benchmarking}
 We explored the increases in speed resulting from applying the entropy-scaling data structure, for both Euclidean and cosine distances (Figures).
+
+For cosine distance, we generated databases with maximum cluster radii of 0.05, 0.1, 0.2, 0.3, 0.4, and 0.5.
+Then, for each query protein from the set \{4rhv, 1ake, 1bmf, 1rbp, 1b7t\}, we ran both naive and accelerated similarity searches with radii of $0.02i \forall i \in \{0,\ldots,49\}$.
+This was repeated 5 times for each measurement, and the ratio of average accelerated vs naive times is shown in Figure \ref{fig:fragbag_cosine}.
+
+For euclidean distance, we generated databases with maximum cluster radii of 10, 20, 25, 50, and 100.
+Again, for each query protein drawn from the same set, we compared the average over 5 runs of the ratio of average accelerated vs naive times (Figure \ref{fig:fragbag_euclid}.
+
 As expected, the acceleration is highly dependent on both the search radius $r$ and the maximum cluster radius $r_c$.
 Additionally, the query protein also makes a major difference in the results.
 We suspect that this is due to the geometry of protein fragment frequency space being very ``spiky'' and ``star-like''.
-Proteins that are near the core show very little acceleration when our data structure is used because the majority of the database is nearby, whereas proteins in the periphery can have neighbors found much more quickly.
+Proteins that are near the core show very little acceleration when our data structure is used because the majority of the database is nearby, whereas proteins in the periphery have fewer neighbors and are thus found much more quickly.
 Changing the maximum cluster radius effectively makes more proteins peripheral proteins, but at the cost of overall acceleration.
 
 Naturally, as the search radius expands, it quickly becomes necessary to compare against nearly the entire database, destroying any acceleration.
@@ -672,7 +680,7 @@ Similarly, once the coarse search encompasses all (or nearly all) the clusters i
 However, we are most interested in proteins that are very similar to the query, the low-radius behavior, which demonstrates varying though substantial acceleration (2x-30x).
 
 Additionally, it is instructive to note that because of he very different geometries of euclidean vs cosine space, acceleration varies tremendously for some proteins, such as 4rhv and 1bmf, which display nearly opposite behaviors.
-Whereas there is nearly 30x acceleration for 4rhv in cosine space, and the same for 1bmf in euclidean space, neither achieves better than \~2.5x acceleration in the other space.
+Whereas there is nearly 30x acceleration for 4rhv in cosine space for low radius, and the same for 1bmf in euclidean space, neither achieves better than \~2.5x acceleration in the other space.
 
 \begin{figure}[tbp]
     \centering
