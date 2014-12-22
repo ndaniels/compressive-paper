@@ -598,7 +598,7 @@ Our implementation allows a user to specify whether any atom mismatches or bond-
 allowed in the maximum common subgraph of two molecules.
 If zero mismatches are allowed, fMCS is just MCS.
 
-As in~\cite{loh}, our compression-accelerated search approach relies on a two-stage process.
+As in~\cite{loh2012compressive}, our compression-accelerated search approach relies on a two-stage process.
 First, a \emph{coarse} search is performed in compressed space, by searching the coarse database.
 The query molecule is unlabeled and transformed in exactly the same manner as the molecular database
 during compression, and this transformed query graph is matched against the coarse database.
@@ -638,8 +638,7 @@ However, FragBag turns out to be an excellent proof-of-concept for entropy-scali
 We intentionally approached the application of entropy-scaling data structures to FragBag in a blind manner,
 without using substantial domain-specific knowledge.
 Instead, we used the very same representation (bag of fragments) and distance functions (Euclidean and cosine distances)
-as FragBag, a greedy k-centers algorithm, and vector difference to generate
-the clustered representation.
+as FragBag, a greedy k-centers algorithm, and vector difference to generate the clustered representation.
 
 \subsection*{Clustering}
 For the cluster generation, we used a randomized greedy 2-pass approach.
@@ -656,7 +655,76 @@ For a given search query $q$ and search radius $r$,
     \item A fine search was performed over the set $F$ to find all proteins within distance $r$ of $q$.
 \end{itemize}
 
+Note that while Euclidean distance is a metric, and thus the triangle inequality guarantees 100\% sensitivity, cosine distance is not.
+Empirically, however, for all of the queries we performed, we achieve $\sim 99.9\%$ accuracy (Supplementary Table).
+
 \subsection*{Benchmarking}
+We explored the increases in speed resulting from applying the entropy-scaling data structure, for both Euclidean and cosine distances (Figures).
+As expected, the acceleration is highly dependent on both the search radius $r$ and the maximum cluster radius $r_c$.
+Additionally, the query protein also makes a major difference in the results.
+We suspect that this is due to the geometry of protein fragment frequency space being very ``spiky'' and ``star-like''.
+Proteins that are near the core show very little acceleration when our data structure is used because the majority of the database is nearby, whereas proteins in the periphery can have neighbors found much more quickly.
+Changing the maximum cluster radius effectively makes more proteins peripheral proteins, but at the cost of overall acceleration.
+
+Naturally, as the search radius expands, it quickly becomes necessary to compare against nearly the entire database, destroying any acceleration.
+For the cosine space in particular, note that the maximum distance between any two points is $1$, so once the coarse search radius of $r+r_c >= 1.0$, there cannot ever be any acceleration.
+Similarly, once the coarse search encompasses all (or nearly all) the clusters in Euclidean space, the acceleration diminishes to 1x, and the overhead costs make the entropy scaling data structure perform worse than a naive search.
+However, we are most interested in proteins that are very similar to the query, the low-radius behavior, which demonstrates varying though substantial acceleration (2x-30x).
+
+Additionally, it is instructive to note that because of he very different geometries of euclidean vs cosine space, acceleration varies tremendously for some proteins, such as 4rhv and 1bmf, which display nearly opposite behaviors.
+Whereas there is nearly 30x acceleration for 4rhv in cosine space, and the same for 1bmf in euclidean space, neither achieves better than \~2.5x acceleration in the other space.
+
+\begin{figure}[tbp]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/4rhv_benchmark_cosine}
+        \caption{}
+    \end{subfigure}%
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/1AKE_benchmark_cosine}
+        \caption{}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/1BMF_benchmark_cosine}
+        \caption{}
+    \end{subfigure}%
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/1RBP_benchmark_cosine}
+        \caption{}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/1b7t_benchmark_cosine}
+        \caption{}
+    \end{subfigure}
+    \caption{Fragbag cosine benchmarking data}
+    \label{fig:fragbag_cosine}
+\end{figure}
+
+\begin{figure}[tbp]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/4rhv_benchmark_euclid}
+        \caption{}
+    \end{subfigure}%
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/1AKE_benchmark_euclid}
+        \caption{}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/1BMF_benchmark_euclid}
+        \caption{}
+    \end{subfigure}%
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/1RBP_benchmark_euclid}
+        \caption{}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/1b7t_benchmark_euclid}
+        \caption{}
+    \end{subfigure}
+    \caption{Fragbag euclidean distance benchmarking data}
+    \label{fig:fragbag_euclid}
+\end{figure}
 
 
 \subsection*{Validation}
