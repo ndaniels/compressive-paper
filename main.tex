@@ -156,11 +156,11 @@ However, similarity search has also demonstrated increasing importance in other 
 \begin{figure}[tbp]
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{computeVsData}
+        \includegraphics[width=1\textwidth]{assets/computeVsData}
         \caption{}
     \end{subfigure}%
     \begin{subfigure}[b]{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{storageVsData}
+        \includegraphics[width=1\textwidth]{assets/storageVsData}
         \caption{}
     \end{subfigure}
     \caption{Genomic data available has grown at a faster exponential rate than computer processing power and disk storage.}
@@ -188,7 +188,7 @@ we demonstrate their applicability on similarity search problems drawn from the 
 \subsection{Data structure}
 \begin{figure}[btp]
     \centering
-    \includegraphics[width=1\textwidth]{dataStructure}
+    \includegraphics[width=1\textwidth]{assets/dataStructure}
     \caption{ Compressive acceleration of similarity search. %
             (a) The naïve approach tests each query against each database entry to find entries within distance  of the query. %
             (b) By selecting appropriate cluster centers with maximum radius  to partition the database, we can (c) first do a coarse search to find all cluster centers within distance  of a query, and then the (d) triangle inequality guarantees that a fine search over all corresponding cluster entries will suffice.}
