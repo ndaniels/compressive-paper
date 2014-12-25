@@ -209,69 +209,19 @@ Let \[\displaystyle F = \bigcup_{c \in B_C(q,r+r_c)} c , \] the union of all the
 Then by the triangle inequality, $B_F(q,r) = B_D(q,r)$.
 Thus, a fine search over the set $F$ can return all items within radius $r$ of $q$.
 
-We will prove in this section that this data structure allows for similarity search queries in time roughly linear (provided the fractal dimension of the database is low) to the entropy of the database
+%We will prove in this section that 
+This data structure allows for similarity search queries in time roughly linear (provided the fractal dimension of the database is low) to the entropy of the database
 Additionally, if desired, the data structure can be stored in a compressed form that uses space also linear in the entropy of the database.
-However, to do this, we will first need to build additional mathematical machinery and make precise our notions of `entropy' and `fractal dimension'.
+%However, to do this, we will first need to build additional mathematical machinery and make precise our notions of `entropy' and `fractal dimension'.
 
-As an aside, note that entropy-scaling data structures are distinct from both succinct data structures and compressed data structures.
+Note that entropy-scaling data structures are distinct from both succinct data structures and compressed data structures.
 Succinct data structures are ones that use space close to the information-theoretic limit in the worst case while permitting efficient queries; i.e.
 succinct data structures do not depend on the actual entropy of the underlying data set, but have size-dependence on the potential worst-case entropy of the data set \cite{jacobson1988succinct}.
 Compressed data structures, on the other hand, bound the amount of the space used by the entropy of the data set while permitting efficient queries \cite{grossi2005compressed, ferragina2000opportunistic}, much like entropy-scaling data structures.
 Unlike entropy-scaling data structures though, they do not measure time-complexity in terms of the entropy.
 \textbf{The primary theoretical advance of entropy-scaling data structures is that they bound both space and time as functions of the data set entropy.}
 
-\subsection{Theoretical setup: entropy}
-Here we provide the setup for entropy-centric analysis.
-Information-theoretic ``entropy'' is of course a measure of the uncertainty of a distribution or random variable, and is not well-defined for a database.
-However, the term is often used in data compression as a shorthand for the number of bits needed to encode the database, a measure of the randomness of that database.
-We use ``entropy'' in the latter sense; precisely, we define the entropy of a database as the number of bits needed to encode the database under some encoding scheme.
-Equivalently, the entropy of a database is the entropy measured in bits of a random variable whose instances are databases that match our database on some structural condition, which we will define later.
-Of course, each encoding scheme thus results in a different definition of entropy, but this simply corresponds to the compressed size of the database under different compression methods.
-
-Let $l$ be the number of bits necessary to encode a point $p$ in the space \textit{de novo} without any other information.
-Without any compression, a set of size $n$ then requires $nl$ bits to store.
-Assume that the number of bits necessary to encode a point $p$ as a function of $q$ (and vice versa) is $\theta(d) \le l$, where $d = ||p -q||$ the distance from $p$ to $q$.
-Effecitvely, we are imposing the condition that the distance is a measure of entropy added by a new point (`pairwise marginal entropy').
-That distance bounds pairwise marginal entropy is clearly true for Hamming distance, and can also be shown for edit distances and more general similarity measures.
-
-Let us consider the spanning trees of the complete distance graph between points in the set.
-The number of bits needed to encode the entire set according to the relationships specified in the spanning tree is then linear in the weight of that tree.
-Thus, the weight of a spanning tree almost corresponds to the entropy of the distribution over all data sets that are in accordance with the pairwise distances specified in that tree.
-One measure of the entropy of a data set would be the entropy of this distribution over a minimum weight spanning tree of the complete distance graph.
-However, we have neglected the number of bits needed to encode the tree itself; as this is an arbitrary tree, every node must encode its parent, so the entropy of the tree itself is $n \log n$ bits.
-Thus, this model of set entropy is not practical as encoding the tree is already super-linear in data set size.
-
-Alternately, we can also specify a set of $k$ privileged points using which we encode all other points.
-With the additional selection of an arbitrary (or zero) root node, this encoding corresponds to a 2-level spanning tree of the complete distance graph, with pre-selected branches, but leaves selected to minimize total weight.
-The distribution over all data sets in accordance with this 2-level spanning tree has a strictly higher entropy than the one corresponding to the minimum spanning tree of course, but encoding the tree itself uses only $kl$ bits.
-This model of entropy also has the advantage of being much more amenable for proving bounds about the time- and space-complexity of the similarity search data structure we introduce below.
-
-\subsection{Theoretical setup: fractal dimension}
-Here we formalize the `fractal dimension' condition we alluded to: intuitively, we want the fractal dimension $d$ of the database to be low, so that increases to a search radius do not significantly blow up the number of hits.
-This is crucial because the coarse search radius is the sum of the fine search radius and the maximum cluster radius.
-Roughly speaking, the number of hits returned by the coarse search radius is exponential in the fractal dimension of the database in the search radius regime, so we need fractal dimension to be low.
-
-Given the connections to entropy, one might think to use the upper Minkowski dimension (also known as the entropy dimension) \cite{falconer2013fractal}.
-Recall the definition of upper Minkowski dimension of a set $S$ using the intrinsic ball-covering number:
-\[
-    \dim_{Minkowski}(S) := \limsup_{\epsilon \to 0} \frac{\log N(\epsilon)}{\log 1/\epsilon}
-\]
-
-where $N(\epsilon)$ is the minimal number of open balls of radius $\epsilon$ with centers in $S$ needed to cover $S$.
-Unfortunately, as the database is finite and the space might be discrete, the given definition always results in $\dim_{Minkowski}(S) = 0$.
-Thus, we need a more appropriate definition while still capturing the dimensional scaling properties of the upper Minkowski dimension.
-
-One commonly used and more easily measured fractal dimension that is more easily adapted for discrete spaces is the correlation dimension \cite{grassberger1984dimensions}.
-Define the correlation integral
-\[
-    C(\epsilon) = \lim_{N \to \infty} \frac{g(\epsilon)}{N^2}
-\]
-where $g(\epsilon)$ is the number of pairs of points within distance $\epsilon$ of each other.
-Then the correlation dimension $d$ is defined by $C(\epsilon) \sim \epsilon^d$ for small $\epsilon$.
-We adapt this for our database by considering $\epsilon \sim r$, where $r$ is our search radius, and stopping the limit at $N \to n$.
-As mentioned, we require to ensure that $d$ is a small constant.
-
-\subsection{Proving complexity bounds}
+\subsection{Structure and complexity bounds}
 We are now finally ready to bound the time- and space-complexity of this data structure.
 Note that this data structure can be thought of as a 2-level spanning tree, with each cluster being a branch of the tree.
 Given that our distance function is bounded by the greater of the pairwise marginal entropies between two points, this tree is exactly the one used in the 2-level spanning tree definition of data set entropy given previously.
@@ -779,53 +729,58 @@ analysis.
 
 \chapter{Online Methods}
 
-\section{Technical details and motivation for the similarity search data structure}
-Let us provide a bit more motivation and rigorous analysis for the general entropy-scaling similarity search data structure.
-Consider the cost of querying a database of size $n$ for all entries within some distance $r$ of some query item $q$.
-All database entries and the query are drawn from a universe $U$ of possible elements, and we impose on the database both a sparsity assumption and a strong structural assumption (described below).
-%For ease of analysis, we will also assume here that the distance function is a metric, but this metricity assumption can be relaxed.
+\section{Theory}
 
-%The quantitative form of knowledge we are most interested in encoding is pairwise distance from the query.
-%Of course, that knowledge is already implicitly available in the database through computing pairwise distance from the query as needed.
-%Indeed, this is the most commonly used naive method, but it turns out to be an expensive endeavor, scaling linearly with the size of the database.
-The most commonly used na\"ive method is to simply compute pairwise distance from the query as needed.
-This is easy, but requires a linear scan through the entire database, which itself uses also linear space.
-Unfortunately, this can often be prohibitively slow.
+\subsection{Theoretical setup: entropy}
+Here we provide the setup for entropy-centric analysis.
+Information-theoretic ``entropy'' is of course a measure of the uncertainty of a distribution or random variable, and is not well-defined for a database.
+However, the term is often used in data compression as a shorthand for the number of bits needed to encode the database, a measure of the randomness of that database.
+We use ``entropy'' in the latter sense; precisely, we define the entropy of a database as the number of bits needed to encode the database under some encoding scheme.
+Equivalently, the entropy of a database is the entropy measured in bits of a random variable whose instances are databases that match our database on some structural condition, which we will define later.
+Of course, each encoding scheme thus results in a different definition of entropy, but this simply corresponds to the compressed size of the database under different compression methods.
 
-One other naive approach is to pre-compute and sort all pairwise distances between database entries and potential queries into a rainbow table.
-If we are given the guarantee that the space of potential queries is small, this approach might be feasible, as then a query requires only a single lookup and effectively constant time to traverse the list of sorted distances until all database entries within $r$ of the query are recovered.
-However, in practice, we do not know in advance the queries expected, and thus constructing such a table requires memory $O(n|U|)$ and time $O(n \log n |U|)$, which is undesirable as the database in sparse in $U$, so $|U| >>n$.
+Let $l$ be the number of bits necessary to encode a point $p$ in the space \textit{de novo} without any other information.
+Without any compression, a set of size $n$ then requires $nl$ bits to store.
+Assume that the number of bits necessary to encode a point $p$ as a function of $q$ (and vice versa) is $\theta(d) \le l$, where $d = ||p -q||$ the distance from $p$ to $q$.
+Effecitvely, we are imposing the condition that the distance is a measure of entropy added by a new point (`pairwise marginal entropy').
+That distance bounds pairwise marginal entropy is clearly true for Hamming distance, and can also be shown for edit distances and more general similarity measures.
 
-Unlike cryptographic hash functions (for which rainbow tables are actually used \cite{oechslin2003making}, the outputs for similar queries in similarity search are strongly correlated.
-We can easily take advantage of these correlations by instead storing the pairwise distances among just the database entries in a self-similarity table.
-Then, if we are really lucky and the query is a database entry, we only have to do the same constant-time lookup as in the rainbow table.
-Most of the time, however, we will not be so lucky, and the query will not be a database entry.
+Let us consider the spanning trees of the complete distance graph between points in the set.
+The number of bits needed to encode the entire set according to the relationships specified in the spanning tree is then linear in the weight of that tree.
+Thus, the weight of a spanning tree almost corresponds to the entropy of the distribution over all data sets that are in accordance with the pairwise distances specified in that tree.
+One measure of the entropy of a data set would be the entropy of this distribution over a minimum weight spanning tree of the complete distance graph.
+However, we have neglected the number of bits needed to encode the tree itself; as this is an arbitrary tree, every node must encode its parent, so the entropy of the tree itself is $n \log n$ bits.
+Thus, this model of set entropy is not practical as encoding the tree is already super-linear in data set size.
 
-For the general case when the query is not a database entry, let us label the database entries $d_1, \ldots, d_n$.
-WLOG, all of these are \textit{a priori} equivalent; say we first compare $q$ to $d_1$ by looking at the first row of the table.
-Then by the triangle inequality, all database entries within radius $r$ of $q$ must be within distance $||q-d_1|| +r$ of $d_1$.
-Thus, if $q$ is close to $d_1$, we need only check some small fraction of the database.
-If $d_1$ is far from $q$, we can instead progressively try other rows, starting with $d_2, d_3$, etc.
-(note that we will call $d_i$ the central element of row $i$).
-Without going into detail, it is intuitively obvious that the closer together (more redundant) database entries are, the better the performance of similarity search on this data structure, and thus we begin to scale with entropy.
-However, constructing this data structure still requires memory-complexity of $O(n^2)$ and time-complexity $O(n^2 \log n)$, which is still not ideal.
+Alternately, we can also specify a set of $k$ privileged points using which we encode all other points.
+With the additional selection of an arbitrary (or zero) root node, this encoding corresponds to a 2-level spanning tree of the complete distance graph, with pre-selected branches, but leaves selected to minimize total weight.
+The distribution over all data sets in accordance with this 2-level spanning tree has a strictly higher entropy than the one corresponding to the minimum spanning tree of course, but encoding the tree itself uses only $kl$ bits.
+This model of entropy also has the advantage of being much more amenable for proving bounds about the time- and space-complexity of the similarity search data structure we introduce below.
 
-Note that there are still three major sources of extraneous information in the pairwise distances table:
+\subsection{Theoretical setup: fractal dimension}
+Here we formalize the `fractal dimension' condition we alluded to: intuitively, we want the fractal dimension $d$ of the database to be low, so that increases to a search radius do not significantly blow up the number of hits.
+This is crucial because the coarse search radius is the sum of the fine search radius and the maximum cluster radius.
+Roughly speaking, the number of hits returned by the coarse search radius is exponential in the fractal dimension of the database in the search radius regime, so we need fractal dimension to be low.
 
-\begin{enumerate}
-    \item We have $n$ copies of the database, one copy for each database entry.
-However, the algorithm will almost never get to the end of the table, because it will likely contain a sufficiently close starting database entry before then, so the last rows are probably unnecessary.
-    \item Similarly, the last columns of each row are also probably unnecessary, as the algorithm only cares about entries that are close to the central entry of the row.
-    \item The sorting information within each row is used to check only if entries fall within a particular radius and not used beyond that.
-\end{enumerate}
+Given the connections to entropy, one might think to use the upper Minkowski dimension (also known as the entropy dimension) \cite{falconer2013fractal}.
+Recall the definition of upper Minkowski dimension of a set $S$ using the intrinsic ball-covering number:
+\[
+    \dim_{Minkowski}(S) := \limsup_{\epsilon \to 0} \frac{\log N(\epsilon)}{\log 1/\epsilon}
+\]
 
-It is by eliminating this extraneous information that we constructed a generalized data structure we introduced in the paper.
-More precisely, we reduce the table to $k$ rows.
-Then, we remove all the ``distant'' entries from every row, so that every database entry appears in only one row, the one to whose central element it is closest.
-Additionally, we do not need the full sorting information, since each entry only appears with its closest row center.
-Note that the data structure is no longer a table, but rather instead a partition of the original database, thus instead of rows, we refer to clusters and cluster centers.
-Say that the maximum cluster radius is $r_c$.
-Then the similarity search algorithm is to do a `coarse search' on the cluster centers for all centers within distance $r+r_c$ of $q$, expand those clusters, and do a ‘fine search’ on all entries in those clusters for those entries within distance $r$ of $q$, as stated earlier.
+where $N(\epsilon)$ is the minimal number of open balls of radius $\epsilon$ with centers in $S$ needed to cover $S$.
+Unfortunately, as the database is finite and the space might be discrete, the given definition always results in $\dim_{Minkowski}(S) = 0$.
+Thus, we need a more appropriate definition while still capturing the dimensional scaling properties of the upper Minkowski dimension.
+
+One commonly used and more easily measured fractal dimension that is more easily adapted for discrete spaces is the correlation dimension \cite{grassberger1984dimensions}.
+Define the correlation integral
+\[
+    C(\epsilon) = \lim_{N \to \infty} \frac{g(\epsilon)}{N^2}
+\]
+where $g(\epsilon)$ is the number of pairs of points within distance $\epsilon$ of each other.
+Then the correlation dimension $d$ is defined by $C(\epsilon) \sim \epsilon^d$ for small $\epsilon$.
+We adapt this for our database by considering $\epsilon \sim r$, where $r$ is our search radius, and stopping the limit at $N \to n$.
+As mentioned, we require to ensure that $d$ is a small constant.
 
 \section{Cablastx}
 
@@ -1020,6 +975,53 @@ Lastly, this entire section was an illustration of the application of our entrop
 Although similarity search is found as a primitive through-out data science, it is by no means the only primitive query type.
 Augmenting this data structure or designing new data structures to permit other query types while maintaining theoretical guarantees will necessitate the development of new analysis tools, beyond the ones show-cased in this section.
 
+\section{Technical details and motivation for the similarity search data structure}
+Let us provide a bit more motivation and rigorous analysis for the general entropy-scaling similarity search data structure.
+Consider the cost of querying a database of size $n$ for all entries within some distance $r$ of some query item $q$.
+All database entries and the query are drawn from a universe $U$ of possible elements, and we impose on the database both a sparsity assumption and a strong structural assumption (described below).
+%For ease of analysis, we will also assume here that the distance function is a metric, but this metricity assumption can be relaxed.
+
+%The quantitative form of knowledge we are most interested in encoding is pairwise distance from the query.
+%Of course, that knowledge is already implicitly available in the database through computing pairwise distance from the query as needed.
+%Indeed, this is the most commonly used naive method, but it turns out to be an expensive endeavor, scaling linearly with the size of the database.
+The most commonly used na\"ive method is to simply compute pairwise distance from the query as needed.
+This is easy, but requires a linear scan through the entire database, which itself uses also linear space.
+Unfortunately, this can often be prohibitively slow.
+
+One other naive approach is to pre-compute and sort all pairwise distances between database entries and potential queries into a rainbow table.
+If we are given the guarantee that the space of potential queries is small, this approach might be feasible, as then a query requires only a single lookup and effectively constant time to traverse the list of sorted distances until all database entries within $r$ of the query are recovered.
+However, in practice, we do not know in advance the queries expected, and thus constructing such a table requires memory $O(n|U|)$ and time $O(n \log n |U|)$, which is undesirable as the database in sparse in $U$, so $|U| >>n$.
+
+Unlike cryptographic hash functions (for which rainbow tables are actually used \cite{oechslin2003making}, the outputs for similar queries in similarity search are strongly correlated.
+We can easily take advantage of these correlations by instead storing the pairwise distances among just the database entries in a self-similarity table.
+Then, if we are really lucky and the query is a database entry, we only have to do the same constant-time lookup as in the rainbow table.
+Most of the time, however, we will not be so lucky, and the query will not be a database entry.
+
+For the general case when the query is not a database entry, let us label the database entries $d_1, \ldots, d_n$.
+WLOG, all of these are \textit{a priori} equivalent; say we first compare $q$ to $d_1$ by looking at the first row of the table.
+Then by the triangle inequality, all database entries within radius $r$ of $q$ must be within distance $||q-d_1|| +r$ of $d_1$.
+Thus, if $q$ is close to $d_1$, we need only check some small fraction of the database.
+If $d_1$ is far from $q$, we can instead progressively try other rows, starting with $d_2, d_3$, etc.
+(note that we will call $d_i$ the central element of row $i$).
+Without going into detail, it is intuitively obvious that the closer together (more redundant) database entries are, the better the performance of similarity search on this data structure, and thus we begin to scale with entropy.
+However, constructing this data structure still requires memory-complexity of $O(n^2)$ and time-complexity $O(n^2 \log n)$, which is still not ideal.
+
+Note that there are still three major sources of extraneous information in the pairwise distances table:
+
+\begin{enumerate}
+    \item We have $n$ copies of the database, one copy for each database entry.
+However, the algorithm will almost never get to the end of the table, because it will likely contain a sufficiently close starting database entry before then, so the last rows are probably unnecessary.
+    \item Similarly, the last columns of each row are also probably unnecessary, as the algorithm only cares about entries that are close to the central entry of the row.
+    \item The sorting information within each row is used to check only if entries fall within a particular radius and not used beyond that.
+\end{enumerate}
+
+It is by eliminating this extraneous information that we constructed a generalized data structure we introduced in the paper.
+More precisely, we reduce the table to $k$ rows.
+Then, we remove all the ``distant'' entries from every row, so that every database entry appears in only one row, the one to whose central element it is closest.
+Additionally, we do not need the full sorting information, since each entry only appears with its closest row center.
+Note that the data structure is no longer a table, but rather instead a partition of the original database, thus instead of rows, we refer to clusters and cluster centers.
+Say that the maximum cluster radius is $r_c$.
+Then the similarity search algorithm is to do a `coarse search' on the cluster centers for all centers within distance $r+r_c$ of $q$, expand those clusters, and do a ‘fine search’ on all entries in those clusters for those entries within distance $r$ of $q$, as stated earlier.
 
 \end{document}
 
