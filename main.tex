@@ -700,59 +700,6 @@ analysis.
 
 \chapter{Online Methods}
 
-\section{Theory}
-
-\subsection{Theoretical setup: entropy}
-Here we provide the setup for entropy-centric analysis.
-Information-theoretic ``entropy'' is of course a measure of the uncertainty of a distribution or random variable, and is not well-defined for a database.
-However, the term is often used in data compression as a shorthand for the number of bits needed to encode the database, a measure of the randomness of that database.
-We use ``entropy'' in the latter sense; precisely, we define the entropy of a database as the number of bits needed to encode the database under some encoding scheme.
-Equivalently, the entropy of a database is the entropy measured in bits of a random variable whose instances are databases that match our database on some structural condition, which we will define later.
-Of course, each encoding scheme thus results in a different definition of entropy, but this simply corresponds to the compressed size of the database under different compression methods.
-
-Let $l$ be the number of bits necessary to encode a point $p$ in the space \textit{de novo} without any other information.
-Without any compression, a set of size $n$ then requires $nl$ bits to store.
-Assume that the number of bits necessary to encode a point $p$ as a function of $q$ (and vice versa) is $\theta(d) \le l$, where $d = ||p -q||$ the distance from $p$ to $q$.
-Effecitvely, we are imposing the condition that the distance is a measure of entropy added by a new point (`pairwise marginal entropy').
-That distance bounds pairwise marginal entropy is clearly true for Hamming distance, and can also be shown for edit distances and more general similarity measures.
-
-Let us consider the spanning trees of the complete distance graph between points in the set.
-The number of bits needed to encode the entire set according to the relationships specified in the spanning tree is then linear in the weight of that tree.
-Thus, the weight of a spanning tree almost corresponds to the entropy of the distribution over all data sets that are in accordance with the pairwise distances specified in that tree.
-One measure of the entropy of a data set would be the entropy of this distribution over a minimum weight spanning tree of the complete distance graph.
-However, we have neglected the number of bits needed to encode the tree itself; as this is an arbitrary tree, every node must encode its parent, so the entropy of the tree itself is $n \log n$ bits.
-Thus, this model of set entropy is not practical as encoding the tree is already super-linear in data set size.
-
-Alternately, we can also specify a set of $k$ privileged points using which we encode all other points.
-With the additional selection of an arbitrary (or zero) root node, this encoding corresponds to a 2-level spanning tree of the complete distance graph, with pre-selected branches, but leaves selected to minimize total weight.
-The distribution over all data sets in accordance with this 2-level spanning tree has a strictly higher entropy than the one corresponding to the minimum spanning tree of course, but encoding the tree itself uses only $kl$ bits.
-This model of entropy also has the advantage of being much more amenable for proving bounds about the time- and space-complexity of the similarity search data structure we introduce below.
-
-\subsection{Theoretical setup: fractal dimension}
-Here we formalize the `fractal dimension' condition we alluded to: intuitively, we want the fractal dimension $d$ of the database to be low, so that increases to a search radius do not significantly blow up the number of hits.
-This is crucial because the coarse search radius is the sum of the fine search radius and the maximum cluster radius.
-Roughly speaking, the number of hits returned by the coarse search radius is exponential in the fractal dimension of the database in the search radius regime, so we need fractal dimension to be low.
-
-Given the connections to entropy, one might think to use the upper Minkowski dimension (also known as the entropy dimension) \cite{falconer2013fractal}.
-Recall the definition of upper Minkowski dimension of a set $S$ using the intrinsic ball-covering number:
-\[
-    \dim_{Minkowski}(S) := \limsup_{\epsilon \to 0} \frac{\log N(\epsilon)}{\log 1/\epsilon}
-\]
-
-where $N(\epsilon)$ is the minimal number of open balls of radius $\epsilon$ with centers in $S$ needed to cover $S$.
-Unfortunately, as the database is finite and the space might be discrete, the given definition always results in $\dim_{Minkowski}(S) = 0$.
-Thus, we need a more appropriate definition while still capturing the dimensional scaling properties of the upper Minkowski dimension.
-
-One commonly used and more easily measured fractal dimension that is more easily adapted for discrete spaces is the correlation dimension \cite{grassberger1984dimensions}.
-Define the correlation integral
-\[
-    C(\epsilon) = \lim_{N \to \infty} \frac{g(\epsilon)}{N^2}
-\]
-where $g(\epsilon)$ is the number of pairs of points within distance $\epsilon$ of each other.
-Then the correlation dimension $d$ is defined by $C(\epsilon) \sim \epsilon^d$ for small $\epsilon$.
-We adapt this for our database by considering $\epsilon \sim r$, where $r$ is our search radius, and stopping the limit at $N \to n$.
-As mentioned, we require to ensure that $d$ is a small constant.
-
 \section{Cablastx}
 
 \subsection*{Alphabet Reduction}
@@ -993,6 +940,59 @@ Additionally, we do not need the full sorting information, since each entry only
 Note that the data structure is no longer a table, but rather instead a partition of the original database, thus instead of rows, we refer to clusters and cluster centers.
 Say that the maximum cluster radius is $r_c$.
 Then the similarity search algorithm is to do a `coarse search' on the cluster centers for all centers within distance $r+r_c$ of $q$, expand those clusters, and do a ‘fine search’ on all entries in those clusters for those entries within distance $r$ of $q$, as stated earlier.
+
+\section{Theory}
+
+\subsection{Theoretical setup: entropy}
+Here we provide the setup for entropy-centric analysis.
+Information-theoretic ``entropy'' is of course a measure of the uncertainty of a distribution or random variable, and is not well-defined for a database.
+However, the term is often used in data compression as a shorthand for the number of bits needed to encode the database, a measure of the randomness of that database.
+We use ``entropy'' in the latter sense; precisely, we define the entropy of a database as the number of bits needed to encode the database under some encoding scheme.
+Equivalently, the entropy of a database is the entropy measured in bits of a random variable whose instances are databases that match our database on some structural condition, which we will define later.
+Of course, each encoding scheme thus results in a different definition of entropy, but this simply corresponds to the compressed size of the database under different compression methods.
+
+Let $l$ be the number of bits necessary to encode a point $p$ in the space \textit{de novo} without any other information.
+Without any compression, a set of size $n$ then requires $nl$ bits to store.
+Assume that the number of bits necessary to encode a point $p$ as a function of $q$ (and vice versa) is $\theta(d) \le l$, where $d = ||p -q||$ the distance from $p$ to $q$.
+Effecitvely, we are imposing the condition that the distance is a measure of entropy added by a new point (`pairwise marginal entropy').
+That distance bounds pairwise marginal entropy is clearly true for Hamming distance, and can also be shown for edit distances and more general similarity measures.
+
+Let us consider the spanning trees of the complete distance graph between points in the set.
+The number of bits needed to encode the entire set according to the relationships specified in the spanning tree is then linear in the weight of that tree.
+Thus, the weight of a spanning tree almost corresponds to the entropy of the distribution over all data sets that are in accordance with the pairwise distances specified in that tree.
+One measure of the entropy of a data set would be the entropy of this distribution over a minimum weight spanning tree of the complete distance graph.
+However, we have neglected the number of bits needed to encode the tree itself; as this is an arbitrary tree, every node must encode its parent, so the entropy of the tree itself is $n \log n$ bits.
+Thus, this model of set entropy is not practical as encoding the tree is already super-linear in data set size.
+
+Alternately, we can also specify a set of $k$ privileged points using which we encode all other points.
+With the additional selection of an arbitrary (or zero) root node, this encoding corresponds to a 2-level spanning tree of the complete distance graph, with pre-selected branches, but leaves selected to minimize total weight.
+The distribution over all data sets in accordance with this 2-level spanning tree has a strictly higher entropy than the one corresponding to the minimum spanning tree of course, but encoding the tree itself uses only $kl$ bits.
+This model of entropy also has the advantage of being much more amenable for proving bounds about the time- and space-complexity of the similarity search data structure we introduce below.
+
+\subsection{Theoretical setup: fractal dimension}
+Here we formalize the `fractal dimension' condition we alluded to: intuitively, we want the fractal dimension $d$ of the database to be low, so that increases to a search radius do not significantly blow up the number of hits.
+This is crucial because the coarse search radius is the sum of the fine search radius and the maximum cluster radius.
+Roughly speaking, the number of hits returned by the coarse search radius is exponential in the fractal dimension of the database in the search radius regime, so we need fractal dimension to be low.
+
+Given the connections to entropy, one might think to use the upper Minkowski dimension (also known as the entropy dimension) \cite{falconer2013fractal}.
+Recall the definition of upper Minkowski dimension of a set $S$ using the intrinsic ball-covering number:
+\[
+    \dim_{Minkowski}(S) := \limsup_{\epsilon \to 0} \frac{\log N(\epsilon)}{\log 1/\epsilon}
+\]
+
+where $N(\epsilon)$ is the minimal number of open balls of radius $\epsilon$ with centers in $S$ needed to cover $S$.
+Unfortunately, as the database is finite and the space might be discrete, the given definition always results in $\dim_{Minkowski}(S) = 0$.
+Thus, we need a more appropriate definition while still capturing the dimensional scaling properties of the upper Minkowski dimension.
+
+One commonly used and more easily measured fractal dimension that is more easily adapted for discrete spaces is the correlation dimension \cite{grassberger1984dimensions}.
+Define the correlation integral
+\[
+    C(\epsilon) = \lim_{N \to \infty} \frac{g(\epsilon)}{N^2}
+\]
+where $g(\epsilon)$ is the number of pairs of points within distance $\epsilon$ of each other.
+Then the correlation dimension $d$ is defined by $C(\epsilon) \sim \epsilon^d$ for small $\epsilon$.
+We adapt this for our database by considering $\epsilon \sim r$, where $r$ is our search radius, and stopping the limit at $N \to n$.
+As mentioned, we require to ensure that $d$ is a small constant.
 
 \section{Old complexity bounds}
 
