@@ -210,6 +210,11 @@ Let \[\displaystyle F = \bigcup_{c \in B_C(q,r+r_c)} c , \] the union of all the
 Then by the triangle inequality, $B_F(q,r) = B_D(q,r)$.
 Thus, a fine search over the set $F$ can return all items within radius $r$ of $q$.
 
+Note that we require the metricity requirement only for the Triangle Inequality.
+It turns out that many interesting distance functions are not metrics, but still almost satisfy the Triangle Inequality, which is nearly sufficient.
+More precisely, if an $\alpha$ fraction of the triples in $S$ do not satisfy the Triangle Inequality, then in expectation, we will have sensitivity $1 - \alpha$.
+As we will see later, empirically, this loss in sensitivity appears to be negligible, and can often be ameliorated by increasing the coarse search radius \hl{(NB: is this true, Noah?)}.
+
 %We will prove in this section that 
 This data structure allows for similarity search queries in time roughly linear (provided the fractal dimension of the database is low) to the metric entropy of the database.
 Additionally, under some uniformity assumptions, the data structure can be stored in a compressed form that uses space also linear in the metric entropy of the database.
@@ -579,9 +584,6 @@ For a given search query $q$ and search radius $r$,
     \item A fine search was performed over the set $F$ to find all proteins within distance $r$ of $q$.
 \end{itemize}
 
-Note that while Euclidean distance is a metric, and thus the triangle inequality guarantees 100\% sensitivity, cosine distance is not.
-Empirically, however, for all of the queries we performed, we achieve $\sim 99.9\%$ accuracy (Supplementary Table).
-
 \subsection*{Benchmarking}
 We explored the increases in speed resulting from applying the entropy-scaling data structure, for both Euclidean and cosine distances (Figures).
 
@@ -604,7 +606,7 @@ Similarly, once the coarse search encompasses all (or nearly all) the clusters i
 However, we are most interested in proteins that are very similar to the query, the low-radius behavior, which demonstrates varying though substantial acceleration (2x-30x).
 
 Additionally, it is instructive to note that because of he very different geometries of euclidean vs cosine space, acceleration varies tremendously for some proteins, such as 4rhv and 1bmf, which display nearly opposite behaviors.
-Whereas there is nearly 30x acceleration for 4rhv in cosine space for low radius, and the same for 1bmf in euclidean space, neither achieves better than \~2.5x acceleration in the other space.
+Whereas there is nearly 30x acceleration for 4rhv in cosine space for low radius, and the same for 1bmf in euclidean space, neither achieves better than $\sim$ 2.5x acceleration in the other space.
 
 \begin{figure}[tbp]
     \centering
@@ -660,7 +662,8 @@ Whereas there is nearly 30x acceleration for 4rhv in cosine space for low radius
 
 
 \subsection*{Validation}
-As here we use a single metric distance, the entropy-scaling data structure gives 100\% concordance with the na\"ive linear search.
+Note that while Euclidean distance is a metric, and thus the triangle inequality guarantees 100\% sensitivity, cosine distance is not.
+Empirically, however, for all of the queries we performed, we achieve $\sim 99.9\%$ accuracy (Supplementary Table).
 
 \chapter*{Discussion}
 
@@ -843,6 +846,9 @@ Along with each representative, we preserve the information necessary to reconst
 as a pointer to a set of vertices and edges that have been removed or unlabeled.
 
 \section{Fragbag}
+We took the existing Fragbag method as a black box and by design did not do anything clever except apply our entropy-scaling similarity search data structure.
+To ensure comparability, we removed the sorting-by-distance feature of Andrew Gallant's Fragbag search function, which does not improve the all-matching results we were interested in here---it improves $k$-nearest neighbor search time while decreasing the speed of $\rho$-nearest neighbor, the problem at hand.
+All code was written in Go, and is available on Github.
 
 \bibliographystyle{plain}
 \bibliography{main}
