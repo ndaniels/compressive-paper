@@ -737,6 +737,7 @@ Obviously, the weight of this 2-level spanning tree $W_2 \ge W_1$, but
 encoding the tree itself uses only $kl$ bits to specify each of the privileged points and $n \log k$ to encode the tree the cluster identifications.
 Thus, the database will require $O(kl + W_2 + n \log k)$ bits to store.
 %This model of entropy also has the advantage of being much more amenable for proving bounds about the time- and space-complexity of the similarity search data structure we introduce below.
+However, the cluster identifications can be encoded positionally on disk, so we can actually store it in just $O(kl + W_2)$ bits, so the data structure is basically linear in the entropy of a distribution corresponding to a 2-level cluster.
 
 It turns out though, that we can often do even better than that given a metric entropy $N_{r_c}^{ent} = k$, and actually bound the tree weight $W_3$ with a slightly different tree structure.
 Recall that we assumed the maximum cluster size $S_c$, and the maximum cluster radius is $r_c$ if $k$ points chosen to be at least distance $r_c$ from each other are used as the cluster centers.
@@ -744,8 +745,10 @@ We now consider encoding each item by its nearest neighbor within a cluster, whi
 Clearly, this decreases the weight of the tree from the previous 2-level spanning tree, so $W_1 \le W_3 \le W_2$.
 As each cluster has at most $S_c$ elements, encoding the tree itself uses $(n-k)\log S_c$, but specifying the privileged points again requires $kl$ bits.
 Thus, total number of bits needed is $O(kl + W_3 + (n-k)\log S_c )$
-Furthermore, the entropy of the distribution over databases constrained by this tree is bounded by the cluster radii to be $O((n-k)r_c)$.
-Thus, given our metric entropy bound, we can encode the entire database in $O(kl + (n-k)(r_c + \log S_c))$ bits.
+
+But because the cluster sizes are bounded by $S_c$, we can effectively still encode positionally by using a large window and a standard text compressor like Gzip or Bzip2 and setting the compression window to be larger than $S_c l$.
+Instead of directly encoding differences, this scheme instead lists all cluster members together and uses a standard text compressor to use the redundancy throughout the cluster, which allows us to not store the forest explicitly and still get compression.
+Thus, the total number of bits needed is roughly $O(kl + W_3)$. Again, we can get a data structure basically linear in the entropy, but here linear in the entropy of a distribution closer to that of the optimal minimum spanning tree.
 
 \section{Cablastx}
 
