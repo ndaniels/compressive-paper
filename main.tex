@@ -223,7 +223,7 @@ Compressed data structures, on the other hand, bound the amount of the space use
 Unlike entropy-scaling data structures though, they do not measure time-complexity in terms of the entropy.
 \textbf{The primary theoretical advance of entropy-scaling data structures is that they bound both space and time as functions of the data set entropy.}
 
-\subsection{Structure and complexity bounds}
+\subsection{Complexity bounds}
 We first define the concept of metric entropy and entropy dimension as is usual in fractal geometry:
 \begin{definition}[\cite{tao2014metric} Definition 3 \hl{(NB: need better citation not Tao's blog)}]
     Let $X$ be a metric space, let $D$ be a subset of $X$, and let $\rho>0$ be a radius.
@@ -266,10 +266,13 @@ Then in expectation over possible queries $q$,
 Roughly speaking, this scaling argument just says that doubling a search radius only increases the number of hits by a factor of at most $2^d$.
 Thus, total search time is 
 \[
-    O(k + \left|B_D(q,r)\right|\left(\frac{r+r_c}{r}\right)^d ).
+    O\left(k + \left|B_D(q,r)\right|\left(\frac{r+r_c}{r}\right)^d \right).
 \]
-But note that $k$ is linear in metric entropy and $|B_D(q,r)|$ is the output size, so similarity search can be performed in time linear to metric entropy but a scaled up output size.
+However, note that $k$ is linear in metric entropy and $|B_D(q,r)|$ is the output size, so similarity search can be performed in time linear to metric entropy and a polynomial blow-up of output size.
 Provided that the fractal dimension $d$ is small and $k$ is large, the search time will be dominated by the metric entropy component, which turns out to be the regime of greatest interest for us.
+
+We have thus proven bounds for the time-complexity of similarity search.
+In the Online Methods, we also prove space-complexity bounds for the data structure and connect metric entropy with information-theoretic entropy under some additional uniformity assumptions.
 
 \section*{Metagenomics}
 
@@ -700,6 +703,12 @@ analysis.
 
 \chapter{Online Methods}
 
+\section{Theory}
+
+\subsection{Relationship of metric entropy to information-theoretic entropy}
+
+\subsection{Space-complexity of entropy-scaling similarity search data structure}
+
 \section{Cablastx}
 
 \subsection*{Alphabet Reduction}
@@ -834,9 +843,6 @@ Along with each representative, we preserve the information necessary to reconst
 as a pointer to a set of vertices and edges that have been removed or unlabeled.
 
 \section{Fragbag}
-
-\chapter{Discussion}
-
 
 \bibliographystyle{plain}
 \bibliography{main}
