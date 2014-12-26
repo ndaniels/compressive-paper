@@ -707,10 +707,45 @@ analysis.
 \chapter{Online Methods}
 
 \section{Theory}
+Here we make the connection between metric entropy and information-theoretic Shannon entropy.
+To do this, we will need two conditions: (1) that our distance function measures marginal entropies and (2) that all clusters are smaller than some constant $S_c$.
 
-\subsection{Relationship of metric entropy to information-theoretic entropy}
+Information-theoretic ``entropy'' is of course a measure of the uncertainty of a distribution or random variable, and is not well-defined for a database.
+However, the term is often used in data compression as a shorthand for the number of bits needed to encode the database, a measure of the randomness of that database.
+We use entropy in the latter sense; precisely, we define the entropy of a database as the number of bits needed to encode the database under some encoding scheme.
+Equivalently, the entropy of a database is the entropy measured in bits of a random variable whose instances are databases that match our database on some structural condition, which we will define later.
+Of course, each encoding scheme thus results in a different definition of entropy, but this simply corresponds to the compressed size of the database under different compression methods.
+We now estimate the entropy of the database by attempting to compress it.
 
-\subsection{Space-complexity of entropy-scaling similarity search data structure}
+Let $l$ be the number of bits necessary to encode a point $p$ in the space \textit{de novo} without any other information.
+Without any compression, a set of size $n$ then requires $nl$ bits to store.
+Assume that the number of bits necessary to encode a point $p$ as a function of $q$ (and vice versa) is $\theta(||p-q||) \le l$.
+Effecitvely, we are imposing the condition that the distance is a measure of entropy added by a new point (`pairwise marginal entropy').
+That distance bounds pairwise marginal entropy is clearly true for Hamming distance, and can also be shown for edit distances and more general similarity measures.
+
+Let us consider the spanning trees of the complete distance graph between points in the set.
+The number of bits needed to encode the entire set according to the relationships specified in the spanning tree is then linear in the weight of that tree.
+Thus, the weight of a spanning tree effectively corresponds to the entropy of the distribution over all data sets that are in accordance with the pairwise distances specified in that tree.
+One measure of the entropy of a data set would be the entropy of this distribution over a minimum weight spanning tree of the complete distance graph, and let us call that weight $W_1$.
+However, we have neglected the number of bits needed to encode the tree itself; as this is an arbitrary tree, every node must encode its parent, so the entropy of the tree itself is $ (n-1) \log n$ bits.
+Thus, this encoding is not practical as encoding the tree is already super-linear in data set size.
+In total, including encoding the root node, the database will require $O(l + W + (n-1)\log n$ bits to store.
+
+Alternately, we can also specify a set of $k$ privileged points using which we encode all other points, corresponding to our cluster centers.
+With the additional selection of an arbitrary (or zero) root node, this encoding corresponds to a 2-level spanning tree of the complete distance graph, with pre-selected branches, but leaves selected to minimize total weight.
+Obviously, the weight of this 2-level spanning tree $W_2 \ge W_1$, but
+encoding the tree itself uses only $kl$ bits to specify each of the privileged points and $n \log k$ to encode the tree the cluster identifications.
+Thus, the database will require $O(kl + W_2 + n \log k)$ bits to store.
+%This model of entropy also has the advantage of being much more amenable for proving bounds about the time- and space-complexity of the similarity search data structure we introduce below.
+
+It turns out though, that we can often do even better than that given a metric entropy $N_{r_c}^{ent} = k$, and actually bound the tree weight $W_3$ with a slightly different tree structure.
+Recall that we assumed the maximum cluster size $S_c$, and the maximum cluster radius is $r_c$ if $k$ points chosen to be at least distance $r_c$ from each other are used as the cluster centers.
+We now consider encoding each item by its nearest neighbor within a cluster, which corresponds to a tree made by joining together a forest of minimum spanning trees corresponding to each individual cluster by the roots (i.e. cluster centers).
+Clearly, this decreases the weight of the tree from the previous 2-level spanning tree, so $W_1 \le W_3 \le W_2$.
+As each cluster has at most $S_c$ elements, encoding the tree itself uses $(n-k)\log S_c$, but specifying the privileged points again requires $kl$ bits.
+Thus, total number of bits needed is $O(kl + W_3 + (n-k)\log S_c )$
+Furthermore, the entropy of the distribution over databases constrained by this tree is bounded by the cluster radii to be $O((n-k)r_c)$.
+Thus, given our metric entropy bound, we can encode the entire database in $O(kl + (n-k)(r_c + \log S_c))$ bits.
 
 \section{Cablastx}
 
