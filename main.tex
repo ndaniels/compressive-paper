@@ -443,22 +443,26 @@ size which is the size of the original, uncompressed protein database.
 \subsection*{Benchmarking}
 
 To evaluate the run-time performance of caBLASTX, we tested it against
-BLASTX in two scenarios, and against PAUDA and Kraken in one.
+BLASTX as well as RapSearch2~\cite{rs2} and Diamond~\cite{diamond}.
 BLASTX is often used to align assemblies thought to be exons to a protein
 database, in which case metagenomic reads have already been assembled.
 In this instance, the query-side compression of caBLASTX is not applicable, so
 the performance gains are more modest.
-We benchmarked caBLASTX vs. BLASTX on a dataset consisting of XX assemblies
+We benchmarked caBLASTX vs. BLASTX on a dataset consisting of 22778 assemblies
 from human gut microbiota, 3.1 megabases in total, searching against the NCBI's
 ``NR'' non-redundant protein database.
-The running time of BLASTX was XX minutes, compared to XX minutes for caBLASTX.
+The running time of BLASTX was 3235 minutes, compared to 123 minutes for caBLASTX, a speedup of 26.3.
 
 When aligning next-generation sequencing reads to a protein database, the
 query-side compression aspect of caBLASTX becomes applicable.
-We benchmarked caBLASTX against BLASTX and PAUDA on a Siberian
-permafrost dataset from~\cite{blah}, which consists of XX megabases of
-100-nucleotide reads.
+We benchmarked caBLASTX against BLASTX on a 556,270
+next-generation sequencing reads each of length 151 nucleotides from a human 
+fecal dataset (ERP003820) from~\cite{blah}.
+The running time for BLASTX was 33,380 minutes, while caBLASTX took 48.3 
+minutes, a speedup of 691.
+ 
 Results appear in Table~\ref{qsbench}.
+
 
 
 
@@ -466,16 +470,14 @@ Results appear in Table~\ref{qsbench}.
 
 In order to validate caBLASTX's accuracy, we treated BLASTX as a gold standard. 
 Since caBLASTX accelerates BLASTX
-using compression, false positives with respect to BLASTX should not be
-possible, but false negatives certainly are.
+using entropy-scaling techniques, false positives with respect to BLASTX should 
+not be possible, but false negatives certainly are.
 We evaluated the hits from BLASTX and caBLASTX on the same human gut
 assemblies used for benchmarking, in order to evaluate the accuracy when
 query-side compression is not used.
 For query-side compression, we also evaluated the hits from BLASTX and caBLASTX
 on a set of 151-nucleotide MiSeq reads from the American Gut Project,
 (ERP003820) from~\cite{blah}.
-We also ran DIAMOND and RapSearch2 on this same data set.
-Results appear in Table~\ref{bxacc}.
 
 Note: Due to query-side compression, the output order from caBLASTX does not
 match that of BLASTX.
