@@ -270,7 +270,7 @@
 \newbox\absbox
 \renewenvironment{abstract}{\global\setbox\absbox=\vbox\bgroup
   \hsize=\textwidth\def\baselinestretch{1}%
-  \noindent\unskip\textbf{Abstract}
+  \noindent\unskip\textbf{Summary}
  \par\medskip\noindent\unskip\ignorespaces}
  {\egroup}
 
