@@ -1,16 +1,20 @@
-\documentclass[preprint,12pt]{elsarticle}
+\documentclass[review,preprint,12pt]{elsarticle}
+%\PassOptionsToPackage{numbers,super,comma}{natbib}
+\biboptions{numbers,super,comma}
 
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
 
 \usepackage{graphicx}
-\usepackage{natbib}
+%\usepackage{natbib}
 \usepackage{caption}
 \usepackage{subcaption}
 
 \usepackage{color}
 \usepackage{soul}
+
+%\biboptions{numbers,super,comma}
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
@@ -39,34 +43,22 @@
   }%
 }
 
+\journal{Cell Systems}
+
 \begin{document}
+\begin{frontmatter}
 
 \title{A compressed data structure with entropy-linear approximate similarity search}
 
 %    Information for first author
-\author{Y. William Yu}
+\author[mitmath,mitcsail]{Y. William Yu}
+\author[mitmath,mitcsail]{Noah M. Daniels}
+\author[mitcsail]{David C. Danko}
+\author[mitmath,mitcsail]{Bonnie Berger}
 %    Address of record for the research reported here
-\address{Department of Mathematics, Massachusetts Institute of Technology, Cambridge, Massachusetts 02139}
-%    Current address
-%\curraddr{Department of Mathematics and Statistics,
-%Case Western Reserve University, Cleveland, Ohio 43403}
-%\email{ywy@math.mit.edu}
-%    \thanks will become a 1st page footnote.
-\thanks{The first author was supported by a Hertz Foundation Fellowship.}
+\address[mitmath]{Department of Mathematics, Massachusetts Institute of Technology, Cambridge, Massachusetts 02139}
+\address[mitcsail]{Computer Science and AI Lab, Massachusetts Institute of Technology, Cambridge, Massachusetts 02139}
 
-%    Information for second author
-\author{Noah M. Daniels}
-%\address{Mathematical Research Section, School of Mathematical Sciences,
-%Australian National University, Canberra ACT 2601, Australia}
-%\email{ndaniels@mit.edu}
-%\thanks{Support information for the second author.}
-
-\author{David C. Danko}
-%\address{Mathematical Research Section, School of Mathematical Sciences,
-%Australian National University, Canberra ACT 2601, Australia}
-%\email{dcdanko@mit.edu}
-
-\author{Bonnie Berger}
 %\email{bab@mit.edu}
 
 %    General info
@@ -76,7 +68,6 @@
 
 %\dedicatory{This paper is dedicated to our advisors.}
 
-%\keywords{Similarity search, approximate matching, entropy scaling algorithms}
 
 \begin{abstract}
 Much like sorting is a primitive operation in computer science, similarity
@@ -115,6 +106,12 @@ We also provide software implementations ....
 
 
 \end{abstract}
+
+%\begin{keyword}
+%Similarity search, approximate matching, entropy scaling algorithms
+%\end{keyword}
+
+\end{frontmatter}
 
 \maketitle
 
@@ -866,8 +863,10 @@ We took the existing Fragbag method as a black box and by design did not do anyt
 To ensure comparability, we removed the sorting-by-distance feature of Andrew Gallant's Fragbag search function, which does not improve the all-matching results we were interested in here---it improves $k$-nearest neighbor search time while decreasing the speed of $\rho$-nearest neighbor, the problem at hand.
 All code was written in Go, and is available on Github.
 
-\bibliographystyle{plain}
+\bibliographystyle{model2-names}
+%\bibliographystyle{plain}
 \bibliography{main}
+
 
 \appendix
 \section{Extraneous}
@@ -1104,8 +1103,4 @@ Therefore, we have enough entropy to pay for the increases in search time, and s
 
 
 \end{document}
-
-%------------------------------------------------------------------------------
-% End of journal.tex
-%------------------------------------------------------------------------------
 
