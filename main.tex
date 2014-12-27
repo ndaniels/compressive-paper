@@ -865,10 +865,25 @@ We took the existing Fragbag method as a black box and by design did not do anyt
 To ensure comparability, we removed the sorting-by-distance feature of Andrew Gallant's Fragbag search function, which does not improve the all-matching results we were interested in here---it improves $k$-nearest neighbor search time while decreasing the speed of $\rho$-nearest neighbor, the problem at hand.
 All code was written in Go, and is available on Github.
 
+\section{Author Contributions}
+\hl{How much do we need here, seeing as we have only 4 authors? Tentative draft below; feel free to modify if I gave too little credit at any point.}
+
+Y.W.Y., N.M.D. and B.B. conceived the project.
+Y.W.Y. developed the theoretical analyses, with help from N.M.D.
+N.M.D. implemented and benchmarked Cablastx.
+D.C.D. implemented and benchmarked Ammolite, with help from N.M.D.
+Y.W.Y. applied the entropy-scaling data structure to accelerate Fragbag, with help from N.M.D.
+B.B. supervised research and provided critical advice on the study.
+Y.W.Y., N.M.D. and B.B. wrote the manuscript.
+
+\section{Acknowledgments}
+Y.W.Y. is supported by a Hertz Foundation fellowship.
+
 \bibliographystyle{model2-names}
 %\bibliographystyle{plain}
 \bibliography{main}
 
+\newpage
 
 \appendix
 \section{Extraneous}
