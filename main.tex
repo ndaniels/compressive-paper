@@ -92,39 +92,16 @@ This approach allows us to achieve massive acceleration of tools drawn from geno
 %\maketitle
 \section{Summary}
 { \bfseries
-Much like sorting is a primitive operation in computer science, similarity
-search (alternately, approximate matching) is a fundamental operation in data
-science and lies at the heart of many other problems.
-Traditionally, approximate matching has been studied primarily in the context
-of strings under edit distance metrics (e.g. for spell-checkers).
-In recent years, however, similarity search has become increasingly important
-for other objects and distance functions (e.g. biological genomes and alignment
-scores, networks and the Jaccard index).
+    The continual onslaught of new data in computational biology has forced scientists into the happy problem of having too much data to analyze.
+    However, the standard toolkit of the modern practitioner, although sometimes sufficient, is ill-prepared to scale.
+    Although computers are getting faster and cheaper, they are not doing so at a fast enough rate to keep pace with this exponential explosion of data.
+    Luckily, it turns out that many of these huge data sets are highly redundant in nature, which can be exploited to design smarter tools.
+    In this paper, we present a novel similarity search data structure that scales with the entropy of the underlying database.
+    By applying this data structure and also exploiting other structure in the database, we are able to achieve massive acceleration in several standard tools in the three domains of metagenomics, high-throughput drug screening, and protein structure search.
+    In particular, we can achieve, using our new tool CaBLASTX, 700x speedup of BLASTX with less than 5\% loss in sensitivity and no loss in specificity, using our new tool Ammolite, \hl{??}x speedup of small molecule similarity search, and, using an entropy-scaling version of FragBag, 2-30x speedup of FragBag with less than 0.2\% loss in sensitivity and no loss in specificity.
+    Thus, we present not only a novel data structure for use in accelerating similarity search in any low-entropy setting, but also practical tools ready for immediate use by the practitioner.
 
-As available data grows exponentially, algorithms that scale linearly no longer
-suffice.
-The primary ways the literature addresses this problem (e.g. locality sensitive
-hashing, vector approximation, space partitioning) involve the construction of
-data structures that admit a more efficient search operation.
-However, we note that as data increases, very often the redundancy present in
-the data also increases.
-Existing general purpose methods do not explicitly take advantage of this
-phenomenon.
-
-
-In contrast, in the emerging field of ``compressive genomics'', the prevailing
-algorithmic framework specifically takes advantage of the particularly
-pronounced redundancy in large biological data sets.
-This has enabled orders of magnitude speedup of existing search algorithms such
-as BLAST and BLAT, as well as of applications using similarity search as a
-primitive, such as read mapping and network analysis.
-The key to these improvements is the use of data structures that seemingly
-scale linearly with the ``entropy'' of the dataset, both in space and time.
-
-In this paper, we present a prototypical compressed data structure for
-similarity search in Hamming-like spaces and prove the linear entropy-scaling
-result.
-We also provide software implementations ....
+    All source code is publicly available for download.
 }
 
 \section{Introduction}
@@ -981,6 +958,42 @@ Additionally, we do not need the full sorting information, since each entry only
 Note that the data structure is no longer a table, but rather instead a partition of the original database, thus instead of rows, we refer to clusters and cluster centers.
 Say that the maximum cluster radius is $r_c$.
 Then the similarity search algorithm is to do a `coarse search' on the cluster centers for all centers within distance $r+r_c$ of $q$, expand those clusters, and do a ‘fine search’ on all entries in those clusters for those entries within distance $r$ of $q$, as stated earlier.
+
+\subsection{Old Abstract}
+
+Much like sorting is a primitive operation in computer science, similarity
+search (alternately, approximate matching) is a fundamental operation in data
+science and lies at the heart of many other problems.
+Traditionally, approximate matching has been studied primarily in the context
+of strings under edit distance metrics (e.g. for spell-checkers).
+In recent years, however, similarity search has become increasingly important
+for other objects and distance functions (e.g. biological genomes and alignment
+scores, networks and the Jaccard index).
+
+As available data grows exponentially, algorithms that scale linearly no longer
+suffice.
+The primary ways the literature addresses this problem (e.g. locality sensitive
+hashing, vector approximation, space partitioning) involve the construction of
+data structures that admit a more efficient search operation.
+However, we note that as data increases, very often the redundancy present in
+the data also increases.
+Existing general purpose methods do not explicitly take advantage of this
+phenomenon.
+
+
+In contrast, in the emerging field of ``compressive genomics'', the prevailing
+algorithmic framework specifically takes advantage of the particularly
+pronounced redundancy in large biological data sets.
+This has enabled orders of magnitude speedup of existing search algorithms such
+as BLAST and BLAT, as well as of applications using similarity search as a
+primitive, such as read mapping and network analysis.
+The key to these improvements is the use of data structures that seemingly
+scale linearly with the ``entropy'' of the dataset, both in space and time.
+
+In this paper, we present a prototypical compressed data structure for
+similarity search in Hamming-like spaces and prove the linear entropy-scaling
+result.
+We also provide software implementations ....
 
 \end{document}
 
