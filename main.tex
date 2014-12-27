@@ -254,7 +254,7 @@ Provided that the fractal dimension $d$ is small and $k$ is large, the search ti
 We have thus proven bounds for the time-complexity of similarity search.
 In the Online Methods, we also prove space-complexity bounds for the data structure and connect metric entropy with information-theoretic entropy under some additional uniformity assumptions.
 
-\subsection*{Metagenomics}
+\subsection{Metagenomics}
 
 Metagenomics, the study of genomic data sequenced directly from environmental
 samples, has recently grown in popularity.
@@ -343,11 +343,11 @@ no loss in specificity. For the short reads, we demonstrate run-time
 performance approximately 700x faster than BLASTX, with less than 5\% loss in
 sensitivity and no loss in specificity.
 
-\subsubsection*{Compressed representation}
+\subsubsection{Compressed representation}
 
 
 
-\subsubsection*{Query Compression}
+\subsubsection{Query Compression}
 
 Metagenomic reads are themselves nucleotide sequences, so no alphabet reduction
 is performed on them directly.
@@ -369,7 +369,7 @@ cannot be amortized.
 Thus, we would not refer to the query compression as entropy-scaling, but it
 still provides a practical benefit.
 
-\subsubsection*{Search}
+\subsubsection{Search}
 
 Given a compressed protein database and a compressed query read set, search
 comprises two phases.
@@ -415,7 +415,7 @@ to BLASTX's default of 10) to filter hits.
 To ensure that E-value calculation is correct, BLASTX uses a corrected database
 size which is the size of the original, uncompressed protein database.
 
-\subsubsection*{Benchmarking}
+\subsubsection{Benchmarking}
 
 To evaluate the run-time performance of caBLASTX, we tested it against
 BLASTX as well as RapSearch2~\cite{rs2} and Diamond~\cite{diamond}.
@@ -441,7 +441,7 @@ Results appear in Table~\ref{qsbench}.
 
 
 
-\subsubsection*{Validation}
+\subsubsection{Validation}
 
 In order to validate caBLASTX's accuracy, we treated BLASTX as a gold standard. 
 Since caBLASTX accelerates BLASTX
@@ -457,13 +457,13 @@ on a set of 151-nucleotide MiSeq reads from the American Gut Project,
 Note: Due to query-side compression, the output order from caBLASTX does not
 match that of BLASTX.
 
-\subsection*{High-throughput Drug Screening}
+\subsection{High-throughput Drug Screening}
 
 - introductory info about small-molecule search in drug repurposing and discovery
 - growth of PubChem over time
 - cite Girke and Thornton
 
-\subsubsection*{Compression}
+\subsubsection{Compression}
 
 We introduce a framework for compressing molecular databases that use the 
 popular SDF molecular structure format, such as PubChem, and for searching for 
@@ -496,7 +496,7 @@ full molecules it represents.
 
 
 
-\subsubsection*{Search}
+\subsubsection{Search}
 
 We implemented a variant of a maximum common subgraph (MCS) algorithm, known as \emph{flexible} maximum
 common subgraph (fMCS), as detailed by Cao, et al.~\cite{cao}.
@@ -522,11 +522,11 @@ Next, the \emph{fine search} is performed against these decompressed possible hi
 Fine search is performed using fMCS, with user-defined parameters for bond and atom mismatches and
 similarity-score threshold.
 
-\subsubsection*{Benchmarking}
+\subsubsection{Benchmarking}
 
-\subsubsection*{Validation}
+\subsubsection{Validation}
 
-\subsection*{Protein Structure Search}
+\subsection{Protein Structure Search}
 
 Given a protein of solved (or predicted) structure but unknown function, the efficient identification
 of structurally similar proteins in the Protein Data Bank is critical to function and structure prediction.
@@ -546,13 +546,13 @@ without using substantial domain-specific knowledge.
 Instead, we used the very same representation (bag of fragments) and distance functions (Euclidean and cosine distances)
 as FragBag, a greedy k-centers algorithm, and vector difference to generate the clustered representation.
 
-\subsubsection*{Clustering}
+\subsubsection{Clustering}
 For the cluster generation, we used a randomized greedy 2-pass approach.
 First, all proteins in the PDB were randomly ordered.
 Then in the first pass, proteins were selected as cluster centers if and only if they were not within a user-specified Euclidean distance $r_c$ from an existing center (i.e. the first protein is always selected, and the second if further away than $r_c$ from the first, etc.).
 In the second pass, every protein was assigned to the nearest cluster center.
 
-\subsubsection*{Search}
+\subsubsection{Search}
 Similarity search here is performed exactly as described in the data structure section, with no modifications.
 For a given search query $q$ and search radius $r$,
 \begin{itemize}
@@ -561,7 +561,7 @@ For a given search query $q$ and search radius $r$,
     \item A fine search was performed over the set $F$ to find all proteins within distance $r$ of $q$.
 \end{itemize}
 
-\subsubsection*{Benchmarking}
+\subsubsection{Benchmarking}
 We explored the increases in speed resulting from applying the entropy-scaling data structure, for both Euclidean and cosine distances (Figures).
 
 For cosine distance, we generated databases with maximum cluster radii of 0.05, 0.1, 0.2, 0.3, 0.4, and 0.5.
@@ -638,11 +638,11 @@ Whereas there is nearly 30x acceleration for 4rhv in cosine space for low radius
 \end{figure}
 
 
-\subsubsection*{Validation}
+\subsubsection{Validation}
 Note that while Euclidean distance is a metric, and thus the triangle inequality guarantees 100\% sensitivity, cosine distance is not.
 Empirically, however, for all of the queries we performed, we achieve $\sim 99.9\%$ accuracy (Supplementary Table).
 
-\section*{Discussion}
+\section{Discussion}
 
 We have introduced a compression-accelerated search algorithm that boosts the
 speed of BLASTX while maintaining its accuracy.
@@ -729,7 +729,7 @@ Thus, the total number of bits needed is roughly $O(kl + W_3)$. Again, we can ge
 
 \subsection{Cablastx}
 
-\subsubsection*{Alphabet Reduction}
+\subsubsection{Alphabet Reduction}
 
 Alphabet reduction--reducing the 20-letter standard amino acid alphabet to a
 smaller set, in order to accelerate search or improve homology detection--has
@@ -750,7 +750,7 @@ D, E, N, Q, K, R, H, B, and Z into a fourth cluster.
 By storing the offset within each cluster of the original letter, the original
 sequence can be reconstructed, making this a reversible reduction.
 
-\subsubsection*{Database Compression}
+\subsubsection{Database Compression}
 
 Given a protein sequence database to be compressed, we proceed as follows:
 \begin{enumerate}
@@ -836,7 +836,7 @@ physicochemical properties of the constituent amino acids.
 
 \subsection{Ammolite}
 
-\subsubsection*{Simplification and compression}
+\subsubsection{Simplification and compression}
 
 First, we remove hydrogen atoms from the molecules; hydrogens can be easily recovered by inferring their 
 presence.
