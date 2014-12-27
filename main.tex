@@ -1,4 +1,8 @@
-\documentclass{amsbook}
+\documentclass[preprint,12pt]{elsarticle}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
 
 \usepackage{graphicx}
 \usepackage{natbib}
@@ -22,7 +26,7 @@
 \numberwithin{equation}{section}
 
 %    Absolute value notation
-\newcommand{\abs}[1]{\lvert#1\rvert}
+%\newcommand{\abs}[1]{\lvert#1\rvert}
 
 %    Blank box placeholder for figures (to avoid requiring any
 %    particular graphics capabilities for printing this document).
@@ -46,7 +50,7 @@
 %    Current address
 %\curraddr{Department of Mathematics and Statistics,
 %Case Western Reserve University, Cleveland, Ohio 43403}
-\email{ywy@math.mit.edu}
+%\email{ywy@math.mit.edu}
 %    \thanks will become a 1st page footnote.
 \thanks{The first author was supported by a Hertz Foundation Fellowship.}
 
@@ -54,25 +58,25 @@
 \author{Noah M. Daniels}
 %\address{Mathematical Research Section, School of Mathematical Sciences,
 %Australian National University, Canberra ACT 2601, Australia}
-\email{ndaniels@mit.edu}
+%\email{ndaniels@mit.edu}
 %\thanks{Support information for the second author.}
 
 \author{David C. Danko}
 %\address{Mathematical Research Section, School of Mathematical Sciences,
 %Australian National University, Canberra ACT 2601, Australia}
-\email{dcdanko@mit.edu}
+%\email{dcdanko@mit.edu}
 
 \author{Bonnie Berger}
-\email{bab@mit.edu}
+%\email{bab@mit.edu}
 
 %    General info
-\subjclass[2010]{Primary 68W99}
+%\subjclass[2010]{Primary 68W99}
 
 \date{September 23, 2014}
 
 %\dedicatory{This paper is dedicated to our advisors.}
 
-\keywords{Similarity search, approximate matching, entropy scaling algorithms}
+%\keywords{Similarity search, approximate matching, entropy scaling algorithms}
 
 \begin{abstract}
 Much like sorting is a primitive operation in computer science, similarity
@@ -114,7 +118,7 @@ We also provide software implementations ....
 
 \maketitle
 
-\chapter{Introduction}
+\section{Introduction}
 Throughout all areas of data science, scientists are being confronted by a veritable explosion of available data.
 In many fields, and in particular molecular biology, this increase is exponential in nature, even outpacing Moore's and Kryder's laws on the respective doublings of transistors on a chip and long-term data storage density \hl{[cite]}.
 As such, the challenges posed by the massive influx of data cannot be solved by waiting for faster and larger capacity computers, but require instead the development of data structures and representations that exploit and simplify complexity in the data set.
@@ -155,9 +159,9 @@ Specifically, if similarity is defined by some metric-like distance function and
 Although these `entropy-linear data structures' can in principle be used to organize nearly any large data set for faster and more space-efficient analysis,
 we demonstrate their applicability on similarity search problems drawn from the three major Big Data challenges in computational biology: genomics, pharmaceuticals, and protein structure \hl{(NB: reword)} \cite{marx2013biology}.
 
-\chapter{Results}
-\section{Entropy-scaling data structure for similarity search}
-\subsection{Data structure}
+\section{Results}
+\subsection{Entropy-scaling data structure for similarity search}
+\subsubsection{Data structure}
 \begin{figure}[btp]
     \centering
     \includegraphics[width=1\textwidth]{assets/dataStructure}
@@ -200,7 +204,7 @@ Compressed data structures, on the other hand, bound the amount of the space use
 Unlike entropy-scaling data structures though, they do not measure time-complexity in terms of the entropy.
 \textbf{The primary theoretical advance of entropy-scaling data structures is that they bound both space and time as functions of the data set entropy.}
 
-\subsection{Complexity bounds}
+\subsubsection{Complexity bounds}
 We first define the concept of metric entropy and entropy dimension as is usual in fractal geometry:
 \begin{definition}[\cite{tao2014metric} Definition 3 \hl{(NB: need better citation not Tao's blog)}]
     Let $X$ be a metric space, let $D$ be a subset of $X$, and let $\rho>0$ be a radius.
@@ -251,7 +255,7 @@ Provided that the fractal dimension $d$ is small and $k$ is large, the search ti
 We have thus proven bounds for the time-complexity of similarity search.
 In the Online Methods, we also prove space-complexity bounds for the data structure and connect metric entropy with information-theoretic entropy under some additional uniformity assumptions.
 
-\section*{Metagenomics}
+\subsection*{Metagenomics}
 
 Metagenomics, the study of genomic data sequenced directly from environmental
 samples, has recently grown in popularity.
@@ -340,11 +344,11 @@ no loss in specificity. For the short reads, we demonstrate run-time
 performance approximately 700x faster than BLASTX, with less than 5\% loss in
 sensitivity and no loss in specificity.
 
-\subsection*{Compressed representation}
+\subsubsection*{Compressed representation}
 
 
 
-\subsection*{Query Compression}
+\subsubsection*{Query Compression}
 
 Metagenomic reads are themselves nucleotide sequences, so no alphabet reduction
 is performed on them directly.
@@ -366,7 +370,7 @@ cannot be amortized.
 Thus, we would not refer to the query compression as entropy-scaling, but it
 still provides a practical benefit.
 
-\subsection*{Search}
+\subsubsection*{Search}
 
 Given a compressed protein database and a compressed query read set, search
 comprises two phases.
@@ -412,7 +416,7 @@ to BLASTX's default of 10) to filter hits.
 To ensure that E-value calculation is correct, BLASTX uses a corrected database
 size which is the size of the original, uncompressed protein database.
 
-\subsection*{Benchmarking}
+\subsubsection*{Benchmarking}
 
 To evaluate the run-time performance of caBLASTX, we tested it against
 BLASTX as well as RapSearch2~\cite{rs2} and Diamond~\cite{diamond}.
@@ -438,7 +442,7 @@ Results appear in Table~\ref{qsbench}.
 
 
 
-\subsection*{Validation}
+\subsubsection*{Validation}
 
 In order to validate caBLASTX's accuracy, we treated BLASTX as a gold standard. 
 Since caBLASTX accelerates BLASTX
@@ -454,13 +458,13 @@ on a set of 151-nucleotide MiSeq reads from the American Gut Project,
 Note: Due to query-side compression, the output order from caBLASTX does not
 match that of BLASTX.
 
-\section*{High-throughput Drug Screening}
+\subsection*{High-throughput Drug Screening}
 
 - introductory info about small-molecule search in drug repurposing and discovery
 - growth of PubChem over time
 - cite Girke and Thornton
 
-\subsection*{Compression}
+\subsubsection*{Compression}
 
 We introduce a framework for compressing molecular databases that use the 
 popular SDF molecular structure format, such as PubChem, and for searching for 
@@ -493,7 +497,7 @@ full molecules it represents.
 
 
 
-\subsection*{Search}
+\subsubsection*{Search}
 
 We implemented a variant of a maximum common subgraph (MCS) algorithm, known as \emph{flexible} maximum
 common subgraph (fMCS), as detailed by Cao, et al.~\cite{cao}.
@@ -519,11 +523,11 @@ Next, the \emph{fine search} is performed against these decompressed possible hi
 Fine search is performed using fMCS, with user-defined parameters for bond and atom mismatches and
 similarity-score threshold.
 
-\subsection*{Benchmarking}
+\subsubsection*{Benchmarking}
 
-\subsection*{Validation}
+\subsubsection*{Validation}
 
-\section*{Protein Structure Search}
+\subsection*{Protein Structure Search}
 
 Given a protein of solved (or predicted) structure but unknown function, the efficient identification
 of structurally similar proteins in the Protein Data Bank is critical to function and structure prediction.
@@ -543,13 +547,13 @@ without using substantial domain-specific knowledge.
 Instead, we used the very same representation (bag of fragments) and distance functions (Euclidean and cosine distances)
 as FragBag, a greedy k-centers algorithm, and vector difference to generate the clustered representation.
 
-\subsection*{Clustering}
+\subsubsection*{Clustering}
 For the cluster generation, we used a randomized greedy 2-pass approach.
 First, all proteins in the PDB were randomly ordered.
 Then in the first pass, proteins were selected as cluster centers if and only if they were not within a user-specified Euclidean distance $r_c$ from an existing center (i.e. the first protein is always selected, and the second if further away than $r_c$ from the first, etc.).
 In the second pass, every protein was assigned to the nearest cluster center.
 
-\subsection*{Search}
+\subsubsection*{Search}
 Similarity search here is performed exactly as described in the data structure section, with no modifications.
 For a given search query $q$ and search radius $r$,
 \begin{itemize}
@@ -558,7 +562,7 @@ For a given search query $q$ and search radius $r$,
     \item A fine search was performed over the set $F$ to find all proteins within distance $r$ of $q$.
 \end{itemize}
 
-\subsection*{Benchmarking}
+\subsubsection*{Benchmarking}
 We explored the increases in speed resulting from applying the entropy-scaling data structure, for both Euclidean and cosine distances (Figures).
 
 For cosine distance, we generated databases with maximum cluster radii of 0.05, 0.1, 0.2, 0.3, 0.4, and 0.5.
@@ -635,11 +639,11 @@ Whereas there is nearly 30x acceleration for 4rhv in cosine space for low radius
 \end{figure}
 
 
-\subsection*{Validation}
+\subsubsection*{Validation}
 Note that while Euclidean distance is a metric, and thus the triangle inequality guarantees 100\% sensitivity, cosine distance is not.
 Empirically, however, for all of the queries we performed, we achieve $\sim 99.9\%$ accuracy (Supplementary Table).
 
-\chapter*{Discussion}
+\section*{Discussion}
 
 We have introduced a compression-accelerated search algorithm that boosts the
 speed of BLASTX while maintaining its accuracy.
@@ -678,9 +682,9 @@ possibly error-prone task.
 However, caBLASTX makes it feasible to use the entire NCBI ``NR'' database for
 analysis.
 
-\chapter{Online Methods}
+\section{Online Methods}
 
-\section{Theory}
+\subsection{Theory}
 Here we make the connection between metric entropy and information-theoretic Shannon entropy.
 To do this, we will need two conditions: (1) that our distance function measures marginal entropies and (2) that all clusters are smaller than some constant $S_c$.
 
@@ -724,9 +728,9 @@ But because the cluster sizes are bounded by $S_c$, we can effectively still enc
 Instead of directly encoding differences, this scheme instead lists all cluster members together and uses a standard text compressor to use the redundancy throughout the cluster, which allows us to not store the forest explicitly and still get compression.
 Thus, the total number of bits needed is roughly $O(kl + W_3)$. Again, we can get a data structure basically linear in the entropy, but here linear in the entropy of a distribution closer to that of the optimal minimum spanning tree.
 
-\section{Cablastx}
+\subsection{Cablastx}
 
-\subsection*{Alphabet Reduction}
+\subsubsection*{Alphabet Reduction}
 
 Alphabet reduction--reducing the 20-letter standard amino acid alphabet to a
 smaller set, in order to accelerate search or improve homology detection--has
@@ -747,7 +751,7 @@ D, E, N, Q, K, R, H, B, and Z into a fourth cluster.
 By storing the offset within each cluster of the original letter, the original
 sequence can be reconstructed, making this a reversible reduction.
 
-\subsection*{Database Compression}
+\subsubsection*{Database Compression}
 
 Given a protein sequence database to be compressed, we proceed as follows:
 \begin{enumerate}
@@ -831,9 +835,9 @@ More balanced clusters would have allowed 3-bit storage, but at the expense of
 clusters that less faithfully represented the BLOSUM62 matrix and the
 physicochemical properties of the constituent amino acids.
 
-\section{Ammolite}
+\subsection{Ammolite}
 
-\subsection*{Simplification and compression}
+\subsubsection*{Simplification and compression}
 
 First, we remove hydrogen atoms from the molecules; hydrogens can be easily recovered by inferring their 
 presence.
@@ -857,7 +861,7 @@ A representative from each such cluster is stored in SDF format; collectively, t
 Along with each representative, we preserve the information necessary to reconstruct each original molecule,
 as a pointer to a set of vertices and edges that have been removed or unlabeled.
 
-\section{Fragbag}
+\subsection{Fragbag}
 We took the existing Fragbag method as a black box and by design did not do anything clever except apply our entropy-scaling similarity search data structure.
 To ensure comparability, we removed the sorting-by-distance feature of Andrew Gallant's Fragbag search function, which does not improve the all-matching results we were interested in here---it improves $k$-nearest neighbor search time while decreasing the speed of $\rho$-nearest neighbor, the problem at hand.
 All code was written in Go, and is available on Github.
@@ -866,8 +870,8 @@ All code was written in Go, and is available on Github.
 \bibliography{main}
 
 \appendix
-\chapter{Extraneous}
-\section{Random text}
+\section{Extraneous}
+\subsection{Random text}
 
 Faster approximate string matching over compressed text \cite{navarro2001faster}.
 Approximate Searching on Compressed Text \cite{perez2005approximate}.
@@ -898,7 +902,7 @@ Adaptive Cluster Distance Bounding for High-Dimensional Indexing \cite{ramaswamy
 \end{itemize}
 
 
-\section{Caveats and Extensions}
+\subsection{Caveats and Extensions}
 
 We had to make several strong assumptions on the structure of the database, most notably the low fractal dimension assumption, which kept the number of clusters that need to be searched from blowing up with .
 It would be nice if we could extend the analysis to do without that assumption and instead work directly with the entropy of the database.
@@ -917,7 +921,7 @@ Lastly, this entire section was an illustration of the application of our entrop
 Although similarity search is found as a primitive through-out data science, it is by no means the only primitive query type.
 Augmenting this data structure or designing new data structures to permit other query types while maintaining theoretical guarantees will necessitate the development of new analysis tools, beyond the ones show-cased in this section.
 
-\section{Technical details and motivation for the similarity search data structure}
+\subsection{Technical details and motivation for the similarity search data structure}
 Let us provide a bit more motivation and rigorous analysis for the general entropy-scaling similarity search data structure.
 Consider the cost of querying a database of size $n$ for all entries within some distance $r$ of some query item $q$.
 All database entries and the query are drawn from a universe $U$ of possible elements, and we impose on the database both a sparsity assumption and a strong structural assumption (described below).
@@ -965,9 +969,9 @@ Note that the data structure is no longer a table, but rather instead a partitio
 Say that the maximum cluster radius is $r_c$.
 Then the similarity search algorithm is to do a `coarse search' on the cluster centers for all centers within distance $r+r_c$ of $q$, expand those clusters, and do a ‘fine search’ on all entries in those clusters for those entries within distance $r$ of $q$, as stated earlier.
 
-\section{Theory}
+\subsection{Theory}
 
-\subsection{Theoretical setup: entropy}
+\subsubsection{Theoretical setup: entropy}
 Here we provide the setup for entropy-centric analysis.
 Information-theoretic ``entropy'' is of course a measure of the uncertainty of a distribution or random variable, and is not well-defined for a database.
 However, the term is often used in data compression as a shorthand for the number of bits needed to encode the database, a measure of the randomness of that database.
@@ -993,7 +997,7 @@ With the additional selection of an arbitrary (or zero) root node, this encoding
 The distribution over all data sets in accordance with this 2-level spanning tree has a strictly higher entropy than the one corresponding to the minimum spanning tree of course, but encoding the tree itself uses only $kl$ bits.
 This model of entropy also has the advantage of being much more amenable for proving bounds about the time- and space-complexity of the similarity search data structure we introduce below.
 
-\subsection{Theoretical setup: fractal dimension}
+\subsubsection{Theoretical setup: fractal dimension}
 Here we formalize the `fractal dimension' condition we alluded to: intuitively, we want the fractal dimension $d$ of the database to be low, so that increases to a search radius do not significantly blow up the number of hits.
 This is crucial because the coarse search radius is the sum of the fine search radius and the maximum cluster radius.
 Roughly speaking, the number of hits returned by the coarse search radius is exponential in the fractal dimension of the database in the search radius regime, so we need fractal dimension to be low.
@@ -1018,7 +1022,7 @@ Then the correlation dimension $d$ is defined by $C(\epsilon) \sim \epsilon^d$ f
 We adapt this for our database by considering $\epsilon \sim r$, where $r$ is our search radius, and stopping the limit at $N \to n$.
 As mentioned, we require to ensure that $d$ is a small constant.
 
-\section{Old complexity bounds}
+\subsection{Old complexity bounds}
 
 We are now finally ready to bound the time- and space-complexity of this data structure.
 Note that this data structure can be thought of as a 2-level spanning tree, with each cluster being a branch of the tree.
