@@ -66,12 +66,32 @@
 %    General info
 %\subjclass[2010]{Primary 68W99}
 
-\date{September 23, 2014}
+%\date{September 23, 2014}
 
 %\dedicatory{This paper is dedicated to our advisors.}
 
+%\begin{keyword}
+%Similarity search, approximate matching, entropy scaling algorithms
+%\end{keyword}
 
 \begin{abstract}
+    \begin{itemize}
+        \item Low entropy data sets are common in Biological Big Data problems
+        \item Under certain structural assumptions, it is possible to construct a data structure admitting similarity search in time- and space-complexity roughly linear to ``entropy''
+        \item For problems drawn from genomics, small molecule search, and protein structure search, we demonstrate substantial acceleration of analyses using this data structure
+    \end{itemize}
+\noindent\unskip\textbf{eTOC Blurb}
+\par\medskip\noindent\unskip\ignorespaces
+Massive data sets in computational biology often exhibit high redundancy and thus low entropy.
+We have developed a data structure for similarity search whose complexity scales with entropy.
+This approach allows us to achieve massive acceleration of tools drawn from genomics, small molecule search, and protein structure search.
+\end{abstract}
+
+\end{frontmatter}
+
+%\maketitle
+\section{Summary}
+{ \bfseries
 Much like sorting is a primitive operation in computer science, similarity
 search (alternately, approximate matching) is a fundamental operation in data
 science and lies at the heart of many other problems.
@@ -105,17 +125,7 @@ In this paper, we present a prototypical compressed data structure for
 similarity search in Hamming-like spaces and prove the linear entropy-scaling
 result.
 We also provide software implementations ....
-
-
-\end{abstract}
-
-%\begin{keyword}
-%Similarity search, approximate matching, entropy scaling algorithms
-%\end{keyword}
-
-\end{frontmatter}
-
-%\maketitle
+}
 
 \section{Introduction}
 Throughout all areas of data science, scientists are being confronted by a veritable explosion of available data.
