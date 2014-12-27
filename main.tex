@@ -263,10 +263,36 @@ possibly error-prone task.
 However, caBLASTX makes it feasible to use the entire NCBI ``NR'' database for
 analysis.
 
-\subsubsection{Compressed representation}
+\subsubsection{Clustering}
 
-- alphabet reduction
-- pointers to differences from original sequence
+CaBLASTX extends the approach of~\cite{Daniels:2013} in order to cluster 
+protein sequences.
+Amino acid sequences are reduced from a 20-letter alphabet to a 4-letter
+alphabet, which exposes more similarity among sequences at lower computational
+cost.
+This alphabet reduction can be thought of as a form of clustering; the offset 
+within each of the 4 letters of the reduced alphabet is stored, so the original
+sequence is recoverable (see Online Methods).
+CaBLASTX employs a seed-and-extend approach in order to identify similar regions
+of subsequence among entries in the database (see Online Methods).
+This approach differs from the strict clustering described in the Data 
+Structures section; in order to take advantage of the evolutionary nature of
+protein sequence, \emph{subsequence} clustering is employed.
+Specifically, CaBLASTX does not require that two entire protein sequences be 
+similar in order to represent one in terms of the other; a similar region that 
+is long enough (specifically, 40 residues at 70\% sequence identity in the 
+reduced alphabet) will result in clustering of those subsequences. 
+Thus, a sequence may have sub-sequences in a number of different clusters.
+
+Given a clustering, each subsequence is represented in terms of a 
+\emph{coarse sequence}, a pointer to the indices within the original sequence,
+and the information required to recover the original sequence based on the
+reduced alphabet.
+Here, the distance function chosen, sequence identity based upon an alignment,
+is decidedly not a metric.
+In practice, however, as demonstrated in~\cite{Daniels:2013} and here, this
+results in effective clustering performance with negligible loss of accuracy
+in search.
 
 \subsubsection{Query Clustering}
 
