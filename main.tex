@@ -569,7 +569,7 @@ For the cosine space in particular, note that the maximum distance between any t
 Similarly, once the coarse search encompasses all (or nearly all) the clusters in Euclidean space, the acceleration diminishes to 1x, and the overhead costs make the entropy scaling data structure perform worse than a naive search.
 However, we are most interested in proteins that are very similar to the query, the low-radius behavior, which demonstrates varying though substantial acceleration (2x-30x).
 
-Additionally, it is instructive to note that because of he very different geometries of euclidean vs cosine space, acceleration varies tremendously for some proteins, such as 4rhv and 1bmf, which display nearly opposite behaviors.
+Additionally, it is instructive to note that because of the very different geometries of euclidean vs cosine space, acceleration varies tremendously for some proteins, such as 4rhv and 1bmf, which display nearly opposite behaviors.
 Whereas there is nearly 30x acceleration for 4rhv in cosine space for low radius, and the same for 1bmf in euclidean space, neither achieves better than $\sim$ 2.5x acceleration in the other space.
 
 \begin{figure}[tbp]
@@ -627,7 +627,7 @@ Whereas there is nearly 30x acceleration for 4rhv in cosine space for low radius
 
 \subsubsection{Validation}
 Note that while Euclidean distance is a metric, and thus the triangle inequality guarantees 100\% sensitivity, cosine distance is not.
-Empirically, however, for all of the queries we performed, we achieve $\sim 99.9\%$ accuracy (Supplementary Table).
+Empirically, however, for all of the queries we performed, we achieve $> 99.8\%$ sensitivity (Supplementary Table \hl{??}).
 
 \section{Discussion}
 
