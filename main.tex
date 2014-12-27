@@ -50,7 +50,7 @@
 
 \begin{frontmatter}
 
-\title{A compressed data structure with entropy-linear approximate similarity search}
+\title{Exploiting redundancy in biological data to scale analysis tools with entropy}
 
 %    Information for first author
 \author[mitmath,mitcsail]{Y. William Yu\corref{co}}
@@ -153,7 +153,6 @@ we demonstrate their applicability on similarity search problems drawn from the 
 
 \section{Results}
 \subsection{Entropy-scaling data structure for similarity search}
-\subsubsection{Data structure}
 \begin{figure}[btp]
     \centering
     \includegraphics[width=1\textwidth]{assets/dataStructure}
@@ -163,89 +162,6 @@ we demonstrate their applicability on similarity search problems drawn from the 
     \label{fig:dataStructure}
 \end{figure}
 
-Let us now define our entropy-scaling similarity search data structure (Figure \ref{fig:dataStructure}).
-For ease of analysis, we will work in a high-dimensional metric space and consider the database as a set $D$ of $n$ unique points in that metric space.
-Note however that the metricity requirement is needed only for a 100\% sensitivity guarantee; other distance functions can be used, but result in some loss in sensitivity.
-Define $B_S(q,r) = \{ p \in S | ||q-p||<r \}$. The similarity search problem is thus to compute $B_D(q,r)$ for a query $q$ and radius $r$.
-
-The data structure in its most basic incarnation involves clustering the points in the set by assigning them to their nearest `cluster center'.
-A set $C$ of $k$ cluster centers are chosen such that no cluster has radius greater than a user-specified parameter $r_c$ and no two cluster centers are within distance $r_c$ of one another.
-Overloading notation a bit, we will identify each cluster with its center, so $C$ is also the set of clusters.
-%We will additionally require that each cluster contain at least $\frac{n}{k \alpha}$ items, for some constant $\alpha \ge 1$ (i.e. that the clusters are balanced).
-For a given similarity search query of all items within distance $r$ of a query $q$, this data structure breaks the query into coarse and fine search stages.
-The coarse search is over the list of cluster centers, returning $B_C(q,r + r_c)$.
-Let \[\displaystyle F = \bigcup_{c \in B_C(q,r+r_c)} c , \] the union of all the returned clusters.
-Then by the triangle inequality, $B_F(q,r) = B_D(q,r)$.
-Thus, a fine search over the set $F$ can return all items within radius $r$ of $q$.
-
-Note that we require the metricity requirement only for the Triangle Inequality.
-It turns out that many interesting distance functions are not metrics, but still almost satisfy the Triangle Inequality, which is nearly sufficient.
-More precisely, if an $\alpha$ fraction of the triples in $S$ do not satisfy the Triangle Inequality, then in expectation, we will have sensitivity $1 - \alpha$.
-As we will see later, empirically, this loss in sensitivity appears to be negligible, and can often be ameliorated by increasing the coarse search radius \hl{(NB: is this true, Noah?)}.
-
-%We will prove in this section that 
-This data structure allows for similarity search queries in time roughly linear (provided the fractal dimension of the database is low) to the metric entropy of the database.
-Additionally, under some uniformity assumptions, the data structure can be stored in a compressed form that uses space also linear in the metric entropy of the database.
-Further, as suggested by the last sentence, the metric entropy of the database can be related to the more typical information theoretic notion of entropy (see Online Methods).
-%However, to do this, we will first need to build additional mathematical machinery and make precise our notions of `entropy' and `fractal dimension'.
-
-Note that entropy-scaling data structures are distinct from both succinct data structures and compressed data structures.
-Succinct data structures are ones that use space close to the information-theoretic limit in the worst case while permitting efficient queries; i.e.
-succinct data structures do not depend on the actual entropy of the underlying data set, but have size-dependence on the potential worst-case entropy of the data set \cite{jacobson1988succinct}.
-Compressed data structures, on the other hand, bound the amount of the space used by the entropy of the data set while permitting efficient queries \cite{grossi2005compressed, ferragina2000opportunistic}, much like entropy-scaling data structures.
-Unlike entropy-scaling data structures though, they do not measure time-complexity in terms of the entropy.
-\textbf{The primary theoretical advance of entropy-scaling data structures is that they bound both space and time as functions of the data set entropy.}
-
-\subsubsection{Complexity bounds}
-We first define the concept of metric entropy and entropy dimension as is usual in fractal geometry:
-\begin{definition}[\cite{tao2014metric} Definition 3 \hl{(NB: need better citation not Tao's blog)}]
-    Let $X$ be a metric space, let $D$ be a subset of $X$, and let $\rho>0$ be a radius.
-    \begin{itemize}
-        \item The \textit{internal covering number} $N_\rho^{int}(D)$ is the fewest number of points $x_1, \ldots, x_n \in D$ such that the balls $B(x_1,\rho), \ldots B(x_n,\rho)$ cover $D$.
-        \item The \textit{metric entopy} $N_\rho^{ent}(D)$ is the largest number of points $x_1, \ldots, x_n$ one can find in $D$ that are $\rho$-separated, thus $||x_i - x_j|| \ge \rho$ for all $i \ne j$.
-    \end{itemize}
-\end{definition}
-\begin{definition}[\cite{falconer2013fractal}]
-    The upper Minkowski dimension (also known as the entropy dimension) of a set $D$ is given by 
-\[
-    \dim_{Minkowski}(D) := \limsup_{\rho \to 0} \frac{\log N_\rho(D)}{\log 1/\rho}
-\]
-\end{definition}
-Unfortunately, as $D$ is a finite, discrete, set, the given definision always gives $\dim_{Minkowski}(D) = 0$.
-However, we are only interested in scaling behaviors around large radii, so instead we use:
-\begin{definition}
-    The fractal dimension $d$ of a set $D$ at a scale $[\rho_1,\rho_2]$ is given by
-    \[
-        d = \operatorname*{arg\,max}_{d^*} \{ N_\rho(D) \propto \rho^{-d^*} | \rho \in [\rho_1,\rho_2] \}.
-    \]
-\end{definition}
-
-Recall that $k$ entries are selected as cluster centers for partitioning the database to result in clusters with maximum radius $r_c$.
-From the definition above, it is trivial to verify $ N_{r_c}^{int}(D) \le k \le N_{r_c}^{ent} (D)$.
-The upper bound is guaranteed by our requirement that the cluster centers not be within distance $r_c$ and the lower bound follows from the fact that our clustering is designed to cover the database.
-
-%We will set $r_c = \theta(\frac{1}{k})$.
-Given any query $q$, the coarse search over the cluster centers always requires $k$ comparisons.
-Additionally, the fine search is over the set $F$, the union of clusters with centers within distance $r+r_c$ from $q$.
-As the time-complexity of similarity search is just the total of the coarse and fine searches, this implies that the total search time is $O(k + |F|)$.
-
-By the triangle inequality, $F \subset B_D(q,r+r_c)$,
-so we can bound $|F| \le |B_D(q,r+r_c)|$.
-Let the fractal dimension $D$ at the scale between $r_c$ and $r_c + r$ be $d$.
-Then in expectation over possible queries $q$,
-\[
-    \left|B_D(q, r+r_c)\right| \sim \left|B_D(q,r)\right|\left(\frac{r+r_c}{r}\right)^d .
-\]
-Roughly speaking, this scaling argument just says that doubling a search radius only increases the number of hits by a factor of at most $2^d$.
-Thus, total search time is 
-\[
-    O\left(k + \left|B_D(q,r)\right|\left(\frac{r+r_c}{r}\right)^d \right).
-\]
-However, note that $k$ is linear in metric entropy and $|B_D(q,r)|$ is the output size, so similarity search can be performed in time linear to metric entropy and a polynomial blow-up of output size.
-Provided that the fractal dimension $d$ is small and $k$ is large, the search time will be dominated by the metric entropy component, which turns out to be the regime of greatest interest for us.
-
-We have thus proven bounds for the time-complexity of similarity search.
-In the Online Methods, we also prove space-complexity bounds for the data structure and connect metric entropy with information-theoretic entropy under some additional uniformity assumptions.
 
 \subsection{Metagenomics}
 
@@ -685,7 +601,93 @@ read data presents a problem for storage and transfer, as well as analysis.
 
 \section{Online Methods}
 
-\subsection{Space-complexity}
+\subsection{Theory}
+\subsubsection{Time-complexity}
+Recall our definition of the entropy-scaling similarity search data structure (Figure \ref{fig:dataStructure}).
+For ease of analysis, we will work in a high-dimensional metric space and consider the database as a set $D$ of $n$ unique points in that metric space.
+Note however that the metricity requirement is needed only for a 100\% sensitivity guarantee; other distance functions can be used, but result in some loss in sensitivity.
+Define $B_S(q,r) = \{ p \in S | ||q-p||<r \}$. The similarity search problem is thus to compute $B_D(q,r)$ for a query $q$ and radius $r$.
+
+The data structure first clusters the points in the set by assigning them to their nearest `cluster center'.
+A set $C$ of $k$ cluster centers are chosen such that no cluster has radius greater than a user-specified parameter $r_c$ and no two cluster centers are within distance $r_c$ of one another.
+Overloading notation a bit, we will identify each cluster with its center, so $C$ is also the set of clusters.
+%We will additionally require that each cluster contain at least $\frac{n}{k \alpha}$ items, for some constant $\alpha \ge 1$ (i.e. that the clusters are balanced).
+For a given similarity search query of all items within distance $r$ of a query $q$, this data structure breaks the query into coarse and fine search stages.
+The coarse search is over the list of cluster centers, returning $B_C(q,r + r_c)$.
+Let \[\displaystyle F = \bigcup_{c \in B_C(q,r+r_c)} c , \] the union of all the returned clusters.
+Then by the triangle inequality, $B_F(q,r) = B_D(q,r)$.
+Thus, a fine search over the set $F$ can return all items within radius $r$ of $q$.
+
+Note that we require the metricity requirement only for the Triangle Inequality.
+It turns out that many interesting distance functions are not metrics, but still almost satisfy the Triangle Inequality, which is nearly sufficient.
+More precisely, if an $\alpha$ fraction of the triples in $S$ do not satisfy the Triangle Inequality, then in expectation, we will have sensitivity $1 - \alpha$.
+As we will see later, empirically, this loss in sensitivity appears to be negligible, and can often be ameliorated by increasing the coarse search radius \hl{(NB: is this true, Noah?)}.
+
+%We will prove in this section that 
+This data structure allows for similarity search queries in time roughly linear (provided the fractal dimension of the database is low) to the metric entropy of the database.
+Additionally, under some uniformity assumptions, the data structure can be stored in a compressed form that uses space also linear in the metric entropy of the database.
+Further, as suggested by the last sentence, the metric entropy of the database can be related to the more typical information theoretic notion of entropy (see Online Methods).
+%However, to do this, we will first need to build additional mathematical machinery and make precise our notions of `entropy' and `fractal dimension'.
+
+Note that entropy-scaling data structures are distinct from both succinct data structures and compressed data structures.
+Succinct data structures are ones that use space close to the information-theoretic limit in the worst case while permitting efficient queries; i.e.
+succinct data structures do not depend on the actual entropy of the underlying data set, but have size-dependence on the potential worst-case entropy of the data set \cite{jacobson1988succinct}.
+Compressed data structures, on the other hand, bound the amount of the space used by the entropy of the data set while permitting efficient queries \cite{grossi2005compressed, ferragina2000opportunistic}, much like entropy-scaling data structures.
+Unlike entropy-scaling data structures though, they do not measure time-complexity in terms of the entropy.
+\textbf{The primary theoretical advance of entropy-scaling data structures is that they bound both space and time as functions of the data set entropy.}
+
+\subsubsection{Complexity bounds}
+We first define the concept of metric entropy and entropy dimension as is usual in fractal geometry:
+\begin{definition}[\cite{tao2014metric} Definition 3 \hl{(NB: need better citation not Tao's blog)}]
+    Let $X$ be a metric space, let $D$ be a subset of $X$, and let $\rho>0$ be a radius.
+    \begin{itemize}
+        \item The \textit{internal covering number} $N_\rho^{int}(D)$ is the fewest number of points $x_1, \ldots, x_n \in D$ such that the balls $B(x_1,\rho), \ldots B(x_n,\rho)$ cover $D$.
+        \item The \textit{metric entopy} $N_\rho^{ent}(D)$ is the largest number of points $x_1, \ldots, x_n$ one can find in $D$ that are $\rho$-separated, thus $||x_i - x_j|| \ge \rho$ for all $i \ne j$.
+    \end{itemize}
+\end{definition}
+\begin{definition}[\cite{falconer2013fractal}]
+    The upper Minkowski dimension (also known as the entropy dimension) of a set $D$ is given by 
+\[
+    \dim_{Minkowski}(D) := \limsup_{\rho \to 0} \frac{\log N_\rho(D)}{\log 1/\rho}
+\]
+\end{definition}
+Unfortunately, as $D$ is a finite, discrete, set, the given definision always gives $\dim_{Minkowski}(D) = 0$.
+However, we are only interested in scaling behaviors around large radii, so instead we use:
+\begin{definition}
+    The fractal dimension $d$ of a set $D$ at a scale $[\rho_1,\rho_2]$ is given by
+    \[
+        d = \operatorname*{arg\,max}_{d^*} \{ N_\rho(D) \propto \rho^{-d^*} | \rho \in [\rho_1,\rho_2] \}.
+    \]
+\end{definition}
+
+Recall that $k$ entries are selected as cluster centers for partitioning the database to result in clusters with maximum radius $r_c$.
+From the definition above, it is trivial to verify $ N_{r_c}^{int}(D) \le k \le N_{r_c}^{ent} (D)$.
+The upper bound is guaranteed by our requirement that the cluster centers not be within distance $r_c$ and the lower bound follows from the fact that our clustering is designed to cover the database.
+
+%We will set $r_c = \theta(\frac{1}{k})$.
+Given any query $q$, the coarse search over the cluster centers always requires $k$ comparisons.
+Additionally, the fine search is over the set $F$, the union of clusters with centers within distance $r+r_c$ from $q$.
+As the time-complexity of similarity search is just the total of the coarse and fine searches, this implies that the total search time is $O(k + |F|)$.
+
+By the triangle inequality, $F \subset B_D(q,r+r_c)$,
+so we can bound $|F| \le |B_D(q,r+r_c)|$.
+Let the fractal dimension $D$ at the scale between $r_c$ and $r_c + r$ be $d$.
+Then in expectation over possible queries $q$,
+\[
+    \left|B_D(q, r+r_c)\right| \sim \left|B_D(q,r)\right|\left(\frac{r+r_c}{r}\right)^d .
+\]
+Roughly speaking, this scaling argument just says that doubling a search radius only increases the number of hits by a factor of at most $2^d$.
+Thus, total search time is 
+\[
+    O\left(k + \left|B_D(q,r)\right|\left(\frac{r+r_c}{r}\right)^d \right).
+\]
+However, note that $k$ is linear in metric entropy and $|B_D(q,r)|$ is the output size, so similarity search can be performed in time linear to metric entropy and a polynomial blow-up of output size.
+Provided that the fractal dimension $d$ is small and $k$ is large, the search time will be dominated by the metric entropy component, which turns out to be the regime of greatest interest for us.
+
+We have thus proven bounds for the time-complexity of similarity search.
+In the Online Methods, we also prove space-complexity bounds for the data structure and connect metric entropy with information-theoretic entropy under some additional uniformity assumptions.
+
+\subsubsection{Space-complexity}
 Here we bound the space-complexity of our entropy-scaling data structure and show that metric entropy bounds can give information-theoretic Shannon entropy bounds.
 To do this, we will need two conditions: (1) that our distance function measures marginal entropies and (2) that all clusters are smaller than some constant $S_c$.
 
