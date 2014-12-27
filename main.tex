@@ -323,18 +323,28 @@ proportional to the amount of redundancy in the read data.
 
 
 We tested caBLASTX on 200-400nt partially-assembled human gut microbiome
-sequences, as well as on 100nt human gut microbiome reads at ~100x coverage.
+sequences, as well as on 151nt human gut microbiome reads at ~100x coverage.
 For the partially-assembled sequences, we demonstrate run-time performance
 approximately 10x faster than BLASTX, with negligible loss in sensitivity and
 no loss in specificity. For the short reads, we demonstrate run-time
 performance approximately 700x faster than BLASTX, with less than 5\% loss in
 sensitivity and no loss in specificity.
 
+CaBLASTX is a drop-in replacement for BLASTX in any pipeline.
+As such, it can be used to accelerate other metagenomic analysis tools, such
+as MetaPhlAn~\cite{blah}.
+Moreover, many of these analysis tools have, for performance reasons, required
+users to construct a targeted protein database, which is a time-consuming and
+possibly error-prone task.
+However, caBLASTX makes it feasible to use the entire NCBI ``NR'' database for
+analysis.
+
 \subsubsection{Compressed representation}
 
+- alphabet reduction
+- pointers to differences from original sequence
 
-
-\subsubsection{Query Compression}
+\subsubsection{Query Clustering}
 
 Metagenomic reads are themselves nucleotide sequences, so no alphabet reduction
 is performed on them directly.
@@ -349,11 +359,20 @@ typically short and usually of fixed length, which is known in advance.
 Thus, the minimum alignment length required for a match, and the maximum
 length unaligned fragment to append to a match, require different values based
 on the read length.
+An additional complication is that insertions and deletions from one read to
+another will change the reading frame, potentially resulting in significantly
+different amino acid sequences.
+For this reason, query clustering requires long, \emph{ungapped} windows of high
+sequence identity.
+Specifically, for 151-nucleotide reads, for two sequences to cluster together,
+we required a 120-nucleotide ungapped region of at least 80\% sequence identity.
+Effectively, this means that the distance function for query clustering is
+Hamming distance.
 
 We note that unlike the compression of the database, which can be amortized 
 over future queries, the time spent clustering and compressing the queries 
 cannot be amortized.
-Thus, we would not refer to the query compression as entropy-scaling, but it
+Thus, we would not refer to the query clustering as entropy-scaling, but it
 still provides a practical benefit.
 
 \subsubsection{Search}
@@ -450,9 +469,9 @@ match that of BLASTX.
 - growth of PubChem over time
 - cite Girke and Thornton
 
-\subsubsection{Compression}
+\subsubsection{Clustering}
 
-We introduce a framework for compressing molecular databases that use the 
+We introduce a framework for clustering molecular databases that use the 
 popular SDF molecular structure format, such as PubChem, and for searching for 
 similar molecular structures in compressed space.
 We designed this compression and search framework around one of the standard 
@@ -466,50 +485,58 @@ The `f' in fmcsR, which stands for ``flexible,'' indicates that some bounded
 number of vertex or edge label mismatches are permitted, at significant 
 computational cost.
 
-In order to boost the effectiveness of clustering, we employ an approach
-somewhat analogous to the reversible alphabet reduction discussed in the section
-on metagenomics.
-Specifically, we leave carbon atoms labeled as `C,' and we label all non-carbon
-atoms as `N' (for non-carbon).
-Similarly, we leave single-bond edges labeled as `1,' and we label all 
-non-single bond edges as `2.'
-We call this approach \emph{label simplification}
-
-Our compression approach relies on a clustering according to structural 
-similarity, after structures have had their labels simplified.
+Our clustering approach relies on structural similarity.
+In order to more effectively group molecules based on structural motifs,
+each molecule is \emph{simplified} by removing nodes and edges that do not
+participate in simple cycles.
+Clusters are formed of molecules that are isomorphic after this simplification
+step.
 Each cluster can then be represented by a single molecular structure, along 
 with pointers to \emph{difference sets} between that structure and each of the 
 full molecules it represents.
+The difference set contains the nodes and edges that were removed in the 
+simplification step.
 
 
 
 \subsubsection{Search}
 
-We implemented a variant of a maximum common subgraph (MCS) algorithm, known as \emph{flexible} maximum
+We implemented a variant of a maximum common subgraph (MCS) algorithm, known as 
+\emph{flexible} maximum
 common subgraph (fMCS), as detailed by Cao, et al.~\cite{cao}.
-Our implementation allows a user to specify whether any atom mismatches or bond-type mismatches should be 
+Our implementation allows a user to specify whether any atom mismatches or 
+bond-type mismatches should be 
 allowed in the maximum common subgraph of two molecules.
 If zero mismatches are allowed, fMCS is just MCS.
+The distance function used is the graph distance metric of~\cite{bunke:1998},
+specifically $d(G_1,G_2) = 1 - \frac{|mcs(G_1,G_2)}{max(|G_1|,|G_2|)}$.
 
-As in~\cite{loh2012compressive}, our compression-accelerated search approach relies on a two-stage process.
-First, a \emph{coarse} search is performed in compressed space, by searching the coarse database.
-The query molecule is unlabeled and transformed in exactly the same manner as the molecular database
-during compression, and this transformed query graph is matched against the coarse database.
-To preserve sensitivity, this coarse search is performed with a permissive similarity score.
+As in~\cite{loh2012compressive}, our compression-accelerated search approach 
+relies on a two-stage process.
+First, a \emph{coarse} search is performed in compressed space, by searching 
+the coarse database.
+The query molecule is simplified in exactly the same manner as 
+the molecular database during clustering, and this transformed query graph is 
+matched against the coarse database.
+To preserve sensitivity, this coarse search is performed with a permissive 
+similarity score.
 The idea behind coarse search is to identify \emph{possible} hits.
-Since the compressed molecule database contains only unlabeled molecular graphs, there is no need to
-allow bond or atom mismatches during coarse search; the search at this level is purely MCS.
 
-Any possible hits--molecular graphs from the compressed database whose MCS to the transformed
-query molecule was within the similarity score threshold--are then decompressed, by following
-pointers to the removed atom and bond information, and reconstructing the original molecules.
-Typically, only a small fraction of the compressed database must be decompressed.
 
-Next, the \emph{fine search} is performed against these decompressed possible hits.
-Fine search is performed using fMCS, with user-defined parameters for bond and atom mismatches and
-similarity-score threshold.
+Any possible hits--molecular graphs from the coarse database whose MCS to 
+the transformed query molecule was within the similarity score threshold--are 
+then reconstructed, by following
+pointers to the removed atom and bond information, and recreating the 
+original molecules.
+
+Next, the \emph{fine search} is performed against these decompressed possible 
+hits.
+Fine search is performed using MCS or fMCS, with user-defined parameters for 
+bond and atom mismatches and similarity-score threshold.
 
 \subsubsection{Benchmarking}
+
+
 
 \subsubsection{Validation}
 
@@ -631,42 +658,24 @@ Empirically, however, for all of the queries we performed, we achieve $> 99.8\%$
 
 \section{Discussion}
 
-We have introduced a compression-accelerated search algorithm that boosts the
-speed of BLASTX while maintaining its accuracy.
-Our approach scales sublinearly with both the size of the database being
-searched, and the size of the query set when analyzing metagenomic reads.
+We have introduced a data structure for accelerating approximate search, and
+demonstrated its effectiveness in three distinct areas of computational
+molecular biology.
+This data structure provably scales almost linearly with entropy of the 
+database, allowing search on large data sets to scale even as these data sets
+grow exponentially.
+We provide open-source software for all three areas: metagenomic analysis,
+small-molecule structure search, and protein structure search.
+In the case of metagenomic analysis, caBLASTX also compares favorably to recent 
+search tools that outperform BLASTX.
 
-One notable contrast to metagenomic classification tools such as PAUDA and
-Kraken is that caBLASTX does not require a complete reference genome for the
-targeted organisms.
-CaBLASTX relies on a protein database, such as NCBI's ``NR,'' but there are
-individual protein sequences for many organisms present in this database whose
-complete genomes are not available.
-In this sense, caBLASTX is also capable of identifying species in metagenomic
-samples when those species cannot be \emph{a priori} narrowed down to a small
-set of genomes.
+In this work, we have not focused on the space-saving compression that is
+possible with entropy-scaling data structures, but rather on the run-time
+acceleration of approximate search.
+However, particularly in the case of metagenomic analysis, the collection of 
+read data presents a problem for storage and transfer, as well as analysis.
 
-An area of particular interest to human health is \emph{functional 
-metagenomics}, the analysis of metabolic pathways present in a microbial
-community at large.
-One approach to functional metagenomics is to first identify clades of
-microbes present, and then to consider their metabolic pathways~\cite{blah}.
-Another approach is to search a protein database to identify proteins involved
-in known metabolic pathways.
-CaBLASTX is particularly useful here, as it can accelerate the search for
-homologous, or even remotely homologous proteins that may be likely to be
-involved in metabolic pathways.
-This capability gives caBLASTX capabilities beyond those of tools, that require
-complete reference genomes.
 
-CaBLASTX is a drop-in replacement for BLASTX in any pipeline.
-As such, it can be used to accelerate other metagenomic analysis tools, such
-as MetaPhlAn~\cite{blah}.
-Moreover, many of these analysis tools have, for performance reasons, required
-users to construct a targeted protein database, which is a time-consuming and
-possibly error-prone task.
-However, caBLASTX makes it feasible to use the entire NCBI ``NR'' database for
-analysis.
 
 \section{Online Methods}
 
