@@ -415,11 +415,15 @@ match that of BLASTX.
 
 \subsection{High-throughput Drug Screening}
 
-- introductory info about small-molecule search in drug repurposing and discovery
-- growth of PubChem over time
-- cite Girke and Thornton
-
-\subsubsection{Clustering}
+In the field of drug discovery and drug repurposing, prediction of biologically 
+active compounds is a critical task. 
+Computational high-throughput screening can eliminate many compounds from 
+wet-lab consideration, but even this screening can be computationally 
+intensive, and thus time-consuming.
+PubChem~\cite{Bolton:2008} is a repository of molecular compound structures, 
+which has grown exponentially since 2008 (Figure~\ref{pubchemdata}). 
+In October, 2013, PubChem contained roughly 47 million molecular structures; 
+in December, 2014 it contains 61.3 million structures.
 
 We introduce a framework for clustering molecular databases that use the 
 popular SDF molecular structure format, such as PubChem, and for searching for 
@@ -435,6 +439,9 @@ The `f' in fmcsR, which stands for ``flexible,'' indicates that some bounded
 number of vertex or edge label mismatches are permitted, at significant 
 computational cost.
 
+\subsubsection{Clustering}
+
+
 Our clustering approach relies on structural similarity.
 In order to more effectively group molecules based on structural motifs,
 each molecule is \emph{simplified} by removing nodes and edges that do not
@@ -446,8 +453,6 @@ with pointers to \emph{difference sets} between that structure and each of the
 full molecules it represents.
 The difference set contains the nodes and edges that were removed in the 
 simplification step.
-
-
 
 \subsubsection{Search}
 
