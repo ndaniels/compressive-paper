@@ -534,7 +534,7 @@ For a given search query $q$ and search radius $r$,
 We explored the increases in speed resulting from applying the entropy-scaling data structure, for both Euclidean and cosine distances (Figures).
 
 For cosine distance, we generated databases with maximum cluster radii of 0.05, 0.1, 0.2, 0.3, 0.4, and 0.5.
-Then, for each query protein from the set \{4rhv, 1ake, 1bmf, 1rbp, 1b7t\}, we ran both naive and accelerated similarity searches with radii of $0.02i \forall i \in \{0,\ldots,49\}$.
+Then, for each query protein from the set \{\texttt{4rhv}, \texttt{1ake}, \texttt{1bmf}, \texttt{1rbp}, \texttt{1b7t}\}, we ran both naive and accelerated similarity searches with radii of $0.02i \forall i \in \{0,\ldots,49\}$.
 This was repeated 5 times for each measurement, and the ratio of average accelerated vs naive times is shown in Figure \ref{fig:fragbag_cosine}.
 
 For euclidean distance, we generated databases with maximum cluster radii of 10, 20, 25, 50, and 100.
@@ -551,8 +551,8 @@ For the cosine space in particular, note that the maximum distance between any t
 Similarly, once the coarse search encompasses all (or nearly all) the clusters in Euclidean space, the acceleration diminishes to 1x, and the overhead costs make the entropy scaling data structure perform worse than a naive search.
 However, we are most interested in proteins that are very similar to the query, the low-radius behavior, which demonstrates varying though substantial acceleration (2x-30x).
 
-Additionally, it is instructive to note that because of the very different geometries of euclidean vs cosine space, acceleration varies tremendously for some proteins, such as 4rhv and 1bmf, which display nearly opposite behaviors.
-Whereas there is nearly 30x acceleration for 4rhv in cosine space for low radius, and the same for 1bmf in euclidean space, neither achieves better than $\sim$ 2.5x acceleration in the other space.
+Additionally, it is instructive to note that because of the very different geometries of euclidean vs cosine space, acceleration varies tremendously for some proteins, such as \texttt{4rhv} and \texttt{1bmf}, which display nearly opposite behaviors.
+Whereas there is nearly 30x acceleration for \texttt{4rhv} in cosine space for low radius, and the same for \texttt{1bmf} in euclidean space, neither achieves better than $\sim$ 2.5x acceleration in the other space.
 
 \begin{figure}[tbp]
     \centering
