@@ -211,25 +211,24 @@ Metagenomics, the study of genomic data sequenced directly from environmental
 samples, has recently grown in popularity.
 From studies of the human gut microbiome to seawater and soil samples,
 metagenomics has contributed to improved understanding of how ecosystems recover
-from environmental damage~\cite{Tyson:2004}, how the human gut responds to 
-diet
-and infection~\cite{David:2014}, and even some surprising clues as to disorders 
-such as Autism Spectrum Disorder~\cite{MacFabe:2012}.
+from environmental damage~\cite{tyson2004community}, how the human gut responds 
+to diet
+and infection~\cite{david2014host}, and even some surprising clues as to disorders 
+such as Autism Spectrum Disorder~\cite{macfabe2012short}.
 
 Massive amounts of metagenomic reads are generated every day from 
 next-generation sequencing (NGS) machines.
 Overall, the rate of NGS sequencing is growing at a greater exponential rate
-than computing power~\cite{Loh}.
+than computing power~\cite{loh2012compressive}.
 These metagenomic reads must be stored and analyzed to do further downstream
-analysis such as abundance determination (e.g. MetaPhlAn~\cite{Huttenhower}) 
-and functional characterization (e.g. PICRUSt~\cite{Huttenhower}).
- Months of computing time are often required to process data for novel, 
-large-scale sequencing studies that enable us to catalog genetic variation, 
-provide new insights into our evolutionary history~\cite{8}, and promise to 
-revolutionize the study of cell lineages in higher organisms~\cite{9}. 
+analysis such as abundance determination (e.g. 
+MetaPhlAn~\cite{segata2012metagenomic}) 
+and functional characterization (e.g. PICRUSt~\cite{langille2013predictive}).
+ Months of computing time are often required to process data for these novel, 
+large-scale sequencing studies.
 These computational challenges are at present a barrier to widespread use of 
 metagenomic data throughout biotechnology, which impacts genomic medicine and 
-environmental genomics~\cite{blah}.
+environmental genomics~\cite{frank2008gastrointestinal}.
 
 One approach to making metagenomic analysis tractable is to
 sequence only the 16S ribosomal subunit of the microbiota, which is sufficient
@@ -239,23 +238,24 @@ closely-related strains.
 In order to detect such minor functional differences, tools such as BLAST can 
 be used to map metagenomic sequence data onto a database of known genome
 sequences.
-More recently, tools such as Kraken~\cite{kraken} have provided significantly 
-faster methods for this analysis.
+More recently, tools such as Kraken~\cite{wood2014kraken} have provided 
+significantly faster methods for this analysis.
 This approach, however, requires a reference genome for any organism to be
 identified.
 
 Alternatively, BLASTX is widely used, both directly for analysis, as well as in 
-pipelines such as MetaPhlAn~\cite{Huttenhower} to map reads to protein 
-databases.
+pipelines such as MetaPhlAn~\cite{segata2012metagenomic} to map reads to 
+protein databases.
 The advantage of the BLASTX approach is that complete reference genomes are not
 required; BLASTX can identify homologs, particularly in the case where the
 nucleotide sequence identity is low but translated protein sequence identity
-is higher~\cite{Turnbaugh:2006, Kurokawa:2007}.
+is higher~\cite{turnbaugh2006obesity, kurokawa2007comparative}.
 However, because BLASTX must search a protein database for possible hits for
 each nucleotide read from a metagenomic sample, it is computationally intensive.
-For example, \citet{Mackelprang:2011} reported that using BLASTX to map 246
-million reads against the KEGG~\cite{kegg} database required 800,000 CPU hours
-at a supercomputing center.
+For example, \citet{mackelprang2011metagenomic} reported that using BLASTX to 
+map 246
+million reads against the KEGG~\cite{kanehisa2000kegg} database required 
+800,000 CPU hours at a supercomputing center.
 Moreover, BLASTX's run time requirements scale linearly with the size of the 
 full read dataset, and each year require exponentially more runtime to process 
 the exponentially growing read data. 
@@ -263,8 +263,9 @@ the exponentially growing read data.
 
 We present caBLASTX (compressively accelerated BLASTX), an algorithm and 
 software implementation that relies on the techniques of compressive 
-acceleration~\cite{Loh, Daniels} to map metagenomic reads onto a protein 
-database orders of magnitude faster than BLASTX.
+acceleration~\cite{loh2012compressive, daniels2013compressive} to map 
+metagenomic reads onto a protein database orders of magnitude faster than 
+BLASTX.
 
 CaBLASTX is useful for two of the most common metagenomic analysis tasks. 
 The first of these is mapping assembled or partially-assembled
@@ -296,7 +297,7 @@ sensitivity and no loss in specificity.
 
 CaBLASTX is a drop-in replacement for BLASTX in any pipeline.
 As such, it can be used to accelerate other metagenomic analysis tools, such
-as MetaPhlAn~\cite{blah}.
+as MetaPhlAn~\cite{segata2012metagenomic}.
 Moreover, many of these analysis tools have, for performance reasons, required
 users to construct a targeted protein database, which is a time-consuming and
 possibly error-prone task.
@@ -305,8 +306,8 @@ analysis.
 
 \subsubsection{Clustering}
 
-CaBLASTX extends the approach of~\cite{Daniels:2013} in order to cluster 
-protein sequences.
+CaBLASTX extends the approach of~\cite{daniels2013compressive} in order to 
+cluster protein sequences.
 Amino acid sequences are reduced from a 20-letter alphabet to a 4-letter
 alphabet, which exposes more similarity among sequences at lower computational
 cost.
@@ -330,9 +331,9 @@ and the information required to recover the original sequence based on the
 reduced alphabet.
 Here, the distance function chosen, sequence identity based upon an alignment,
 is decidedly not a metric.
-In practice, however, as demonstrated in~\cite{Daniels:2013} and here, this
-results in effective clustering performance with negligible loss of accuracy
-in search.
+In practice, however, as demonstrated in~\cite{daniels2013compressive} and 
+here, this results in effective clustering performance with negligible loss of 
+accuracy in search.
 
 \subsubsection{Query Clustering}
 
@@ -414,18 +415,19 @@ size which is the size of the original, uncompressed protein database.
 \subsubsection{Benchmarking}
 
 To evaluate the run-time performance of caBLASTX, we tested it against
-BLASTX as well as RapSearch2~\cite{rs2} and Diamond~\cite{diamond}.
+BLASTX as well as RapSearch2~\cite{zhao2012rapsearch2} and
+Diamond~\cite{buchfink2014fast}.
 BLASTX is often used to align assemblies thought to be exons to a protein
 database, in which case metagenomic reads have already been assembled.
 In this instance, the query-side compression of caBLASTX is not applicable, so
 the performance gains are more modest.
 We benchmarked caBLASTX vs. BLASTX on a dataset consisting of 22778 assemblies
 from human gut microbiota, 3.1 megabases in total, searching against the NCBI's
-``NR'' non-redundant protein database.
+``NR'' non-redundant protein database from September, 2014.
 The running time of BLASTX was 3235 minutes, compared to 123 minutes for caBLASTX, a speedup of 26.3.
 
 When aligning next-generation sequencing reads to a protein database, the
-query-side compression aspect of caBLASTX becomes applicable.
+query-side clustering aspect of caBLASTX becomes applicable.
 We benchmarked caBLASTX against BLASTX on a 556,270
 next-generation sequencing reads each of length 151 nucleotides from a human 
 fecal dataset (ERP003820) from~\cite{blah}.
@@ -448,7 +450,7 @@ assemblies used for benchmarking, in order to evaluate the accuracy when
 query-side compression is not used.
 For query-side compression, we also evaluated the hits from BLASTX and caBLASTX
 on a set of 151-nucleotide MiSeq reads from the American Gut Project,
-(ERP003820) from~\cite{blah}.
+(ERX308536) from~\cite{blah}.
 
 Note: Due to query-side compression, the output order from caBLASTX does not
 match that of BLASTX.
@@ -460,7 +462,8 @@ active compounds is a critical task.
 Computational high-throughput screening can eliminate many compounds from 
 wet-lab consideration, but even this screening can be computationally 
 intensive, and thus time-consuming.
-PubChem~\cite{Bolton:2008} is a repository of molecular compound structures, 
+PubChem~\cite{bolton2008pubchem} is a repository of molecular compound 
+structures, 
 which has grown exponentially since 2008 (Figure~\ref{pubchemdata}). 
 In October, 2013, PubChem contained roughly 47 million molecular structures; 
 in December, 2014 it contains 61.3 million structures.
@@ -471,8 +474,9 @@ similar molecular structures in compressed space.
 We designed this compression and search framework around one of the standard 
 techniques for high-throughput screening of potential drug compounds, the use 
 of maximum common subgraph (MCS) to identify similar motifs among molecules.
-Many existing MCS-based tools, such as SMSD~\cite{thornton} and 
-fmcsR~\cite{girke} compute the maximum common subgraph on fully labeled graphs; 
+Many existing MCS-based tools, such as SMSD~\cite{rahman2009small} and 
+fmcsR~\cite{cao2008maximum} compute the maximum common subgraph on fully 
+labeled graphs; 
 vertices are labeled with chemical elements, and edges are labeled with bond 
 types (such as single or double bonds).
 The `f' in fmcsR, which stands for ``flexible,'' indicates that some bounded 
@@ -498,12 +502,13 @@ simplification step.
 
 We implemented a variant of a maximum common subgraph (MCS) algorithm, known as 
 \emph{flexible} maximum
-common subgraph (fMCS), as detailed by Cao, et al.~\cite{cao}.
+common subgraph (fMCS), as detailed by Cao, et al.~\cite{cao2008maximum}.
 Our implementation allows a user to specify whether any atom mismatches or 
 bond-type mismatches should be 
 allowed in the maximum common subgraph of two molecules.
 If zero mismatches are allowed, fMCS is just MCS.
-The distance function used is the graph distance metric of~\cite{bunke:1998},
+The distance function used is the graph distance metric 
+of~\cite{bunke1998graph},
 specifically $d(G_1,G_2) = 1 - \frac{|mcs(G_1,G_2)}{max(|G_1|,|G_2|)}$.
 
 As in~\cite{loh2012compressive}, our compression-accelerated search approach 
@@ -818,15 +823,16 @@ In this manner, we can relate the Shannon entropy of the database to the metric 
 
 Alphabet reduction--reducing the 20-letter standard amino acid alphabet to a
 smaller set, in order to accelerate search or improve homology detection--has
-been proposed and implemented several times~\cite{blah}.
-In particular, \citet{Murphy:2000, Peterson:2009} considered reducing the
+been proposed and implemented several times~\cite{bacardit2007automated, peterson2009reduced}.
+In particular, \citet{murphy2000simplified} considered reducing the
 amino-acid alphabet to 17, 10, or even 4 letters.
-More recently, \citet{Zhao:2012} and \citet{Huson:2013} applied a reduction to
+More recently, \citet{zhao2012rapsearch2} and \citet{huson2013poor} applied a reduction to
 a 4-letter alphabet, termed a ``pseudoDNA'' alphabet, in sequence alignment.
 
-In this work, we extend the compression approach of \citet{Daniels:2013} using
-a reversible alphabet reduction.
-We use the alphabet reduction of \citet{Murphy:2000} to map the standard amino
+In this work, we extend the compression approach of 
+\citet{daniels2013compressive} using a reversible alphabet reduction.
+We use the alphabet reduction of \citet{murphy2000simplified} to map the 
+standard amino
 acid alphabet (along with the four common ambiguous letters ) onto a 4-letter 
 alphabet.
 Specifically, we map F, W, and Y into one cluster; C, I, L, M, V, and J into
@@ -879,9 +885,10 @@ seed table, first attempt \textit{ungapped} extension:
         
 When ungapped extension terminates, attempt \textit{gapped} extension.
 From the end of the aligned regions thus far, align 25-mer windows of both
-$s$ and $s'$ using the Needleman-Wunsch~\cite{Needleman:1970gm} algorithm using
-an identity matrix.
-Note that the original caBLASTP~\cite{Daniels:2013} used BLOSUM62 as it was
+$s$ and $s'$ using the Needleman-Wunsch~\cite{needleman1970general} algorithm 
+using an identity matrix.
+Note that the original caBLASTP~\cite{daniels2013compressive} used BLOSUM62 as 
+it was
 operating in amino acid space; as we are now operating in a reduced-alphabet
 space, an identity matrix is appropriate, just as it is for nucleotide space.
 After gapped extension on a window length of 25, attempt ungapped extension
@@ -937,9 +944,10 @@ For example, as shown in Figure~\ref{}, bicyclohexyl and dicyclohexylamine would
 
 After this transformation is applied to each molecule in a database to be compressed, we identify all clusters
 of fully-isomorphic transformed molecular graphs.
-Isomorphism detection is performed using the VF2~\cite{Cordella} algorithm; a simple hash computed from the
-number of vertices and edges in each transformed molecular graph is first used to filter molecular graphs that
-cannot possibly be isomorphic.
+Isomorphism detection is performed using the VF2~\cite{cordella2001improved} 
+algorithm; a simple hash computed from the
+number of vertices and edges in each transformed molecular graph is first used 
+to filter molecular graphs that cannot possibly be isomorphic.
 A representative from each such cluster is stored in SDF format; collectively, these representatives form a 
 ``coarse'' database.
 Along with each representative, we preserve the information necessary to reconstruct each original molecule,
