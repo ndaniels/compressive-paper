@@ -355,16 +355,23 @@ another will change the reading frame, potentially resulting in significantly
 different amino acid sequences.
 For this reason, query clustering requires long, \emph{ungapped} windows of high
 sequence identity.
-Specifically, for 151-nucleotide reads, for two sequences to cluster together,
-we required a 120-nucleotide ungapped region of at least 80\% sequence identity.
+Specifically, for 202-nucleotide reads, for two sequences to cluster together,
+we required a 150-nucleotide ungapped region of at least 80\% sequence identity.
 Effectively, this means that the distance function for query clustering is
 Hamming distance.
+In the future, we may consider first translating the reads, and performing
+clustering in the amino acid space (after alphabet reduction).
+This would have the advantage of allowing reads with insertions or deletions
+to cluster together, without causing reading-frame mismatches.
+However, gapped alignment is significantly slower than ungapped alignment,
+so the resulting cost of query clustering might negate speed gains.
 
 We note that unlike the compression of the database, which can be amortized 
 over future queries, the time spent clustering and compressing the queries 
 cannot be amortized.
 Thus, we would not refer to the query clustering as entropy-scaling, but it
 still provides a practical benefit.
+
 
 \subsubsection{Search}
 
@@ -469,8 +476,6 @@ typically does not match that of BLASTX.
 As show in Table~\ref{mgbench}, on the metagenomic assemblies, where query-side 
 compression was not performed, caBLASTX achieves 99.2\% accuracy, while on the 
 raw reads, caBLASTX achieves 95.7\% accuracy.
-
-
 
 
 \subsection{High-throughput Drug Screening}
