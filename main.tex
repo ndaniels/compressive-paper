@@ -449,11 +449,11 @@ Results appear in Table~\ref{mgbench}.
 \caption{Comparison of caBLASTX and BLASTX running time and accuracy.\label{mgbench}}
 \begin{tabular}{ccccc}
 \hline
-dataset & BLASTX & caBLASTX & speedup & accuracy\\
+dataset & BLASTX (s) & caBLASTX  (s) & speedup & accuracy\\
 \hline
-assemblies & 3235 & 123 & 26.3 & 99.2\%\\
+assemblies & 3235 & 123 & 26.3x & 99.2\%\\
 \hline
-NGS reads & 14423 & 21 & 673 & 95.7\%\\
+NGS reads & 14423 & 21 & 673x & 95.7\%\\
 \hline
 \end{tabular}
 \end{table}
@@ -961,7 +961,7 @@ Both Diamond was run with the \texttt{--sensitive} option.
 In all cases, an E-value threshold of \texttt{1e-7} was used.
 
 \begin{table}
-\caption{Running time of BLASTX, caBLASTX, RapSearch2, and Diamond.\label{mgspeed}}
+\caption{Running time of BLASTX, caBLASTX, RapSearch2, and Diamond. All units in seconds.\label{mgspeed}}
 \begin{tabular}{ccccc}
 \hline
 dataset & BLASTX & caBLASTX & RapSearch2 & Diamond \\
