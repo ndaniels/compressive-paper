@@ -986,6 +986,18 @@ NGS reads & 95.7\% & 79.5\% & 76.9\% \\
 \end{tabular}
 \end{table}
 
+While Diamond is notably faster than caBLASTX, it achieves this speed at the
+expense of some accuracy, particularly on raw reads.
+Moreover, caBLASTX actually accelerates standard BLASTX itself, and allows the
+user to pass arbitrary parameters to the underlying BLASTX during fine search.
+Thus, caBLASTX may be suitable to a wider variety of existing analysis 
+pipelines.
+With respect for future work, it may be possible to apply entropy-scaling data
+structures to Diamond itself, achieving even greater speed gains.
+Of course, the accuracy of such an approach would still be limited by Diamond
+itself; entropy-scaling data structures cannot themselves improve accuracy,
+except by virtue of making computationally expensive analyses more tractable.
+
 \subsection{Ammolite}
 
 \subsubsection{Simplification and compression}
