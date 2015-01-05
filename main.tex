@@ -178,8 +178,15 @@ the space can be divided into cells, allowing quick similarity searches by searc
 However, when the dimensionality of that subspace increases, cell search time blows up exponentially, and in sparse data sets, most of the cells will be empty, which wastes search time.
 Also, cell search performs poorly when each of the dimensions is small and discrete, as is the case with genomic sequences when we consider each position as a dimension and the four possible nucleotides as the possible locations along that axis.
 
+
+\begin{figure}[btp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/treepoints/treepoints.png}
+    \caption{Cartoon depiction of points in a high-dimensional space that live close to a tree-like structure. Although high-dimensional at a fine scale, at the coarser scale of covering spheres, the data cloud looks nearly 1-dimensional.}
+    \label{fig:tree}
+\end{figure}
 More importantly though, biological databases do not often actually live in low-dimensional subspaces.
-Let's consider the instructive case of genomes along an evolutionary Tree of Life.
+Let's consider the instructive case of genomes along an evolutionary Tree of Life (Figure \ref{fig:tree}).
 Such a tree has many branches (plus admixture merges branches back together), and might look nearly ``1-dimensional'' locally, but on a global scale is anything but---at least considering it as a subspace.
 Additionally, because of diffusion due to mutation, each of the branches is also ``thick'' (high-dimensional) when looked at closely.
 %Figure 1b for illustration.
