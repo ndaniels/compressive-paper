@@ -88,7 +88,7 @@
     \end{itemize}
 \noindent\unskip\textbf{eTOC Blurb}
 \par\medskip\noindent\unskip\ignorespaces
-Massive data sets in computational biology often exhibit high redundancy and thus low entropy.
+Massive data sets in cell systems often exhibit high redundancy and thus low entropy.
 We have developed a data structure for similarity search whose complexity scales with entropy.
 This approach allows us to achieve massive acceleration of tools drawn from genomics, small molecule search, and protein structure search.
 \end{abstract}
@@ -98,16 +98,16 @@ This approach allows us to achieve massive acceleration of tools drawn from geno
 %\maketitle
 \section{Summary}
 { \bfseries
-    The continual onslaught of new data in computational biology has forced scientists into the happy problem of having too much data to analyze.
+    The continual onslaught of new data from cell systems has forced scientists into the fortunate problem of having too much data to analyze.
     However, the standard toolkit of the modern practitioner, although sometimes sufficient, is ill-prepared to scale.
     Although computers are getting faster and cheaper, they are not doing so at a fast enough rate to keep pace with this exponential explosion of data.
-    Luckily, it turns out that many of these huge data sets are highly redundant in nature, which can be exploited to design smarter tools.
-    In this paper, we present a novel similarity search data structure that scales with the entropy of the underlying database.
-    By applying this data structure and also exploiting other structure in the database, we are able to achieve massive acceleration in several standard tools in the three domains of metagenomics, high-throughput drug screening, and protein structure search.
-    In particular, we can achieve, using our new tool CaBLASTX, 700x speedup of BLASTX with less than 5\% loss in sensitivity and no loss in specificity, using our new tool Ammolite, \hl{??}x speedup of small molecule similarity search, and, using an entropy-scaling version of FragBag, 2-30x speedup of FragBag with less than 0.2\% loss in sensitivity and no loss in specificity.
+    Luckily, it turns out that many of these huge data sets are highly redundant in nature, which can be exploited to design smarter tools for similarity search, the most fundamental task for analyzing biological data.
+    In this paper, we present a novel entropy-scaling data structure which scales in both time and space with the entropy of the underlying database to perform similarity search.
+    By applying this data structure directly as well as in a way that exploits specific redunant structure in the database, we are able to achieve massive acceleration in several standard tools in the three domains of metagenomics, high-throughput drug screening, and protein structure search.
+    In particular, we can achieve using our new entropy-scaling tools: CaBLASTX, 700x speedup of BLASTX with less than 5\% loss in sensitivity and no loss in specificity; Ammolite, \hl{??}x speedup of small molecule similarity search; and, Topaz, 2-30x speedup of FragBag with less than 0.2\% loss in sensitivity and no loss in specificity.
     Thus, we present not only a novel data structure for use in accelerating similarity search in any low-entropy setting, but also practical tools ready for immediate use by the practitioner.
 
-    All source code is publicly available for download.
+    All source code is publicly available for download at {http://gems.csail.mit.edu.}
 }
 
 \section{Introduction}
@@ -115,10 +115,10 @@ Throughout all areas of data science, scientists are being confronted by a verit
 In many fields, and in particular molecular biology, this increase is exponential in nature, even outpacing Moore's and Kryder's laws on the respective doublings of transistors on a chip and long-term data storage density \hl{[cite]}.
 As such, the challenges posed by the massive influx of data cannot be solved by waiting for faster and larger capacity computers, but require instead the development of data structures and representations that exploit and simplify complexity in the data set.
 
-Here, we focus our attention on similarity search (alternately, approximate matching), where the task at hand is to find all entries in some database that are `similar' to some query item.
+Here, we focus our attention on similarity search, where the task at hand is to find all entries in some database that are `similar', or approximate matches, to some query item.
 Much like sorting is a primitive operation in computer science, similarity search is a fundamental operation in data science and lies at the heart of many other problems.
 Traditionally, approximate matching has been studied primarily in the context of strings under edit distance metrics (e.g., for spell-checkers) \cite{ukkonen1985algorithms}.
-However, similarity search has also demonstrated increasing importance in other domains, including local alignment of sequences, chemical graphs, and protein structures \cite{altschul1990basic, kent2002blat, schaeffer2007graph, budowski2010fragbag}.
+However, similarity search has also demonstrated increasing importance in other biological system domains, including local alignment of sequences \cite{altschul1990basic, kent2002blat}, chemical graphs \cite{schaeffer2007graph}, and protein structures \cite{budowski2010fragbag}.
 %In recent years, however, similarity search has become increasingly important for other objects and distance functions (e.g., biological genomes and alignment scores, networks and the Jaccard index) [Altschul et al, 1990; Kent, 2002; Schaeffer, 2007].
 
 \begin{figure}[tbp]
@@ -135,7 +135,9 @@ However, similarity search has also demonstrated increasing importance in other 
     \label{fig:expdata}
 \end{figure}
 
-As available data grows exponentially (e.g., genomic data in Figure 1), algorithms that scale linearly no longer suffice.
+As available data grows exponentially \cite{BergerPengSingh2013,YuYPB015} (e.g., genomic data in Supplementary Figure S1), 
+%move figure to supplement
+algorithms that scale linearly with the amount of data no longer suffice.
 The primary ways the literature addresses this problem (e.g.
 locality sensitive hashing \cite{indyk1998approximate}, vector approximation \cite{ferhatosmanoglu2000vector}, space partitioning \cite{weber1998quantitative}) involve the construction of data structures that admit a more efficient search operation.
 However, we note that as data increases, very often the redundancy present in the data also increases.
@@ -145,65 +147,66 @@ In the specific context of local alignment in genomics, however, the emerging fi
 Similar results have been demonstrated for local alignment in proteomics, using much the same strategies \cite{daniels2013compressive}.
 Empirically, this compressive acceleration appears to scale almost linearly in the entropy of the database, often resulting in orders of magnitude better performance.
 
-In this paper, we generalize this approach and introduce a practical data structure for similarity search that provably scales almost linearly with entropy of the database.
-Specifically, if similarity is defined by some metric-like distance function and the database exhibits both low `metric entropy' and low `fractal dimension', this data structure performs much better than na\"ive methods.
+In this paper, we generalize this approach and introduce a practical data structure for similarity search that provably scales almost linearly in both time and space with the entropy of the database.
+Specifically, if similarity is defined by some metric-like distance function and the database exhibits both low `metric entropy' and low `fractal dimension', this data structure performs much better than na\"ive and even optimized methods.
 %We will define metric entropy and fractal dimension more precisely later, but intuitively, they are respectively measures of the total information content and scaling behavior of number of points contained in spheres of varying radii.
-Although these `entropy-linear data structures' can in principle be used to organize nearly any large data set for faster and more space-efficient analysis,
-we demonstrate their applicability on similarity search problems drawn from the three major Big Data challenges in computational biology: genomics, pharmaceuticals, and protein structure \hl{(NB: reword)} \cite{marx2013biology}.
+Although these `entropy-scaling data structures' can in principle be used to organize nearly any large data set for faster and more space-efficient analysis,
+we demonstrate their applicability on similarity search problems drawn from the three major biological `big challenges of big data': genomics, pharmaceuticals, and protein structure \hl{(NB: reword)} \cite{marx2013biology}.
 
 \section{Results}
 \subsection{Entropy-scaling data structure for similarity search}
 \begin{figure}[btp]
     \centering
     \includegraphics[width=1\textwidth]{assets/dataStructure}
-    \caption{ Compressive acceleration of similarity search. %
-            (a) The na\"ive approach tests each query against each database entry to find entries within distance  of the query. %
+    \caption{ Entropy-scaling data structure for similarity search. %
+            (a) The na\"ive approach tests each query against each database entry to find entries within distance $X$  of the query. %
             (b) By selecting appropriate cluster centers with maximum radius $r_c$ to partition the database, we can (c) first do a coarse search to find all cluster centers within distance $r+r_c$ of a query, and then the (d) triangle inequality guarantees that a fine search over all corresponding cluster entries will suffice.}
     \label{fig:dataStructure}
 \end{figure}
 
-We present here an opportunistic data structure for similarity search that scales both in time and space with the entropy of the underlying database.
+We present here an opportunistic data structure for similarity search that scales with the entropy of the underlying database.
 In the following we consider entropy to be nearly synonymous with distance between points in a high-dimensional space.
 For genomic sequences, this can be edit distance, for chemical graphs, maximum common subgraph size, and for general vectors, Euclidean or cosine distance.
 The similarity search problem we are most interested in is finding all points in a set that are close to (i.e. similar to) the query point.
 The basics of the data structure itself are presented in Figure \ref{fig:dataStructure}, but understanding why it works requires a bit more intuition.
 
 Let's first consider what it means for a large biological data set, considered as points in a high-dimensional space, to be highly redundant.
-Perhaps many of the points are exact duplicates; this easy scenario is trivially exploited by de-duplication, and is already standard practice (e.g. the NR NCBI protein database).
-
+Perhaps many of the points are exact duplicates; this easy scenario is trivially exploited by de-duplication and is already standard practice (e.g. the NR NCBI protein database).
 Or maybe the points mostly live on a low-dimensional subspace; statistical tools such as PCA (Principal Component Analysis) exploit this property in data analysis.
-Furthermore, if the dimension of the subspace is sufficiently low and each dimension sufficiently ``long'', the space can be divided into cells, giving us also quick similarity searches by searching only nearby cells \hl{[Cite]}.
-However, when the dimensionality of that subspace increases, cell search time blows up exponentially, and in sparse data sets, most of the cells will be empty, which is wasted search time.
+Furthermore, if the dimension of the subspace is sufficiently low and each dimension sufficiently ``long'',
+the space can be divided into cells, allowing quick similarity searches by searching only nearby cells \hl{[Cite]}.
+However, when the dimensionality of that subspace increases, cell search time blows up exponentially, and in sparse data sets, most of the cells will be empty, which wastes search time.
 Also, cell search performs poorly when each of the dimensions is small and discrete, as is the case with genomic sequences when we consider each position as a dimension and the four possible nucleotides as the possible locations along that axis.
 
 More importantly though, biological databases do not often actually live in low-dimensional subspaces.
 Let's consider the instructive case of genomes along an evolutionary Tree of Life.
-Such a tree has many branches (and admixture merges branches back together), and might look nearly ``1-dimensional'' locally, but on a global scale is anything but---at least considering it as a subspace.
+Such a tree has many branches (plus admixture merges branches back together), and might look nearly ``1-dimensional'' locally, but on a global scale is anything but---at least considering it as a subspace.
 Additionally, because of diffusion due to mutation, each of the branches is also ``thick'' (high-dimensional) when looked at closely.
-
-Thus, considering it as a subspace is the wrong thing to do.
+%Figure 1b for illustration.
+%Please look up Jinbo Xu and my work on Tree Decomposition in JACM.
+Thus, considering this example as a subspace is the wrong thing to do.
 However, the local 1-dimensionality is real, and can be exploited, but we have to look on the right scales.
 In particular, we look at the tree on two different scales, a coarse scale in which the tree looks 1-dimensional locally, and a fine scale where the branch width matters.
-We cover the tree with little spheres with radius $r_c$ at least the width of the branches; these spheres are our clusters, and the number of them is the ``metric entropy'' of the tree.
+We cover the tree with little spheres of radius $r_c$, at least the width of the branches; these spheres are our clusters, and the number of them is the ``metric entropy'' of the tree.
 Because all the points within a sphere are close to each other, they can be encoded in terms of one another, and so are highly redundant; thus, the number of such spheres is a good approximation of the entropy of the entire database.
 
 For any similarity search query of all points within distance $r$ of a query, by the triangle inequality, we need only look in nearby spheres with centers within a distance $r+r_c$ of the query.
+%ref Figure 1?.
 However, because the spheres are wide enough the cover the branches, from the coarse scale of spheres, the tree is locally 1-dimensional---we'll call this the ``fractal dimension'' of the tree at the scale $r_c$.
 Thus, doubling a search radius (or increasing from $r$ to $r+r_c$) only doubles (or increases by a factor of $\frac{r+r_c}{r}$) the number of points that need to be searched in a fine search after spheres have been identied.
-Total similarity search time is then proportional to the number of spherse (the metric entropy) plus a constant multiple of the actual output size.
+Total similarity search time is then proportional to the number of spheres (the metric entropy) plus a constant multiple of the actual output size.
 
 We have only considered here graph-like structures (i.e. an evolutionary tree), which are locally 1-dimensional.
-However, the general scheme of covering the data set with spheres to then do a coarse and fine search works even when the fractal dimension is higher (maybe locally it looks more like a 2D surface than a line).
+However, the general scheme of covering the data set with spheres to then perform a coarse and fine search works even when the fractal dimension is higher (maybe locally it looks more like a 2D surface than a line).
 All that will change is that the search time will have a component that blows up with increasing search radius by a function exponential in that fractal dimension.
 However, assuming low fractal dimension, search time is still dominated by the metric entropy of the database.
-Similarly, storing the database can be done in a compressed manner according to these covering spheres.
+Similarly, storing the database can be done in a compressed manner according to these covering spheres (see Online Methods for further details).
 
-These notions are more formally proven in the Online Methods, but in the next several sections we explore the application of this data structure in several different incarnations to actual data.
-Note that real data is much messier than the rosy picture we painted here.
-Sometimes the distance function we are given is not a metric, so we do not get a Triangle Inequality guarantee of 100\% sensitivity,
-sometimes some of the clusters are much larger than others, and sometimes what counts as a point is not entirely clear.
-However, the diversity of these examples will show that this general scheme works for massively accelerating similarity search under a robust set of different contexts.
-We expect that so long as the data set exhibits both low entropy (many items are similar to one another, which is nearly always the case when the query is a simlarity search) and low fractal dimension (the data set has some much simpler structure generating it, such as in the example of an evolutionary tree above), our entropy-scaling data structure has the potential to achieve massive speedup over more naive methods.
+Since real data is often messier than the rosy picture we painted here, we  explore the application of this data structure in several different incarnations to actual data.
+Sometimes the distance function we are given is not a metric, and thus we do not get a triangle inequality guarantee of 100\% sensitivity;
+sometimes some of the clusters are much larger than others; and sometimes what counts as a point is not entirely clear.
+However, the diversity of these examples will show that the general scheme we present works for massively accelerating similarity search under a robust set of different contexts.
+We expect that so long as the data set exhibits both low entropy (many items are similar to one another, which is nearly always the case when the query is a simlarity search) and low fractal dimension (the data set has some much simpler structure generating it, such as in the example of an evolutionary tree above), our entropy-scaling data structure has the potential to achieve massive speedup over more naive methods and significant speedup over highly optimized methods.
 
 \subsection{Metagenomics}
 
