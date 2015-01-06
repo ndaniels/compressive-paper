@@ -67,6 +67,11 @@ real weight_width(pair x, pair[] A) {
     return ans;
 }
 
+real density_map(pair x) {
+    pair gp = (round(x.x),round(x.y));
+    return (1 - dist(gp,x))^4;
+}
+
 for (int i=0; i < 17; ++i)
 {
     path pab = z[i];
@@ -75,8 +80,10 @@ for (int i=0; i < 17; ++i)
         for (real j=0; j<=1; j+= (0.001/arclength(pab)))
         {
             var x = relpoint(pab, j);
-            x = x + (unitrand()-0.5,unitrand()-0.5)*weight_width(x,p);
-            dot(x,linewidth(1));
+            if (density_map(x)>unitrand()) {
+                x = x + (unitrand()-0.5,unitrand()-0.5)*weight_width(x,p);
+                dot(x,linewidth(1));
+            }
         }
         for (int j=0; j<=100; ++j)
         {
