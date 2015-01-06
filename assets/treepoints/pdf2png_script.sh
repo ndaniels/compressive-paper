@@ -1,2 +1,2 @@
 #!/bin/bash
-convert -density 300 treepoints.pdf treepoints.png
+convert -density 300 treepoints2D.pdf treepoints2D.png
