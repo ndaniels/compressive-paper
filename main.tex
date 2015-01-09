@@ -147,7 +147,7 @@ In the specific context of local alignment in genomics, however, the emerging fi
 Similar results have been demonstrated for local alignment in proteomics, using much the same strategies \cite{daniels2013compressive}.
 Empirically, this compressive acceleration appears to scale almost linearly in the entropy of the database, often resulting in orders of magnitude better performance.
 
-In this paper, we generalize this approach and introduce a practical data structure for similarity search that provably scales almost linearly in both time and space with the entropy of the database.
+In this paper, we generalize this approach and introduce a practical opportunistic data structure for similarity search that provably scales almost linearly in both time and space with the entropy of the database.
 Specifically, if similarity is defined by some metric-like distance function and the database exhibits both low `metric entropy' and low `fractal dimension', this data structure performs much better than na\"ive and even optimized methods.
 %We will define metric entropy and fractal dimension more precisely later, but intuitively, they are respectively measures of the total information content and scaling behavior of number of points contained in spheres of varying radii.
 Although these `entropy-scaling data structures' can in principle be used to organize nearly any large data set for faster and more space-efficient analysis,
@@ -193,30 +193,30 @@ Additionally, because of diffusion due to mutation, each of the branches is also
 %Please look up Jinbo Xu and my work on Tree Decomposition in JACM.
 % NMD: I'm familiar with TreePack, but not seeing how it's relevant.
 Thus, considering this example as a subspace is the wrong thing to do.
-However, the local 1-dimensionality is real, and can be exploited, but we have to look on the right scales.
-In particular, we look at the tree on two different scales, a coarse scale in which the tree looks 1-dimensional locally, and a fine scale where the branch width matters.
-We cover the tree with little spheres of radius $r_c$, at least the width of the branches; these spheres are our clusters, and the number of them is the ``metric entropy'' of the tree.
+However, the local 1-dimensionality can be exploited by looking on the right scales.
+In particular, we use two different scales: a coarse scale in which the tree looks 1-dimensional locally and a fine scale where the branch width matters.
+We cover the tree with spheres of radius $r_c$, on the order of the width of the branches; these spheres are our clusters, and the number of them is the ``metric entropy'' of the tree.
 Because all the points within a sphere are close to each other, they can be encoded in terms of one another, and so are highly redundant; thus, the number of such spheres is a good approximation of the entropy of the entire database.
 
 For any similarity search query of all points within distance $r$ of a query, by the triangle inequality, we need only look in nearby spheres with centers within a distance $r+r_c$ of the query.
 %ref Figure 1?.
-However, because the spheres are wide enough the cover the branches, from the coarse scale of spheres, the tree is locally 1-dimensional---we'll call this the ``fractal dimension'' of the tree at the scale $r_c$.
+However, because the spheres have radius comparable to branch width, the tree is locally 1-dimensional on the coarse scale---we will call this the ``fractal dimension'' of the tree at the scale $r_c$.
 Thus, doubling a search radius (or increasing from $r$ to $r+r_c$) only doubles (or increases by a factor of $\frac{r+r_c}{r}$) the number of points that need to be searched in a fine search after spheres have been identied.
 Total similarity search time is then proportional to the number of spheres (the metric entropy) plus a constant multiple of the actual output size.
 
 We have only considered here graph-like structures (i.e. an evolutionary tree), which are locally 1-dimensional.
-However, the general scheme of covering the data set with spheres to then perform a coarse and fine search works even when the fractal dimension is higher (maybe locally it looks more like a 2D surface than a line).
+However, the general scheme of covering the data set with spheres to then perform a coarse and fine search works even when the fractal dimension is higher (e.g. the local structure might be a 2D manifold. or than a curve).
 All that will change is that the search time will have a component that blows up with increasing search radius by a function exponential in that fractal dimension.
 However, assuming low fractal dimension, search time is still dominated by the metric entropy of the database.
 Similarly, using these covering spheres, the database can be stored in a 
 compressed manner (see Online Methods for further details).
 
-Since real data is often messier than the rosy picture we painted here, we
+Since real data is often messier than the rosy picture painted here, we
 explore the application of this data structure to actual data in several different incarnations.
-Sometimes the distance function we are given is not a metric, and thus we do not get a triangle inequality guarantee of 100\% sensitivity;
+Sometimes the distance function we are given is not a metric (e.g. cosine distance), and thus we do not get a triangle inequality guarantee of 100\% sensitivity;
 sometimes some of the clusters are much larger than others; and sometimes what counts as a point is not entirely clear.
-However, the diversity of these examples will show that the general scheme we present works for massively accelerating similarity search under a robust set of different contexts.
-We expect that so long as the data set exhibits both low entropy (many items are similar to one another, which is nearly always the case when the query is a simlarity search) and low fractal dimension (the data set has some much simpler structure generating it, such as in the example of an evolutionary tree above), our entropy-scaling data structure has the potential to achieve massive speedup over more naive methods and significant speedup over highly optimized methods.
+However, the diversity of the applications we explore in this paper demonstrate that the general scheme works for massively accelerating similarity search in a robust set of different contexts.
+We expect that so long as the data set exhibits both low entropy (many items are similar to one another, which is nearly always the case when the query is a simlarity search) and low fractal dimension (the data set has some much simpler structure generating it, such as an evolutionary tree), our entropy-scaling data structure has the potential to achieve massive speedup over more naive methods and significant speedup over even other highly optimized methods.
 
 \subsection{Metagenomics}
 
