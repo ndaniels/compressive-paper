@@ -637,54 +637,50 @@ Whereas there is nearly 30x acceleration for \texttt{4rhv} in cosine space for l
 
 \begin{figure}[tbp]
     \centering
-    \begin{subfigure}[b]{0.49\textwidth}
+    \begin{subfigure}[b]{0.40\textwidth}
+        \caption{Cosine distance}
         \includegraphics[width=1\textwidth]{assets/4rhv_benchmark_cosine}
-        \caption{}
+        \label{fig:fragbag_cosine}
     \end{subfigure}%
-    \begin{subfigure}[b]{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{assets/1AKE_benchmark_cosine}
-        \caption{}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{assets/1BMF_benchmark_cosine}
-        \caption{}
-    \end{subfigure}%
-    \begin{subfigure}[b]{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{assets/1RBP_benchmark_cosine}
-        \caption{}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{assets/1b7t_benchmark_cosine}
-        \caption{}
-    \end{subfigure}
-    \caption{Fragbag cosine benchmarking data. \hl{NB: Much bigger and more data than final figures. Also, for final figures, will include tables and choose more appropriate axes}}
-    \label{fig:fragbag_cosine}
-\end{figure}
-
-\begin{figure}[tbp]
-    \centering
-    \begin{subfigure}[b]{0.49\textwidth}
+    \begin{subfigure}[b]{0.40\textwidth}
+        \caption{Euclidean distance}
         \includegraphics[width=1\textwidth]{assets/4rhv_benchmark_euclid}
-        \caption{}
+        \label{fig:fragbag_euclid}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.40\textwidth}
+        \includegraphics[width=1\textwidth]{assets/1AKE_benchmark_cosine}
+        %\caption{}
     \end{subfigure}%
-    \begin{subfigure}[b]{0.49\textwidth}
+    \begin{subfigure}[b]{0.40\textwidth}
         \includegraphics[width=1\textwidth]{assets/1AKE_benchmark_euclid}
-        \caption{}
+        %\caption{}
     \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{assets/1BMF_benchmark_euclid}
-        \caption{}
+    \begin{subfigure}[b]{0.40\textwidth}
+        \includegraphics[width=1\textwidth]{assets/1BMF_benchmark_cosine}
+        %\caption{}
     \end{subfigure}%
-    \begin{subfigure}[b]{0.49\textwidth}
+    \begin{subfigure}[b]{0.40\textwidth}
+        \includegraphics[width=1\textwidth]{assets/1BMF_benchmark_euclid}
+        %\caption{}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.40\textwidth}
+        \includegraphics[width=1\textwidth]{assets/1RBP_benchmark_cosine}
+        %\caption{}
+    \end{subfigure}%
+    \begin{subfigure}[b]{0.40\textwidth}
         \includegraphics[width=1\textwidth]{assets/1RBP_benchmark_euclid}
-        \caption{}
+        %\caption{}
     \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{assets/1b7t_benchmark_euclid}
-        \caption{}
-    \end{subfigure}
-    \caption{Fragbag euclidean distance benchmarking data. \hl{NB: Much bigger and more data than final figures. Also, for final figures, will include tables and choose more appropriate axes}}
-    \label{fig:fragbag_euclid}
+    %\begin{subfigure}[b]{0.49\textwidth}
+    %    \includegraphics[width=1\textwidth]{assets/1b7t_benchmark_cosine}
+        %\caption{}
+    %\end{subfigure}%
+    %\begin{subfigure}[b]{0.49\textwidth}
+    %    \includegraphics[width=1\textwidth]{assets/1b7t_benchmark_euclid}
+        %\caption{}
+    %\end{subfigure}
+    \caption{Fragbag benchmarking data. (a) Cosine distance gives on the whole better acceleration, but results in only $>99.8\%$ sensitivity, whereas (b) Euclidean distance as a metric is guaranteed by the Triangle Inequality to get $100\%$ sensitivity. }
+    \label{fig:fragbag}
 \end{figure}
 
 
@@ -1178,6 +1174,60 @@ In this paper, we present a prototypical compressed data structure for
 similarity search in Hamming-like spaces and prove the linear entropy-scaling
 result.
 We also provide software implementations ....
+
+\section{Old fragbag figure}
+
+\begin{figure}[tbp]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/4rhv_benchmark_cosine}
+        \caption{}
+    \end{subfigure}%
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/1AKE_benchmark_cosine}
+        \caption{}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/1BMF_benchmark_cosine}
+        \caption{}
+    \end{subfigure}%
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/1RBP_benchmark_cosine}
+        \caption{}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/1b7t_benchmark_cosine}
+        \caption{}
+    \end{subfigure}
+    \caption{Fragbag cosine benchmarking data. \hl{NB: Much bigger and more data than final figures. Also, for final figures, will include tables and choose more appropriate axes}}
+    %\label{fig:fragbag_cosine}
+\end{figure}
+
+\begin{figure}[tbp]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/4rhv_benchmark_euclid}
+        \caption{}
+    \end{subfigure}%
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/1AKE_benchmark_euclid}
+        \caption{}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/1BMF_benchmark_euclid}
+        \caption{}
+    \end{subfigure}%
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/1RBP_benchmark_euclid}
+        \caption{}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/1b7t_benchmark_euclid}
+        \caption{}
+    \end{subfigure}
+    \caption{Fragbag euclidean distance benchmarking data. \hl{NB: Much bigger and more data than final figures. Also, for final figures, will include tables and choose more appropriate axes}}
+    %\label{fig:fragbag_euclid}
+\end{figure}
 
 \end{document}
 
