@@ -253,12 +253,12 @@ In order to detect such minor functional differences, tools such as BLAST can
 be used to map metagenomic sequence data onto a database of known genome
 sequences.
 More recently, tools such as Kraken~\cite{wood2014kraken} have provided 
-significantly faster methods for this analysis.
-This approach, however, requires a reference genome for any organism to be
-identified.
+significantly faster methods for this genome mapping analysis.
+This approach, however, requires a reference genome for each organism of
+interest to first be identified.
 
 Alternatively, BLASTX is widely used, both directly for analysis, as well as in 
-pipelines such as MetaPhlAn~\cite{segata2012metagenomic} to map reads to 
+pipelines such as MetaPhlAn~\cite{segata2012metagenomic}, to map reads to 
 protein databases.
 The advantage of the BLASTX approach is that complete reference genomes are not
 required; BLASTX can identify homologs, particularly in the case where the
