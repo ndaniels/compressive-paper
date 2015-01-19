@@ -183,7 +183,7 @@ Also, cell search performs poorly when each of the dimensions is small and discr
 \begin{figure}[btp]
     \centering
     \includegraphics[width=0.8\textwidth]{assets/treepoints/treepoints2D_clusters.png}
-    \caption{Cartoon depiction of points in a high-dimensional space that live close to a 1D tree-like structure. Although high-dimensional at a fine scale, at the coarser scale of covering spheres, the data cloud looks nearly 1-dimensional. Note that the cluster center generation was performed using the same algorithm used in Topaz, which is our accelerated version of Fragbag.}
+    \caption{Cartoon depiction of points in a high-dimensional space that live close to a 1D tree-like structure. Although high-dimensional at a fine scale, at the coarser scale of covering spheres, the data cloud looks nearly 1-dimensional. Note that the cluster center generation was performed using the same algorithm used in Topaz, which is our accelerated version of FragBag.}
     \label{fig:tree}
 \end{figure}
 More importantly though, biological databases do not often actually live in low-dimensional subspaces.
@@ -579,29 +579,41 @@ bond and atom mismatches and similarity-score threshold.
 
 \subsection{Protein Structure Search}
 
-Given a protein of solved (or predicted) structure but unknown function, the efficient identification
-of structurally similar proteins in the Protein Data Bank is critical to function and structure prediction.
-One approach to structural neighbor finding is FragBag~\cite{budowski2010fragbag}, which describes each protein as a
-``bag of fragments,'' where each fragment is a small structural motif; the bag of fragments is essentially
+The relationship between protein structure and function has been a subject of intense study for decades,
+and this strong link has been used for the fruitful prediction of function from structure \cite{hegyi1999relationship}.
+To wit, given a protein of solved (or predicted) structure but unknown function, the efficient identification
+of structurally similar proteins in the Protein Data Bank is critical to function prediction.
+Relatedly, finding structural neighbors can also give insight into the evolutionary origins of proteins of interest.
+
+One approach to finding structural neighbors is to attempt to align the query protein to all the entries in the Protein Data Bank (PDB) using a structural aligner (e.g. STRUCTAL \cite{subbiah1993structural} or ICE \cite{shindyalov1998protein}).
+However, performing a full alignment against every entry in the PDB is prohibitively expensive, especially as the database grows.
+Alternately, the approach we use here is the one introduced by FragBag~\cite{budowski2010fragbag}, which describes each protein as a
+``bag of fragments,'' where each fragment is a small structural motif.
+
+The bag of fragments is essentially
 a term frequency vector representing the number of occurrences of each structural motif within the protein.
 While FragBag does not generate structural alignments the way standard aligners do, it provides an excellent
 filter for computing proteins that are likely to have close alignments; those alignments could then be computed
 with a standard aligner.
-FragBag's accuracy has been reported as comparable to structural aligners such as STRUCTAL~\cite{blah} and
-ICE~\cite{blah}.
-FragBag is already quite fast, much faster than these standard aligners.
-However, FragBag turns out to be an excellent proof-of-concept for entropy-scaling data structures.
+FragBag's accuracy has been reported as comparable to structural aligners such as STRUCTAL and
+ICE.
+FragBag is already quite fast, much faster than these standard aligners, but also importantly for us
+FragBag turns out to be very amenable to acceleration using an entropy-scaling data structure because much of the computation is spent in doing a similarity search on a frequency vector.
 
-We intentionally approached the application of entropy-scaling data structures to FragBag in a blind manner,
+For this last example, we intentionally approached the application of entropy-scaling data structures to FragBag in a blind manner,
 without using substantial domain-specific knowledge.
 Instead, we used the very same representation (bag of fragments) and distance functions (Euclidean and cosine distances)
 as FragBag, a greedy k-centers algorithm, and vector difference to generate the clustered representation.
+Note that this is in stark contrast to caBlastX and Ammolite, which both exploited domain knowledge to further improve performance.
+Thus, Topaz, our entropy-scaling version of FragBag, is exactly an existing FragBag codebase augmented with new database generation and similarity search functions.
+Although it's conceivable that using similar techniques to exploit domain specific knowledge as in caBlastX and Ammolite will result in greater speedup, Topaz here is primarily a proof-of-concept to analyze the performance of a the entropy-scaling data structure alone.
 
 \subsubsection{Clustering}
 For the cluster generation, we used a randomized greedy 2-pass approach.
-First, all proteins in the PDB were randomly ordered.
+First, all proteins in the Protein Data Bank were randomly ordered.
 Then in the first pass, proteins were selected as cluster centers if and only if they were not within a user-specified Euclidean distance $r_c$ from an existing center (i.e. the first protein is always selected, and the second if further away than $r_c$ from the first, etc.).
-In the second pass, every protein was assigned to the nearest cluster center.
+Recall that this generation of cluster centers is the same as the one used to generate covering spheres in Figure \ref{fig:tree};
+the covering spheres were overlapping, but we trivially assign every protein uniquely to a single cluster by assigning to the nearest cluster center in the second pass.
 
 \subsubsection{Search}
 Similarity search here is performed exactly as described in the data structure section, with no modifications.
@@ -613,7 +625,9 @@ For a given search query $q$ and search radius $r$,
 \end{itemize}
 
 \subsubsection{Benchmarking}
-We explored the increases in speed resulting from applying the entropy-scaling data structure, for both Euclidean and cosine distances (Figures).
+We explored the increases in speed resulting from applying the entropy-scaling data structure, for both Euclidean and cosine distances (Figure \ref{fig:fragbag}).
+Naturally, as search radii increases, the coarse search expands to encompass the entire database; to fully explore parameters, we made certain to increase search radii until the acceleration effect entirely disappeared.
+Additionally, we explored the effect of using different maximum cluster radii and several different query proteins.
 
 For cosine distance, we generated databases with maximum cluster radii of 0.05, 0.1, 0.2, 0.3, 0.4, and 0.5.
 Then, for each query protein from the set \{\texttt{4rhv}, \texttt{1ake}, \texttt{1bmf}, \texttt{1rbp}, \texttt{1b7t}\}, we ran both naive and accelerated similarity searches with radii of $0.02i \forall i \in \{0,\ldots,49\}$.
@@ -625,13 +639,14 @@ Again, for each query protein drawn from the same set, we compared the average o
 As expected, the acceleration is highly dependent on both the search radius $r$ and the maximum cluster radius $r_c$.
 Additionally, the query protein also makes a major difference in the results.
 We suspect that this is due to the geometry of protein fragment frequency space being very ``spiky'' and ``star-like''.
-Proteins that are near the core show very little acceleration when our data structure is used because the majority of the database is nearby, whereas proteins in the periphery have fewer neighbors and are thus found much more quickly.
+Proteins that are near the core (and thus similar to many other proteins) show very little acceleration when our data structure is used because the majority of the database is nearby, whereas proteins in the periphery have fewer neighbors and are thus found much more quickly.
 Changing the maximum cluster radius effectively makes more proteins peripheral proteins, but at the cost of overall acceleration.
 
 Naturally, as the search radius expands, it quickly becomes necessary to compare against nearly the entire database, destroying any acceleration.
-For the cosine space in particular, note that the maximum distance between any two points is $1$, so once the coarse search radius of $r+r_c >= 1.0$, there cannot ever be any acceleration.
+For the cosine space in particular, note that the maximum distance between any two points is $1$, so once the coarse search radius of $r+r_c >= 1.0$, there cannot ever be any acceleration as the fine search encompasses the entire database.
 Similarly, once the coarse search encompasses all (or nearly all) the clusters in Euclidean space, the acceleration diminishes to 1x, and the overhead costs make the entropy scaling data structure perform worse than a naive search.
-However, we are most interested in proteins that are very similar to the query, the low-radius behavior, which demonstrates varying though substantial acceleration (2x-30x).
+However, as we are most interested in proteins that are very similar to the query, the low-radius behavior is of primary interest.
+In the low-radius regime, Topaz demonstrates varying though substantial acceleration (2x-30x) over FragBag.
 
 Additionally, it is instructive to note that because of the very different geometries of euclidean vs cosine space, acceleration varies tremendously for some proteins, such as \texttt{4rhv} and \texttt{1bmf}, which display nearly opposite behaviors.
 Whereas there is nearly 30x acceleration for \texttt{4rhv} in cosine space for low radius, and the same for \texttt{1bmf} in euclidean space, neither achieves better than $\sim$ 2.5x acceleration in the other space.
@@ -680,7 +695,7 @@ Whereas there is nearly 30x acceleration for \texttt{4rhv} in cosine space for l
     %    \includegraphics[width=1\textwidth]{assets/1b7t_benchmark_euclid}
         %\caption{}
     %\end{subfigure}
-    \caption{Fragbag benchmarking data. (a) Cosine distance gives on the whole better acceleration, but results in only $>99.8\%$ sensitivity, whereas (b) Euclidean distance as a metric is guaranteed by the Triangle Inequality to get $100\%$ sensitivity. }
+    \caption{FragBag benchmarking data. (a) Cosine distance gives on the whole better acceleration, but results in only $>99.8\%$ sensitivity, whereas (b) Euclidean distance as a metric is guaranteed by the Triangle Inequality to get $100\%$ sensitivity. }
     \label{fig:fragbag}
 \end{figure}
 
@@ -1035,9 +1050,9 @@ A representative from each such cluster is stored in SDF format; collectively, t
 Along with each representative, we preserve the information necessary to reconstruct each original molecule,
 as a pointer to a set of vertices and edges that have been removed or unlabeled.
 
-\subsection{Fragbag}
-We took the existing Fragbag method as a black box and by design did not do anything clever except apply our entropy-scaling similarity search data structure.
-To ensure comparability, we removed the sorting-by-distance feature of Andrew Gallant's Fragbag search function, which does not improve the all-matching results we were interested in here---it improves $k$-nearest neighbor search time while decreasing the speed of $\rho$-nearest neighbor, the problem at hand.
+\subsection{FragBag}
+We took the existing FragBag method as a black box and by design did not do anything clever except apply our entropy-scaling similarity search data structure.
+To ensure comparability, we removed the sorting-by-distance feature of Andrew Gallant's FragBag search function, which does not improve the all-matching results we were interested in here---it improves $k$-nearest neighbor search time while decreasing the speed of $\rho$-nearest neighbor, the problem at hand.
 All code was written in Go, and is available on Github.
 
 \section{Author Contributions}
@@ -1047,7 +1062,7 @@ Y.W.Y., N.M.D. and B.B. conceived the project.
 Y.W.Y. developed the theoretical analyses, with help from N.M.D.
 N.M.D. implemented and benchmarked Cablastx.
 D.C.D. implemented and benchmarked Ammolite, with help from N.M.D.
-Y.W.Y. applied the entropy-scaling data structure to accelerate Fragbag, with help from N.M.D.
+Y.W.Y. applied the entropy-scaling data structure to accelerate FragBag, with help from N.M.D.
 B.B. supervised research and provided critical advice on the study.
 Y.W.Y., N.M.D. and B.B. wrote the manuscript.
 
