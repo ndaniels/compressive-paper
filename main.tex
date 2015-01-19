@@ -50,7 +50,8 @@
 
 \begin{frontmatter}
 
-\title{Exploiting redundancy in biological data to scale search tools with entropy \\ An entropy-scaling data structure for searching large-scale biological data}
+\title{ %Exploiting redundancy in biological data to scale search tools with entropy \\
+An entropy-scaling data structure for searching large-scale biological data}
 
 %    Information for first author
 \author[mitmath,mitcsail]{Y. William Yu\corref{co}}
@@ -98,14 +99,14 @@ This approach allows us to achieve massive acceleration of tools drawn from geno
 %\maketitle
 \section{Summary}
 { \bfseries
-    The continual onslaught of new data from cell systems has forced scientists into the fortunate problem of having too much data to analyze.
+    The continual onslaught of new data from cell systems has forced upon scientists the fortunate problem of having too much data to analyze.
     However, the standard toolkit of the modern practitioner, although sometimes sufficient, is ill-prepared to scale.
     Although computers are getting faster and cheaper, they are not doing so at a fast enough rate to keep pace with this exponential explosion of data.
-    Luckily, it turns out that many of these huge data sets are highly redundant in nature, which can be exploited to design smarter tools for similarity search, the most fundamental task for analyzing biological data.
-    In this paper, we present a novel entropy-scaling\hl{(NB: redundant?)} data structure which scales in both time and space with the entropy of the underlying database to perform similarity search.
-    By applying this data structure directly as well as in a way that exploits specific redunant structure in the database, we are able to achieve massive acceleration in several standard tools in the three domains of metagenomics, high-throughput drug screening, and protein structure search.
+    Luckily, it turns out that many of these huge data sets are highly redundant in nature, which can be exploited for the design of smarter tools for similarity search, the most fundamental task for analyzing biological data.
+    In this paper, we introduce a novel entropy-scaling data structure---which scales in both time and space with the entropy of the underlying database---to perform similarity search.
+    By applying this data structure---sometimes by itself and sometimes additionally exploiting the domain-specific redunant structure in the database---we are able to achieve massive acceleration in several standard tools in the three domains of metagenomics, high-throughput drug screening, and protein structure search.
     In particular, we can achieve using our new entropy-scaling tools: CaBLASTX, 700x speedup of BLASTX with less than 5\% loss in sensitivity and no loss in specificity; Ammolite, \hl{??}x speedup of small molecule similarity search; and, Topaz, 2-30x speedup of FragBag with less than 0.2\% loss in sensitivity and no loss in specificity.
-    Thus, we present not only a novel data structure for use in accelerating similarity search in any low-entropy setting, but also practical tools ready for immediate use by the practitioner.
+    Thus, we present not only a novel data structure for use in accelerating similarity search in low-entropy settings, but also practical tools ready for immediate use by the practitioner.
 
     All source code is publicly available for download at {http://gems.csail.mit.edu.}
 }
