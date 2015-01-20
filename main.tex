@@ -658,46 +658,38 @@ Whereas there is nearly 30x acceleration for \texttt{4rhv} in cosine space for l
     \begin{subfigure}[b]{0.40\textwidth}
         \caption{Cosine distance}
         \label{fig:fragbag_cosine}
-        \includegraphics[width=1\textwidth]{assets/4rhv_benchmark_cosine}
+        \includegraphics[width=1\textwidth]{assets/4rhv_cosine}
     \end{subfigure}%
     \begin{subfigure}[b]{0.40\textwidth}
         \caption{Euclidean distance}
         \label{fig:fragbag_euclid}
-        \includegraphics[width=1\textwidth]{assets/4rhv_benchmark_euclid}
+        \includegraphics[width=1\textwidth]{assets/4rhv_euclid}
     \end{subfigure}
     \begin{subfigure}[b]{0.40\textwidth}
-        \includegraphics[width=1\textwidth]{assets/1AKE_benchmark_cosine}
+        \includegraphics[width=1\textwidth]{assets/1ake_cosine}
         %\caption{}
     \end{subfigure}%
     \begin{subfigure}[b]{0.40\textwidth}
-        \includegraphics[width=1\textwidth]{assets/1AKE_benchmark_euclid}
+        \includegraphics[width=1\textwidth]{assets/1ake_euclid}
         %\caption{}
     \end{subfigure}
     \begin{subfigure}[b]{0.40\textwidth}
-        \includegraphics[width=1\textwidth]{assets/1BMF_benchmark_cosine}
+        \includegraphics[width=1\textwidth]{assets/1bmf_cosine}
         %\caption{}
     \end{subfigure}%
     \begin{subfigure}[b]{0.40\textwidth}
-        \includegraphics[width=1\textwidth]{assets/1BMF_benchmark_euclid}
+        \includegraphics[width=1\textwidth]{assets/1bmf_euclid}
         %\caption{}
     \end{subfigure}
     \begin{subfigure}[b]{0.40\textwidth}
-        \includegraphics[width=1\textwidth]{assets/1RBP_benchmark_cosine}
+        \includegraphics[width=1\textwidth]{assets/1rbp_cosine}
         %\caption{}
     \end{subfigure}%
     \begin{subfigure}[b]{0.40\textwidth}
-        \includegraphics[width=1\textwidth]{assets/1RBP_benchmark_euclid}
+        \includegraphics[width=1\textwidth]{assets/1rbp_euclid}
         %\caption{}
     \end{subfigure}
-    %\begin{subfigure}[b]{0.49\textwidth}
-    %    \includegraphics[width=1\textwidth]{assets/1b7t_benchmark_cosine}
-        %\caption{}
-    %\end{subfigure}%
-    %\begin{subfigure}[b]{0.49\textwidth}
-    %    \includegraphics[width=1\textwidth]{assets/1b7t_benchmark_euclid}
-        %\caption{}
-    %\end{subfigure}
-    \caption{FragBag benchmarking data. (a) Cosine distance gives on the whole better acceleration, but results in only $>99.8\%$ sensitivity, whereas (b) Euclidean distance as a metric is guaranteed by the Triangle Inequality to get $100\%$ sensitivity. In both cases, we extended the search radii until acceleration disappeared when the fine search encompasses the entire Protein Data Bank. }
+    \caption{FragBag benchmarking data. (a) Cosine distance gives on the whole better acceleration, but results in only $>99.8\%$ sensitivity, whereas (b) Euclidean distance as a metric is guaranteed by the Triangle Inequality to get $100\%$ sensitivity.}
     \label{fig:fragbag}
 \end{figure}
 
@@ -709,18 +701,17 @@ Full results for each data point can be found in supplementary data files.
 
 \begin{table}
     \centering
-    \caption{Average sensitivity of Topaz compared to FragBag when using cosine distance for the trials described in Figure \ref{fig:fragbag_cosine}. This table averages the sensitivities for each choice of search radii $\{0, 0.02, \ldots, 0.98\}$. (NB: no analogous table is given for euclidean distance as the Triangle Inequality ensures perfect recall).}
+    \caption{Average sensitivity of Topaz compared to FragBag when using cosine distance for the trials described in Figure \ref{fig:fragbag_cosine}. This table averages the sensitivities for each choice of search radii $\{0, 0.01, \ldots, 0.49\}$. (NB: no analogous table is given for euclidean distance as the Triangle Inequality ensures perfect recall).}
     \label{tab:fragbag_cosine_sensitivity}
     \begin{tabular}{|c|cccc|}
         \hline
         \backslashbox{Cluster radii}{Query protein}  & 4rhv & 1ake & 1bmf & 1rbp \\
         \hline
-        0.05  & 0.999986  & 0.999859     & 0.999213 & 0.999034  \\
-        0.10  & 1  & 0.999874     & 0.999128 & 0.999931  \\
-        0.20  & 1  & 0.999897     & 0.999335 & 0.999813  \\
-        0.30  & 1  & 0.999957     & 0.999716 & 1  \\
-        0.40  & 1  & 0.999978     & 0.999849 & 1  \\
-        0.50  & 1  & 0.999993     & 0.999972 & 1  \\
+        0.10  & 1  & 0.999840     & 0.998490 & 0.999950  \\
+        0.20  & 1  & 0.999918     & 0.999001 & 0.999978  \\
+        0.30  & 1  & 0.999926     & 0.999649 & 1  \\
+        0.40  & 1  & 0.999974     & 0.999796 & 1  \\
+        0.50  & 1  & 0.999984     & 0.999934 & 1  \\
         \hline
     \end{tabular}
 \end{table}
