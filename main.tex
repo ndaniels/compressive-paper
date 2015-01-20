@@ -757,7 +757,7 @@ Thus, a fine search over the set $F$ can return all items within radius $r$ of $
 Note that we require the metricity requirement only for the Triangle Inequality.
 It turns out that many interesting distance functions are not metrics, but still almost satisfy the Triangle Inequality, which is nearly sufficient.
 More precisely, if an $\alpha$ fraction of the triples in $S$ do not satisfy the Triangle Inequality, then in expectation, we will have sensitivity $1 - \alpha$.
-As we will see later, empirically, this loss in sensitivity appears to be negligible, and can often be ameliorated by increasing the coarse search radius \hl{(NB: is this true, Noah?)}.
+As we will see later, empirically, this loss in sensitivity appears to be low, and can likely be ameliorated by increasing the coarse search radius.
 
 %We will prove in this section that 
 This data structure allows for similarity search queries in time roughly linear (provided the fractal dimension of the database is low) to the metric entropy of the database.
@@ -775,7 +775,7 @@ unlike entropy-scaling data structures though, compressed data structures do not
 
 \subsubsection{Complexity bounds}
 We first define the concept of metric entropy and entropy dimension as is usual in fractal geometry:
-\begin{definition}[\cite{tao2014metric} Definition 3 \hl{(NB: need better citation not Tao's blog)}]
+\begin{definition}[\cite{tao2014metric} Definition 3] 
     Let $X$ be a metric space, let $D$ be a subset of $X$, and let $\rho>0$ be a radius.
     \begin{itemize}
         \item The \textit{internal covering number} $N_\rho^{int}(D)$ is the fewest number of points $x_1, \ldots, x_n \in D$ such that the balls $B(x_1,\rho), \ldots B(x_n,\rho)$ cover $D$.
@@ -1072,8 +1072,6 @@ This allowed us to benchmark just the search time excluding the time to load the
 The prototype implementation of Topaz is also available, but only supports the all $\rho$-nearest neighbor search query found in FragBag.
 
 \section{Author Contributions}
-\hl{How much do we need here, seeing as we have only 4 authors? Tentative draft below; feel free to modify if I gave too little credit at any point.}
-
 Y.W.Y., N.M.D. and B.B. conceived the project.
 Y.W.Y. developed the theoretical analyses, with help from N.M.D.
 N.M.D. implemented and benchmarked Cablastx.
