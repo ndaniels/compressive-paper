@@ -1171,41 +1171,5 @@ Note that the data structure is no longer a table, but rather instead a partitio
 Say that the maximum cluster radius is $r_c$.
 Then the similarity search algorithm is to do a `coarse search' on the cluster centers for all centers within distance $r+r_c$ of $q$, expand those clusters, and do a ‘fine search’ on all entries in those clusters for those entries within distance $r$ of $q$, as stated earlier.
 
-\subsection{Old Abstract}
-
-Much like sorting is a primitive operation in computer science, similarity
-search (alternately, approximate matching) is a fundamental operation in data
-science and lies at the heart of many other problems.
-Traditionally, approximate matching has been studied primarily in the context
-of strings under edit distance metrics (e.g. for spell-checkers).
-In recent years, however, similarity search has become increasingly important
-for other objects and distance functions (e.g. biological genomes and alignment
-scores, networks and the Jaccard index).
-
-As available data grows exponentially, algorithms that scale linearly no longer
-suffice.
-The primary ways the literature addresses this problem (e.g. locality sensitive
-hashing, vector approximation, space partitioning) involve the construction of
-data structures that admit a more efficient search operation.
-However, we note that as data increases, very often the redundancy present in
-the data also increases.
-Existing general purpose methods do not explicitly take advantage of this
-phenomenon.
-
-
-In contrast, in the emerging field of ``compressive genomics'', the prevailing
-algorithmic framework specifically takes advantage of the particularly
-pronounced redundancy in large biological data sets.
-This has enabled orders of magnitude speedup of existing search algorithms such
-as BLAST and BLAT, as well as of applications using similarity search as a
-primitive, such as read mapping and network analysis.
-The key to these improvements is the use of data structures that seemingly
-scale linearly with the ``entropy'' of the dataset, both in space and time.
-
-In this paper, we present a prototypical compressed data structure for
-similarity search in Hamming-like spaces and prove the linear entropy-scaling
-result.
-We also provide software implementations ....
-
 \end{document}
 
