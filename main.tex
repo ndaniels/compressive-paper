@@ -1066,7 +1066,7 @@ Additionally, we removed the sorting-by-distance feature of Andrew Gallant's Fra
 This was done for both the FragBag and the Topaz benchmarks, to ensure comparability.
 All code was written in Go, and is available on Github.
 
-The entire 2014 Oct 31 version of the Protein Data Bank was downloaded and the database was composed of fragment frequency vectors generated from all of the relevant PDB files using the 400-11.json fragment list, as described in \citep{budwoski2010fragbag}.
+The entire 2014 Oct 31 version of the Protein Data Bank was downloaded and the database was composed of fragment frequency vectors generated from all of the relevant PDB files using the 400-11.json fragment list, as described in \citep{budowski2010fragbag}.
 For this paper, we coded the benchmarking in Go, and have provided the source for the benchmarking routine.
 This allowed us to benchmark just the search time excluding the time to load the database from disk.
 The prototype implementation of Topaz is also available, but only supports the all $\rho$-nearest neighbor search query found in FragBag.
