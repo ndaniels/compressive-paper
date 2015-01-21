@@ -130,11 +130,11 @@ However, similarity search has also demonstrated increasing importance in other 
 \begin{figure}[tbp]
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{assets/computeVsData}
+        \includegraphics[width=1\textwidth]{assets/computeVsData.png}
         \caption{}
     \end{subfigure}%
     \begin{subfigure}[b]{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{assets/storageVsData}
+        \includegraphics[width=1\textwidth]{assets/storageVsData.png}
         \caption{}
     \end{subfigure}
     \caption{Genomic data available has grown at a faster exponential rate than computer processing power and disk storage.}
@@ -165,7 +165,7 @@ we demonstrate their utility on similarity search problems drawn from the three 
 \subsection{Entropy-scaling data structure for similarity search}
 \begin{figure}[btp]
     \centering
-    \includegraphics[width=1\textwidth]{assets/dataStructure}
+    \includegraphics[width=1\textwidth]{assets/dataStructure.png}
     \caption{ Entropy-scaling data structure for similarity search. %
             (a) The na\"ive approach tests each query against each database entry to find entries within distance $X$  of the query. %
             (b) By selecting appropriate cluster centers with maximum radius $r_c$ to partition the database, we can (c) first do a coarse search to find all cluster centers within distance $r+r_c$ of a query, and then the (d) triangle inequality guarantees that a fine search over all corresponding cluster entries will suffice.}
@@ -664,35 +664,35 @@ Whereas there is nearly 30x acceleration for \texttt{4rhv} in cosine space for l
     \begin{subfigure}[b]{0.40\textwidth}
         \caption{Cosine distance}
         \label{fig:fragbag_cosine}
-        \includegraphics[width=1\textwidth]{assets/4rhv_cosine}
+        \includegraphics[width=1\textwidth]{assets/4rhv_cosine.png}
     \end{subfigure}%
     \begin{subfigure}[b]{0.40\textwidth}
         \caption{Euclidean distance}
         \label{fig:fragbag_euclid}
-        \includegraphics[width=1\textwidth]{assets/4rhv_euclid}
+        \includegraphics[width=1\textwidth]{assets/4rhv_euclid.png}
     \end{subfigure}
     \begin{subfigure}[b]{0.40\textwidth}
-        \includegraphics[width=1\textwidth]{assets/1ake_cosine}
+        \includegraphics[width=1\textwidth]{assets/1ake_cosine.png}
         %\caption{}
     \end{subfigure}%
     \begin{subfigure}[b]{0.40\textwidth}
-        \includegraphics[width=1\textwidth]{assets/1ake_euclid}
+        \includegraphics[width=1\textwidth]{assets/1ake_euclid.png}
         %\caption{}
     \end{subfigure}
     \begin{subfigure}[b]{0.40\textwidth}
-        \includegraphics[width=1\textwidth]{assets/1bmf_cosine}
+        \includegraphics[width=1\textwidth]{assets/1bmf_cosine.png}
         %\caption{}
     \end{subfigure}%
     \begin{subfigure}[b]{0.40\textwidth}
-        \includegraphics[width=1\textwidth]{assets/1bmf_euclid}
+        \includegraphics[width=1\textwidth]{assets/1bmf_euclid.png}
         %\caption{}
     \end{subfigure}
     \begin{subfigure}[b]{0.40\textwidth}
-        \includegraphics[width=1\textwidth]{assets/1rbp_cosine}
+        \includegraphics[width=1\textwidth]{assets/1rbp_cosine.png}
         %\caption{}
     \end{subfigure}%
     \begin{subfigure}[b]{0.40\textwidth}
-        \includegraphics[width=1\textwidth]{assets/1rbp_euclid}
+        \includegraphics[width=1\textwidth]{assets/1rbp_euclid.png}
         %\caption{}
     \end{subfigure}
     \caption{FragBag benchmarking data. (a) Cosine distance gives on the whole better acceleration, but results in only $>99.8\%$ sensitivity, whereas (b) Euclidean distance as a metric is guaranteed by the Triangle Inequality to get $100\%$ sensitivity.}
@@ -1038,8 +1038,8 @@ Thus, caBLASTX may be suitable to a wider variety of existing analysis
 pipelines.
 With respect for future work, it may be possible to apply entropy-scaling data
 structures to Diamond itself, achieving even greater speed gains.
-Of course, the accuracy of such an approach would still be limited by Diamond
-itself; entropy-scaling data structures cannot themselves improve accuracy,
+Of course, the accuracy of such an approach would still be limited by Diamond; 
+entropy-scaling data structures cannot themselves improve accuracy,
 except by virtue of making computationally expensive analyses more tractable.
 
 CaBlastx is implemented in Go, and its source code is available on Github.
