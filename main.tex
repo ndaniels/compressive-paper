@@ -104,7 +104,10 @@ This approach allows us to achieve massive acceleration of tools drawn from geno
     The continual onslaught of new data from cell systems has forced upon scientists the fortunate problem of having too much data to analyze.
     However, the standard toolkit of the modern practitioner, although sometimes sufficient, is ill-prepared to scale.
     Although computers are getting faster and cheaper, they are not doing so at a fast enough rate to keep pace with this exponential explosion of data.
-    Luckily, it turns out that many of these huge data sets are highly redundant in nature, which can be exploited for the design of smarter tools for similarity search, the most fundamental task for analyzing biological data.
+    Luckily, it turns out that many of these huge data sets are highly 
+redundant in nature, which researchers can exploit for the design of 
+smarter tools for similarity search, the most fundamental task for analyzing 
+biological data.
     In this paper, we introduce a novel entropy-scaling data structure---which scales in both time and space with the entropy of the underlying database---to perform similarity search.
     By applying this data structure---sometimes by itself and sometimes additionally exploiting the domain-specific redunant structure in the database---we are able to achieve massive acceleration in several standard tools in the three domains of metagenomics, high-throughput drug screening, and protein structure search.
     In particular, we can achieve using our new entropy-scaling tools: CaBLASTX, 700x speedup of BLASTX with less than 5\% loss in sensitivity and no loss in specificity; Ammolite, \hl{??}x speedup of small molecule similarity search; and, Topaz, 2-30x speedup of FragBag with less than 0.2\% loss in sensitivity and no loss in specificity.
@@ -152,6 +155,8 @@ Empirically, this compressive acceleration appears to scale almost linearly in t
 
 In this paper, we generalize this approach and introduce a practical opportunistic data structure for similarity search that provably scales almost linearly in both time and space with the entropy of the database.
 Specifically, if similarity is defined by some metric-like distance function and the database exhibits both low `metric entropy' and low `fractal dimension', this data structure performs much better than na\"ive and even optimized methods.
+This data structure allows for minimal (or even zero) loss in recall, coupled
+with zero loss in specificity.
 %We will define metric entropy and fractal dimension more precisely later, but intuitively, they are respectively measures of the total information content and scaling behavior of number of points contained in spheres of varying radii.
 Although these `entropy-scaling data structures' can in principle be used to organize nearly any large data set for faster and more space-efficient analysis,
 we demonstrate their utility on similarity search problems drawn from the three major biological `big challenges of big data': genomics, pharmaceuticals, and protein structure \cite{marx2013biology}.
@@ -217,7 +222,8 @@ compressed manner (see Online Methods for further details).
 Since real data is often messier than the rosy picture painted here, we
 explore the application of this data structure to actual data in several different incarnations.
 Additionally, sometimes the distance function we are given is not a metric (e.g. cosine distance), and thus we do not get a triangle inequality guarantee of 100\% sensitivity;
-sometimes some of the clusters are much larger than others; and sometimes what counts as a point is not entirely clear without domain knowledge.
+sometimes some of the clusters are much larger than others, and sometimes what 
+counts as a point is not entirely clear without domain knowledge.
 However, the diversity of the applications we explore in this paper demonstrate that the general scheme works for massively accelerating similarity search in a robust set of different contexts.
 We expect that so long as the data set exhibits both low entropy (many items are similar to one another, which is nearly always the case when the query is a simlarity search) and low fractal dimension (the data set has some much simpler structure generating it, such as an evolutionary tree), our entropy-scaling data structure has the potential to achieve massive speedup over more naive methods and significant speedup over even other highly optimized methods.
 
@@ -742,6 +748,9 @@ read data presents a problem for storage and transfer, as well as analysis.
 Recall our definition of the entropy-scaling similarity search data structure (Figure \ref{fig:dataStructure}).
 For ease of analysis, we will work in a high-dimensional metric space and consider the database as a set $D$ of $n$ unique points in that metric space.
 Note however that the metricity requirement is needed only for a 100\% sensitivity guarantee; other distance functions can be used, but result in some loss in sensitivity.
+However, regardless of the distance function chosen, there cannot be a loss of
+specificity; false positives will never be introduced.
+\hl{NMD: should we bother to prove this?}
 Define $B_S(q,r) = \{ p \in S | ||q-p||<r \}$. The similarity search problem is thus to compute $B_D(q,r)$ for a query $q$ and radius $r$.
 
 The data structure first clusters the points in the set by assigning them to their nearest `cluster center'.
@@ -822,7 +831,7 @@ However, note that $k$ is linear in metric entropy and $|B_D(q,r)|$ is the outpu
 Provided that the fractal dimension $d$ is small and $k$ is large, the search time will be dominated by the metric entropy component, which turns out to be the regime of greatest interest for us.
 
 We have thus proven bounds for the time-complexity of similarity search.
-In the Online Methods, we also prove space-complexity bounds for the data structure and connect metric entropy with information-theoretic entropy under some additional uniformity assumptions.
+Next, we also prove space-complexity bounds for the data structure and connect metric entropy with information-theoretic entropy under some additional uniformity assumptions.
 
 \subsubsection{Space-complexity}
 Here we bound the space-complexity of our entropy-scaling data structure and show that metric entropy bounds can give information-theoretic Shannon entropy bounds.
@@ -1033,6 +1042,8 @@ Of course, the accuracy of such an approach would still be limited by Diamond
 itself; entropy-scaling data structures cannot themselves improve accuracy,
 except by virtue of making computationally expensive analyses more tractable.
 
+CaBlastx is implemented in Go, and its source code is available on Github.
+
 \subsection{Ammolite}
 
 \subsubsection{Simplification and compression}
@@ -1060,16 +1071,26 @@ A representative from each such cluster is stored in SDF format; collectively, t
 Along with each representative, we preserve the information necessary to reconstruct each original molecule,
 as a pointer to a set of vertices and edges that have been removed or unlabeled.
 
+Ammolite is implemented in Java, and its source code is available on Github.
+
 \subsection{Topaz}
 We took the existing FragBag method as a black box and by design did not do anything clever in Topaz except apply our entropy-scaling similarity search data structure.
-Additionally, we removed the sorting-by-distance feature of Andrew Gallant's FragBag search function, which does not improve the all-matching results we were interested in here---it lowers $k$-nearest neighbor search memory requirements while decreasing the speed of $\rho$-nearest neighbor, the problem at hand.
+Additionally, we removed the sorting-by-distance feature of Andrew Gallant's 
+FragBag search function, which does not improve the all-matching results we 
+were interested in here---it lowers $k$-nearest neighbor search memory 
+requirements while dominating the running time of $\rho$-nearest neighbor, the 
+problem at hand.
 This was done for both the FragBag and the Topaz benchmarks, to ensure comparability.
 All code was written in Go, and is available on Github.
 
-The entire 2014 Oct 31 version of the Protein Data Bank was downloaded and the database was composed of fragment frequency vectors generated from all of the relevant PDB files using the 400-11.json fragment list, as described in \citep{budowski2010fragbag}.
-For this paper, we coded the benchmarking in Go, and have provided the source for the benchmarking routine.
-This allowed us to benchmark just the search time excluding the time to load the database from disk.
-The prototype implementation of Topaz is also available, but only supports the all $\rho$-nearest neighbor search query found in FragBag.
+The entire 2014 Oct 31 version of the Protein Data Bank was downloaded and the 
+database was composed of fragment frequency vectors generated from all of the 
+relevant PDB files using the 400-11.json fragment list, as described in \citep{budowski2010fragbag}.
+For this paper, we implemented the benchmarking in Go, and have provided the 
+source code for the benchmarking routine.
+This allowed us to benchmark just the search time, excluding the time to load the database from disk.
+The prototype implementation of Topaz is also available, but only supports the 
+all $\rho$-nearest neighbor search query found in FragBag.
 
 \section{Author Contributions}
 Y.W.Y., N.M.D. and B.B. conceived the project.
@@ -1082,6 +1103,8 @@ Y.W.Y., N.M.D. and B.B. wrote the manuscript.
 
 \section{Acknowledgments}
 Y.W.Y. is supported by a Hertz Foundation fellowship.
+N.M.D. is supported by \hl{(big data grant)}.
+We thank Andrew Gallant for his implementation of Fragbag.
 
 \bibliographystyle{model2-names}
 %\bibliographystyle{plain}
