@@ -803,12 +803,12 @@ However, we are only interested in scaling behaviors around large radii, so inst
 \begin{definition}
     The fractal dimension $d$ of a set $D$ at a scale $[\rho_1,\rho_2]$ is given by
     \[
-        d = \operatorname*{arg\,max}_{d^*} \{ N_\rho(D) \propto \rho^{-d^*} | \rho \in [\rho_1,\rho_2] \}.
+        d = \operatorname*{arg\,max}_{d^*} \{ N_\rho(D) \propto \rho^{d^*} | \rho \in [\rho_1,\rho_2] \}.
     \]
 \end{definition}
 
 Recall that $k$ entries are selected as cluster centers for partitioning the database to result in clusters with maximum radius $r_c$.
-From the definition above, it is trivial to verify $ N_{r_c}^{int}(D) \le k \le N_{r_c}^{ent} (D)$.
+From the definition above, when setting $\rho = r_c$, it is trivial to verify $ N_{r_c}^{int}(D) \le k \le N_{r_c}^{ent} (D)$.
 The upper bound is guaranteed by our requirement that the cluster centers not be within distance $r_c$ and the lower bound follows from the fact that our clustering is designed to cover the database.
 
 %We will set $r_c = \theta(\frac{1}{k})$.
