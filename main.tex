@@ -746,8 +746,7 @@ Recall our definition of the entropy-scaling similarity search data structure (F
 For ease of analysis, we will work in a high-dimensional metric space and consider the database as a set $D$ of $n$ unique points in that metric space.
 Note however that the metricity requirement is needed only for a 100\% sensitivity guarantee; other distance functions can be used, but result in some loss in sensitivity.
 However, regardless of the distance function chosen, there cannot be a loss of
-specificity; false positives will never be introduced.
-\hl{NMD: should we bother to prove this?}
+specificity; false positives will never be introduced because the fine search is just the original search function on a smaller subset of the database.
 Define $B_S(q,r) = \{ p \in S | ||q-p||<r \}$. The similarity search problem is thus to compute $B_D(q,r)$ for a query $q$ and radius $r$.
 
 The data structure first clusters the points in the set by assigning them to their nearest `cluster center'.
