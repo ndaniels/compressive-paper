@@ -207,10 +207,10 @@ In particular, we use two different scales: a coarse scale in which the tree loo
 We cover the tree with spheres of radius $r_c$, on the order of the width of the branches; these spheres determine our clusters, and the number of them is the ``metric entropy'' of the tree.
 Because all the points within a sphere are close to each other, they can be encoded in terms of one another, and so are highly redundant; thus, the number of such spheres is a good approximation of the entropy of the entire database.
 
-For any similarity search query looking for all points within distance $r$ of a query, by the triangle inequality, we need only look in nearby spheres with centers within a distance $r+r_c$ of the query.
+For any similarity search query looking for all points within distance $r$ of a query, by the triangle inequality, we need only look in nearby spheres with centers within a distance $r+r_c$ of the query, which by the Triangle Inequality only contain points within distance $r+2r_c$ of the query.
 %ref Figure 1?.
 However, because the spheres have radius comparable to branch width, the tree is locally 1-dimensional on the coarse scale---we will call this the ``fractal dimension'' of the tree at the scale $r_c$.
-Thus, doubling a search radius (or increasing from $r$ to $r+r_c$) only doubles (or increases by a factor of $\frac{r+r_c}{r}$) the number of points that need to be searched in a fine search after spheres have been identied.
+Thus, doubling a search radius (or increasing from $r$ to $r+2r_c$) only doubles (or increases by a factor of $\frac{r+2r_c}{r}$) the number of points that need to be searched in a fine search after spheres have been identied.
 Total similarity search time is then proportional to the number of spheres (the metric entropy) plus a constant multiple of the actual output size.
 
 We have only considered here graph-like structures (i.e. an evolutionary tree), which are locally 1-dimensional.
@@ -816,17 +816,17 @@ Given any query $q$, the coarse search over the cluster centers always requires 
 Additionally, the fine search is over the set $F$, the union of clusters with centers within distance $r+r_c$ from $q$.
 As the time-complexity of similarity search is just the total of the coarse and fine searches, this implies that the total search time is $O(k + |F|)$.
 
-By the triangle inequality, $F \subset B_D(q,r+r_c)$,
-so we can bound $|F| \le |B_D(q,r+r_c)|$.
-Let the fractal dimension $D$ at the scale between $r_c$ and $r_c + r$ be $d$.
+By the triangle inequality, $F \subset B_D(q,r+2r_c)$,
+so we can bound $|F| \le |B_D(q,r+2r_c)|$.
+Let the fractal dimension $D$ at the scale between $r_c$ and $2r_c + r$ be $d$.
 Then in expectation over possible queries $q$,
 \[
-    \left|B_D(q, r+r_c)\right| \sim \left|B_D(q,r)\right|\left(\frac{r+r_c}{r}\right)^d .
+    \left|B_D(q, r+2r_c)\right| \sim \left|B_D(q,r)\right|\left(\frac{r+2r_c}{r}\right)^d .
 \]
 Roughly speaking, this scaling argument just says that doubling a search radius only increases the number of hits by a factor of at most $2^d$.
 Thus, total search time is 
 \[
-    O\left(k + \left|B_D(q,r)\right|\left(\frac{r+r_c}{r}\right)^d \right).
+    O\left(k + \left|B_D(q,r)\right|\left(\frac{r+2r_c}{r}\right)^d \right).
 \]
 However, note that $k$ is linear in metric entropy and $|B_D(q,r)|$ is the output size, so similarity search can be performed in time linear to metric entropy and a polynomial blow-up of output size.
 Provided that the fractal dimension $d$ is small and $k$ is large, the search time will be dominated by the metric entropy component, which turns out to be the regime of greatest interest for us.
