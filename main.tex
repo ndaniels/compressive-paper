@@ -166,7 +166,7 @@ Similar results have been demonstrated for local alignment in proteomics, using 
 Empirically, this compressive acceleration appears to scale almost linearly in the entropy of the database, often resulting in orders of magnitude better performance.
 
 In this paper, we generalize this approach and introduce a practical opportunistic data structure for similarity search that provably scales almost linearly in both time and space with the entropy of the database.
-Specifically, if similarity is defined by some metric-like distance function and the database exhibits both low `metric entropy' and low `fractal dimension', this data structure performs much better than na\"ive and even optimized methods.
+Specifically, if similarity is defined by a metric-like distance function and the database exhibits both low `metric entropy' and `fractal dimension', this data structure performs much better than na\"ive and even optimized methods.
 This data structure allows for minimal (or even zero) loss in recall, coupled
 with zero loss in specificity.
 %We will define metric entropy and fractal dimension more precisely later, but intuitively, they are respectively measures of the total information content and scaling behavior of number of points contained in spheres of varying radii.
@@ -184,7 +184,7 @@ we demonstrate their utility on similarity search problems drawn from the three 
     \label{fig:dataStructure}
 \end{figure}
 
-We present here an opportunistic data structure for similarity search that scales with the entropy of the underlying database.
+%We present here an opportunistic data structure for similarity search that scales with the entropy of the underlying database.
 In the following we consider entropy to be nearly synonymous with distance between points in a high-dimensional space.
 For genomic sequences, this can be edit distance, for chemical graphs, maximum common subgraph size, and for general vectors, Euclidean or cosine distance.
 The similarity search problem we are most interested in is finding all points in a set that are close to (i.e. similar to) the query point.
@@ -195,7 +195,7 @@ Perhaps many of the points are exact duplicates; this easy scenario is trivially
 Or maybe the points mostly live on a low-dimensional subspace; statistical tools such as PCA (Principal Component Analysis) exploit this property in data analysis.
 Furthermore, if the dimension of the subspace is sufficiently low,
 it can be divided into cells, allowing quick similarity searches by looking only at nearby cells \cite{weber1998quantitative}.
-However, when the dimensionality of that subspace increases, cell search time blows up exponentially; additionally, in sparse data sets, most of the cells will be empty, which wastes search time.
+However, when the dimensionality of the subspace increases, cell search time blows up exponentially; additionally, in sparse data sets, most of the cells will be empty, which wastes search time.
 %Also, cell search performs poorly when each of the dimensions is small and discrete, as is the case with genomic sequences when we consider each position as a dimension and the four possible nucleotides as the possible locations along that axis.
 
 \begin{figure}[btp]
@@ -206,25 +206,22 @@ However, when the dimensionality of that subspace increases, cell search time bl
 \end{figure}
 More importantly, biological data sets generally do not live in low-dimensional subspaces.
 Consider the instructive case of genomes along an evolutionary Tree of Life (Figure \ref{fig:tree}).
-Such a tree has many branches (plus admixture merges branches back together), and looks nearly ``1-dimensional'' locally, but on a global scale is not when considered as a subspace.
+Such a tree has many branches (plus admixture merges branches back together), and looks nearly 1-dimensional locally, but is not globally.
 Additionally, because of diffusion due to mutation, each of the branches is also ``thick'' (high-dimensional) when looked at closely.
 %Figure 1b for illustration.
 %Please look up Jinbo Xu and my work on Tree Decomposition in JACM.
 % NMD: I'm familiar with TreePack, but not seeing how it's relevant.
-Thus, considering this example as a low-dimensional \textit{subspace} is incorrect.
+Considering this example as a low-dimensional \textit{subspace} is incorrect.
 
 However, the local low-dimensionality can be exploited by looking on the right scales: a coarse scale in which the tree looks 1-dimensional locally and a fine scale where the branch width matters.
-We cover the tree with spheres of radius $r_c$, on the order of the width of the branches; these spheres determine our clusters, and the number of them is the ``metric entropy'' of the tree.
-Because all the points within a sphere are close to each other, they can be encoded in terms of one another, and so are highly redundant; thus, the number of such spheres is a good approximation of the entropy of the entire database.
+We cover the tree with spheres of radius $r_c$ on the order of the branch widths; these spheres determine our clusters, and the number of them is the ``metric entropy'' of the tree.
+Because all the points within a sphere are close to each other, they are highly redundant and can be encoded in terms of one another; thus, the metric entropy is a good approximation of the entropy of the entire database.
 
 By the triangle inequality, to search for all points within distance $r$ of a query we need only look in nearby spheres with centers within a distance $r+r_c$ of the query.
 %ref Figure 1?.
 However, because the spheres have radius comparable to branch width, the tree is locally 1-dimensional on the coarse scale---we will call this the ``fractal dimension'' $d=1$ of the tree at the scale $r_c$.
-Thus, increasing the search radius for our coarse search only linearly increases the number of points that need to be searched in a fine search after spheres have been identified.
-Total similarity search time is then proportional to the number of spheres (the metric entropy) plus a function of the actual output size:
-
-In this example, we considered graph-like structures (i.e. an evolutionary tree), which are locally 1-dimensional.
-However, the more general case (e.g. the local structure might be a higher dimensional manifold) can also be analyzed.
+Increasing the search radius for our coarse search only linearly increases the number of points that need to be searched in a fine search.
+A similar analysis holds in the more general case.
 Given a database with fractal dimension $d$ and metric entropy $k$ at the scale $r_c$, we show in the Supplemental Experimental Procedures that time-complexity for similarity search with radius $r$ is
 \begin{gather}
     O\Bigg(
@@ -233,6 +230,8 @@ Given a database with fractal dimension $d$ and metric entropy $k$ at the scale 
     \underbrace{\left(\frac{r+2r_c}{r}\right)^d}_{\textrm{scaling factor}}
      \Bigg) .
 \end{gather}
+Thus, for small fractal dimension and output size, similarity search is nearly linear in metric entropy.
+Additionally, because the search only has to look at a small subset of the clusters, the clusters can be stored in compressed form, and only decompressed as needed, giving space savings that also scale with entropy.
 %Similarly, using these covering spheres, the database can be stored in a 
 %compressed manner (see Supplemental Experimental Procedures for further details).
 
