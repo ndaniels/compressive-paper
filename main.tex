@@ -18,6 +18,35 @@
 
 \usepackage{diagbox}
 
+% Code from http://tex.stackexchange.com/questions/15735/adding-arrows-to-each-term-of-an-equation
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+
+\makeatletter
+
+% Define how TiKZ will draw the nodes
+\tikzset{mathterm/.style={draw=black,fill=white,rectangle,anchor=base}}
+\tikzstyle{every picture}+=[remember picture]
+\everymath{\displaystyle}
+
+% Designate a term in a math environment to point to
+% Syntax: \mathterm[node label]{some math}
+\newcommand\mathterm[2][]{%
+   \tikz [baseline] { \node [mathterm] (#1) {$#2$}; }}
+
+% A command to draw an arrow from the current position to a labelled math term
+% Default color=black, default arrow head=stealth
+% Syntax: \indicate[color]{term to point to}[path options]
+\newcommand\indicate[2][black]{%
+   \tikz [baseline] \node [inner sep=0pt,anchor=base] (i#2) {\vphantom|};
+   \@ifnextchar[{\@indicateopts{#1}{#2}}{\@indicatenoopts{#1}{#2}}}
+\def\@indicatenoopts#1#2{%
+   {\color{#1} \tikz[overlay] \path[line width=1pt,draw=#1,-stealth] (i#2) edge (#2);}}
+\def\@indicateopts#1#2[#3]{%
+   {\color{#1} \tikz[overlay] \path[line width=1pt,draw=#1,-stealth] (i#2) [#3] edge (#2);}}
+
+\makeatother
+
 %\biboptions{numbers,super,comma}
 
 \newtheorem{theorem}{Theorem}[section]
@@ -109,7 +138,7 @@ smarter analysis tools.
     Using these ideas, we present accelerated versions of standard tools for use by practitioners in the three domains of metagenomics, high-throughput drug screening, and protein structure search:
     CaBLASTX, 700x speedup of BLASTX with less than 5\% loss in sensitivity and no loss in specificity; Ammolite, \hl{??}x speedup of small molecule similarity search; and, Topaz, 2-30x speedup of FragBag with less than 0.2\% loss in sensitivity and no loss in specificity.
 
-    All source code is publicly available for download at {http://gems.csail.mit.edu.}
+    Source code: \url{http://gems.csail.mit.edu}
 }
 
 \section{Introduction}
@@ -164,11 +193,10 @@ The basics of the data structure itself are presented in Figure \ref{fig:dataStr
 Let's first consider what it means for a large biological data set, considered as points in a high-dimensional space, to be highly redundant.
 Perhaps many of the points are exact duplicates; this easy scenario is trivially exploited by de-duplication and is already standard practice (e.g. the NR NCBI protein database \cite{pruitt2005ncbi}).
 Or maybe the points mostly live on a low-dimensional subspace; statistical tools such as PCA (Principal Component Analysis) exploit this property in data analysis.
-Furthermore, if the dimension of the subspace is sufficiently low and each dimension sufficiently ``long'',
-the space can be divided into cells, allowing quick similarity searches by searching only nearby cells \cite{weber1998quantitative}.
-However, when the dimensionality of that subspace increases, cell search time blows up exponentially, and in sparse data sets, most of the cells will be empty, which wastes search time.
-Also, cell search performs poorly when each of the dimensions is small and discrete, as is the case with genomic sequences when we consider each position as a dimension and the four possible nucleotides as the possible locations along that axis.
-
+Furthermore, if the dimension of the subspace is sufficiently low,
+it can be divided into cells, allowing quick similarity searches by looking only at nearby cells \cite{weber1998quantitative}.
+However, when the dimensionality of that subspace increases, cell search time blows up exponentially; additionally, in sparse data sets, most of the cells will be empty, which wastes search time.
+%Also, cell search performs poorly when each of the dimensions is small and discrete, as is the case with genomic sequences when we consider each position as a dimension and the four possible nucleotides as the possible locations along that axis.
 
 \begin{figure}[btp]
     \centering
@@ -176,37 +204,43 @@ Also, cell search performs poorly when each of the dimensions is small and discr
     \caption{Cartoon depiction of points in a high-dimensional space that live close to a 1D tree-like structure. Although high-dimensional at a fine scale, at the coarser scale of covering spheres, the data cloud looks nearly 1-dimensional. Note that the cluster center generation was performed using the same algorithm used in Topaz, which is our accelerated version of FragBag.}
     \label{fig:tree}
 \end{figure}
-More importantly though, biological databases do not often actually live in low-dimensional subspaces.
-Let's consider the instructive case of genomes along an evolutionary Tree of Life (Figure \ref{fig:tree}).
-Such a tree has many branches (plus admixture merges branches back together), and might look nearly ``1-dimensional'' locally, but on a global scale is anything but---at least considering it as a subspace.
+More importantly, biological data sets generally do not live in low-dimensional subspaces.
+Consider the instructive case of genomes along an evolutionary Tree of Life (Figure \ref{fig:tree}).
+Such a tree has many branches (plus admixture merges branches back together), and looks nearly ``1-dimensional'' locally, but on a global scale is not when considered as a subspace.
 Additionally, because of diffusion due to mutation, each of the branches is also ``thick'' (high-dimensional) when looked at closely.
 %Figure 1b for illustration.
 %Please look up Jinbo Xu and my work on Tree Decomposition in JACM.
 % NMD: I'm familiar with TreePack, but not seeing how it's relevant.
-Thus, considering this example as a low-dimensional \textit{subspace} is the wrong thing to do.
-However, the local low-dimensionality can be exploited by looking on the right scales.
-In particular, we use two different scales: a coarse scale in which the tree looks 1-dimensional locally and a fine scale where the branch width matters.
+Thus, considering this example as a low-dimensional \textit{subspace} is incorrect.
+
+However, the local low-dimensionality can be exploited by looking on the right scales: a coarse scale in which the tree looks 1-dimensional locally and a fine scale where the branch width matters.
 We cover the tree with spheres of radius $r_c$, on the order of the width of the branches; these spheres determine our clusters, and the number of them is the ``metric entropy'' of the tree.
 Because all the points within a sphere are close to each other, they can be encoded in terms of one another, and so are highly redundant; thus, the number of such spheres is a good approximation of the entropy of the entire database.
 
-For any similarity search query looking for all points within distance $r$ of a query, by the triangle inequality, we need only look in nearby spheres with centers within a distance $r+r_c$ of the query, which by the Triangle Inequality only contain points within distance $r+2r_c$ of the query.
+By the triangle inequality, to search for all points within distance $r$ of a query we need only look in nearby spheres with centers within a distance $r+r_c$ of the query.
 %ref Figure 1?.
-However, because the spheres have radius comparable to branch width, the tree is locally 1-dimensional on the coarse scale---we will call this the ``fractal dimension'' of the tree at the scale $r_c$.
-Thus, doubling a search radius (or increasing from $r$ to $r+2r_c$) only doubles (or increases by a factor of $\frac{r+2r_c}{r}$) the number of points that need to be searched in a fine search after spheres have been identied.
-Total similarity search time is then proportional to the number of spheres (the metric entropy) plus a constant multiple of the actual output size.
+However, because the spheres have radius comparable to branch width, the tree is locally 1-dimensional on the coarse scale---we will call this the ``fractal dimension'' $d=1$ of the tree at the scale $r_c$.
+Thus, increasing the search radius for our coarse search only linearly increases the number of points that need to be searched in a fine search after spheres have been identified.
+Total similarity search time is then proportional to the number of spheres (the metric entropy) plus a function of the actual output size:
 
-We have only considered here graph-like structures (i.e. an evolutionary tree), which are locally 1-dimensional.
-However, the general scheme of covering the data set with spheres to then perform a coarse and fine search works even when the fractal dimension is higher (e.g. the local structure might be a 2D manifold).
-All that will change is that the search time will have a component that blows up with increasing search radius by a function exponential in that fractal dimension.
-However, assuming low fractal dimension, search time is still dominated by the metric entropy of the database.
-Similarly, using these covering spheres, the database can be stored in a 
-compressed manner (see Supplemental Experimental Procedures for further details).
+In this example, we considered graph-like structures (i.e. an evolutionary tree), which are locally 1-dimensional.
+However, the more general case (e.g. the local structure might be a higher dimensional manifold) can also be analyzed.
+Given a database with fractal dimension $d$ and metric entropy $k$ at the scale $r_c$, we show in the Supplemental Experimental Procedures that time-complexity for similarity search with radius $r$ is
+\begin{gather}
+    O\Bigg(
+    \underbrace{k}_{\textrm{metric entropy}} +
+    \overbrace{\left|B_D(q,r)\right|}^{\textrm{output size}}
+    \underbrace{\left(\frac{r+2r_c}{r}\right)^d}_{\textrm{scaling factor}}
+     \Bigg) .
+\end{gather}
+%Similarly, using these covering spheres, the database can be stored in a 
+%compressed manner (see Supplemental Experimental Procedures for further details).
 
-Since real data is often messier than the rosy picture painted here, we
-explore the application of this data structure to actual data in several different incarnations.
-Additionally, sometimes the distance function we are given is not a metric (e.g. cosine distance), and thus we do not get a triangle inequality guarantee of 100\% sensitivity;
-sometimes some of the clusters are much larger than others, and sometimes what 
-counts as a point is not entirely clear without domain knowledge.
+Real data is generally messier than the rosy picture painted here.
+Sometimes the distance function is not a metric, so we lose the triangle inequality guarantee of 100\% sensitivity;
+sometimes some of the points are much larger than others;
+and sometimes even what counts as a point is not entirely clear without domain knowledge.
+%
 However, the diversity of the applications we explore in this paper demonstrate that the general scheme works for massively accelerating similarity search in a robust set of different contexts.
 We expect that so long as the data set exhibits both low entropy (many items are similar to one another, which is nearly always the case when the query is a simlarity search) and low fractal dimension (the data set has some much simpler structure generating it, such as an evolutionary tree), our entropy-scaling data structure has the potential to achieve massive speedup over more naive methods and significant speedup over even other highly optimized methods.
 
