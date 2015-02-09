@@ -114,21 +114,20 @@ unlike entropy-scaling data structures though, compressed data structures do not
 \textbf{The primary theoretical advance of entropy-scaling data structures is that they bound both space and time as functions of the data set entropy.}
 
 \subsubsection{Complexity bounds}
-We first define the concept of metric entropy and entropy dimension as is usual in fractal geometry:
-\begin{definition}[\cite{tao2014metric} Definition 3] 
+We first define the concept of metric entropy and entropy dimension in the usual manner:
+\begin{definition}[\cite{tao2008product} Definition 6.1] 
     Let $X$ be a metric space, let $D$ be a subset of $X$, and let $\rho>0$ be a radius.
     \begin{itemize}
-        \item The \textit{internal covering number} $N_\rho^{int}(D)$ is the fewest number of points $x_1, \ldots, x_n \in D$ such that the balls $B(x_1,\rho), \ldots B(x_n,\rho)$ cover $D$.
-        \item The \textit{metric entopy} $N_\rho^{ent}(D)$ is the largest number of points $x_1, \ldots, x_n$ one can find in $D$ that are $\rho$-separated, thus $||x_i - x_j|| \ge \rho$ for all $i \ne j$.
+        \item The \textit{metric entropy} $N_\rho^(D)$ is the fewest number of points $x_1, \ldots, x_n \in D$ such that the balls $B(x_1,\rho), \ldots B(x_n,\rho)$ cover $D$.
     \end{itemize}
 \end{definition}
-\begin{definition}[\cite{falconer2013fractal}]
-    The upper Minkowski dimension (also known as the entropy dimension) of a set $D$ is given by 
+\begin{definition}[\cite{falconer1990fractal}]
+    The Hausdorff dimension of a set $D$ is given by 
 \[
-    \dim_{Minkowski}(D) := \limsup_{\rho \to 0} \frac{\log N_\rho(D)}{\log 1/\rho}
+    \dim_{Hausdorff}(D) := \lim_{\rho \to 0} \frac{\log N_\rho(D)}{\log 1/\rho}
 \]
 \end{definition}
-Unfortunately, as $D$ is a finite, discrete, set, the given definision always gives $\dim_{Minkowski}(D) = 0$.
+Unfortunately, as $D$ is a finite, discrete, set, the given definision always gives $\dim_{Hausdorff}(D) = 0$.
 However, we are only interested in scaling behaviors around large radii, so instead we use:
 \begin{definition}
     The fractal dimension $d$ of a set $D$ at a scale $[\rho_1,\rho_2]$ is given by

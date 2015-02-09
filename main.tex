@@ -166,7 +166,7 @@ Similar results have been demonstrated for local alignment in proteomics, using 
 Empirically, this compressive acceleration appears to scale almost linearly in the entropy of the database, often resulting in orders of magnitude better performance.
 
 In this paper, we generalize this approach and introduce a practical opportunistic data structure for similarity search that provably scales almost linearly in both time and space with the entropy of the database.
-Specifically, if similarity is defined by a metric-like distance function and the database exhibits both low `metric entropy' and `fractal dimension', this data structure performs much better than na\"ive and even optimized methods.
+Specifically, if similarity is defined by a metric-like distance function and the database exhibits both low `metric entropy' and `fractal dimension' (See Supplemental Methods: Theory), this data structure performs much better than na\"ive and even optimized methods.
 This data structure allows for minimal (or even zero) loss in recall, coupled
 with zero loss in specificity.
 %We will define metric entropy and fractal dimension more precisely later, but intuitively, they are respectively measures of the total information content and scaling behavior of number of points contained in spheres of varying radii.
@@ -214,12 +214,12 @@ Additionally, because of diffusion due to mutation, each of the branches is also
 Considering this example as a low-dimensional \textit{subspace} is incorrect.
 
 However, the local low-dimensionality can be exploited by looking on the right scales: a coarse scale in which the tree looks 1-dimensional locally and a fine scale where the branch width matters.
-We cover the tree with spheres of radius $r_c$ on the order of the branch widths; these spheres determine our clusters, and the number of them is the ``metric entropy'' of the tree.
+We cover the tree with spheres of radius $r_c$ on the order of the branch widths; these spheres determine our clusters, and the number of them is the ``metric entropy'' of the tree \cite{tao2008product}.
 Because all the points within a sphere are close to each other, they are highly redundant and can be encoded in terms of one another; thus, the metric entropy is a good approximation of the entropy of the entire database.
 
 By the triangle inequality, to search for all points within distance $r$ of a query we need only look in nearby spheres with centers within a distance $r+r_c$ of the query.
 %ref Figure 1?.
-However, because the spheres have radius comparable to branch width, the tree is locally 1-dimensional on the coarse scale---we will call this the ``fractal dimension'' $d=1$ of the tree at the scale $r_c$.
+However, because the spheres have radius comparable to branch width, the tree is locally 1-dimensional on the coarse scale---we will call this the ``fractal dimension'' $d=1$ of the tree at the scale $r_c$ \cite{falconer1990fractal}.
 Increasing the search radius for our coarse search only linearly increases the number of points that need to be searched in a fine search.
 A similar analysis holds in the more general case.
 Given a database with fractal dimension $d$ and metric entropy $k$ at the scale $r_c$, we show in the Supplemental Methods that time-complexity for similarity search with radius $r$ is
