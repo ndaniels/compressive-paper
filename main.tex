@@ -136,7 +136,7 @@ This approach allows us to achieve massive acceleration of tools drawn from geno
 smarter analysis tools.
     We introduce an entropy-scaling data structure---which given a low fractal dimension guarantee, scales in both time and space with the entropy of the underlying database---to perform similarity search, a fundamental operation in data science.
     Using these ideas, we present accelerated versions of standard tools for use by practitioners in the three domains of metagenomics, high-throughput drug screening, and protein structure search:
-    CaBLASTX, 700x speedup of BLASTX with less than 5\% loss in sensitivity and no loss in specificity; Ammolite, \hl{??}x speedup of small molecule similarity search; and, Topaz, 2-30x speedup of FragBag with less than 0.2\% loss in sensitivity and no loss in specificity.
+    CaBLASTX, 700x speedup of BLASTX with less than 5\% loss in sensitivity and no loss in specificity; Ammolite, \hl{??}x speedup of small molecule similarity search; and, esFragBag, 2-30x speedup of FragBag with less than 0.2\% loss in sensitivity and no loss in specificity.
 
     Source code: \url{http://gems.csail.mit.edu}
 }
@@ -201,7 +201,7 @@ However, when the dimensionality of the subspace increases, cell search time blo
 \begin{figure}[btp]
     \centering
     \includegraphics[width=0.8\textwidth]{assets/treepoints/treepoints2D_clusters.png}
-    \caption{Cartoon depiction of points in a high-dimensional space that live close to a 1D tree-like structure. Although high-dimensional at a fine scale, at the coarser scale of covering spheres, the data cloud looks nearly 1-dimensional. Note that the cluster center generation was performed using the same algorithm used in Topaz, which is our accelerated version of FragBag.}
+    \caption{Cartoon depiction of points in a high-dimensional space that live close to a 1D tree-like structure. Although high-dimensional at a fine scale, at the coarser scale of covering spheres, the data cloud looks nearly 1-dimensional. Note that the cluster center generation was performed using the same algorithm used in esFragBag.}
     \label{fig:tree}
 \end{figure}
 More importantly, biological data sets generally do not live in low-dimensional subspaces.
@@ -629,8 +629,8 @@ without using substantial domain-specific knowledge.
 Instead, we used the very same representation (bag of fragments) and distance functions (Euclidean and cosine distances)
 as FragBag, a greedy k-centers algorithm, and vector difference to generate the clustered representation.
 Note that this is in stark contrast to caBlastX and Ammolite, which both exploited domain knowledge to further improve performance.
-Thus, Topaz, our entropy-scaling version of FragBag, is exactly an existing FragBag codebase augmented with new database generation and similarity search functions.
-Although it's conceivable that using similar techniques to exploit domain specific knowledge as in caBlastX and Ammolite will result in greater speedup, Topaz here is primarily a proof-of-concept to analyze the performance of a the entropy-scaling data structure alone.
+Thus, esFragBag, our entropy-scaling augmentation of FragBag, simply involves grafting new database generation and similarity search functions onto an existing codebase.
+Although using similar techniques to exploit domain specific knowledge as in caBlastX and Ammolite might result in greater speedup, esFragBag here is primarily a proof-of-concept to analyze the performance of a the entropy-scaling data structure alone.
 
 \subsubsection{Clustering}
 For the cluster generation, we used a randomized greedy 2-pass approach.
@@ -670,7 +670,7 @@ Naturally, as the search radius expands, it quickly becomes necessary to compare
 For the cosine space in particular, note that the maximum distance between any two points is $1$, so once the coarse search radius of $r+r_c >= 1.0$, there cannot ever be any acceleration as the fine search encompasses the entire database.
 Similarly, once the coarse search encompasses all (or nearly all) the clusters in Euclidean space, the acceleration diminishes to 1x, and the overhead costs make the entropy scaling data structure perform worse than a naive search.
 However, as we are most interested in proteins that are very similar to the query, the low-radius behavior is of primary interest.
-In the low-radius regime, Topaz demonstrates varying though substantial acceleration (2x-30x) over FragBag.
+In the low-radius regime, esFragBag demonstrates varying though substantial acceleration (2x-30x) over FragBag.
 
 Additionally, it is instructive to note that because of the very different geometries of euclidean vs cosine space, acceleration varies tremendously for some proteins, such as \texttt{4rhv} and \texttt{1bmf}, which display nearly opposite behaviors.
 Whereas there is nearly 30x acceleration for \texttt{4rhv} in cosine space for low radius, and the same for \texttt{1bmf} in euclidean space, neither achieves better than $\sim$ 2.5x acceleration in the other space.
@@ -723,7 +723,7 @@ Full results for each data point can be found in supplementary data files.
 
 \begin{table}
     \centering
-    \caption{Average sensitivity of Topaz compared to FragBag when using cosine distance for the trials described in Figure \ref{fig:fragbag_cosine}. This table averages the sensitivities for each choice of search radii $\{0, 0.01, \ldots, 0.49\}$. (NB: no analogous table is given for euclidean distance as the Triangle Inequality ensures perfect recall).}
+    \caption{Average sensitivity of esFragBag compared to FragBag when using cosine distance for the trials described in Figure \ref{fig:fragbag_cosine}. This table averages the sensitivities for each choice of search radii $\{0, 0.01, \ldots, 0.49\}$. (NB: no analogous table is given for euclidean distance as the Triangle Inequality ensures perfect recall).}
     \label{tab:fragbag_cosine_sensitivity}
     \begin{tabular}{|c|cccc|}
         \hline
@@ -747,7 +747,7 @@ This data structure provably scales almost linearly with entropy of the
 database, allowing search on large data sets to scale even as these data sets
 grow exponentially.
 We provide open-source software for all three areas: caBlastX for metagenomic analysis,
-Ammolite for small-molecule structure search, and Topaz for protein structure search.
+Ammolite for small-molecule structure search, and esFragBag for protein structure search.
 In the case of metagenomic analysis, caBLASTX also compares favorably to recent 
 search tools that outperform BLASTX.
 
