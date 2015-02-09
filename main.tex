@@ -116,7 +116,7 @@ An entropy-scaling data structure for searching large-scale biological data}
 \begin{abstract}
     \begin{itemize}
         \item Low entropy data sets are common in Biological Big Data problems
-        \item Under certain structural assumptions, it is possible to construct a data structure admitting similarity search in time- and space-complexity roughly linear to ``entropy''
+        \item Under common structural assumptions, it is possible to construct a data structure admitting similarity search in time- and space-complexity roughly linear to ``entropy''
         \item For problems drawn from genomics, small molecule search, and protein structure search, we demonstrate substantial acceleration of analyses using this data structure
     \end{itemize}
 \noindent\unskip\textbf{eTOC Blurb}
@@ -158,15 +158,15 @@ As available data grows exponentially \cite{berger2013computational,yu2015qualit
 algorithms that scale linearly with the amount of data no longer suffice.
 The primary ways the literature addresses this problem (e.g.
 locality sensitive hashing \cite{indyk1998approximate}, vector approximation \cite{ferhatosmanoglu2000vector}, space partitioning \cite{weber1998quantitative}) involve the construction of data structures that admit a more efficient search operation.
-However, we note that as data increases, very often the redundancy present in the data also increases.
+However, we note that as data increases, very often the redundancy present in the data also increases \cite{loh2012compressive}.
 Existing general purpose methods do not explicitly exploit this particular feature of biological data.
 
 In the specific context of local alignment in genomics, however, the emerging field of ``compressive genomics'' has shown that existing tools such as BLAST and BLAT can be ``compressively accelerated'' by taking advantage of high redundancy between related genomes using link pointers and edit scripts to a database of unique sequences \cite{loh2012compressive}.
 Similar results have been demonstrated for local alignment in proteomics, using much the same strategies \cite{daniels2013compressive}.
 Empirically, this compressive acceleration appears to scale almost linearly in the entropy of the database, often resulting in orders of magnitude better performance.
 
-In this paper, we generalize this approach and introduce a practical opportunistic data structure for similarity search that provably scales almost linearly in both time and space with the entropy of the database.
-Specifically, if similarity is defined by a metric-like distance function and the database exhibits both low `metric entropy' and `fractal dimension' (See Supplemental Methods: Theory), this data structure performs much better than na\"ive and even optimized methods.
+In this paper, we substantially generalize and formalize this approach by introducing a practical opportunistic data structure for similarity search that \textbf{provably} scales almost linearly in both time and space with the entropy of the database.
+Specifically, if similarity is defined by a metric-like distance function (e.g., edit or Hamming distance) and the database exhibits both low `metric entropy' and `fractal dimension' (See Supplemental Methods: Theory), this data structure performs much better than na\"ive and even optimized methods.
 This data structure allows for minimal (or even zero) loss in recall, coupled
 with zero loss in specificity.
 %We will define metric entropy and fractal dimension more precisely later, but intuitively, they are respectively measures of the total information content and scaling behavior of number of points contained in spheres of varying radii.
@@ -764,12 +764,12 @@ Y.W.Y. and B.B. developed the theoretical analyses, with help from N.M.D.
 N.M.D. implemented and benchmarked Cablastx.
 D.C.D. implemented and benchmarked Ammolite, with help from N.M.D.
 Y.W.Y. applied the entropy-scaling data structure to accelerate FragBag, with help from N.M.D.
-B.B. supervised research and provided critical advice on the study.
+B.B. guided all research and provided critical advice on the study.
 Y.W.Y., N.M.D. and B.B. wrote the manuscript.
 
 \section{Acknowledgments}
 Y.W.Y. is supported by a Hertz Foundation fellowship.
-N.M.D. is supported by \hl{(big data grant)}.
+N.M.D. and B.B. are supported by NIH GM108348.
 We thank Andrew Gallant for his implementation of Fragbag.
 
 \bibliographystyle{model5-names-noitalic}
