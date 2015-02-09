@@ -222,7 +222,7 @@ By the triangle inequality, to search for all points within distance $r$ of a qu
 However, because the spheres have radius comparable to branch width, the tree is locally 1-dimensional on the coarse scale---we will call this the ``fractal dimension'' $d=1$ of the tree at the scale $r_c$.
 Increasing the search radius for our coarse search only linearly increases the number of points that need to be searched in a fine search.
 A similar analysis holds in the more general case.
-Given a database with fractal dimension $d$ and metric entropy $k$ at the scale $r_c$, we show in the Supplemental Experimental Procedures that time-complexity for similarity search with radius $r$ is
+Given a database with fractal dimension $d$ and metric entropy $k$ at the scale $r_c$, we show in the Supplemental Methods that time-complexity for similarity search with radius $r$ is
 \begin{gather}
     O\Bigg(
     \underbrace{k}_{\textrm{metric entropy}} +
@@ -233,7 +233,7 @@ Given a database with fractal dimension $d$ and metric entropy $k$ at the scale 
 Thus, for small fractal dimension and output size, similarity search is nearly linear in metric entropy.
 Additionally, because the search only has to look at a small subset of the clusters, the clusters can be stored in compressed form, and only decompressed as needed, giving space savings that also scale with entropy.
 %Similarly, using these covering spheres, the database can be stored in a 
-%compressed manner (see Supplemental Experimental Procedures for further details).
+%compressed manner (see Supplemental Methods for further details).
 
 Real data is generally messier than the rosy picture painted here.
 Sometimes the distance function is not a metric, so we lose the triangle inequality guarantee of 100\% sensitivity;
@@ -351,9 +351,9 @@ alphabet, which exposes more similarity among sequences at lower computational
 cost.
 This alphabet reduction can be thought of as a form of clustering; the offset 
 within each of the 4 letters of the reduced alphabet is stored, so the original
-sequence is recoverable (see Supplemental Experimental Procedures).
+sequence is recoverable (see Supplemental Methods).
 CaBLASTX employs a seed-and-extend approach in order to identify similar regions
-of subsequence among entries in the database (see Supplemental Experimental Procedures).
+of subsequence among entries in the database (see Supplemental Methods).
 This approach differs from the strict clustering described in the Data 
 Structures section; in order to take advantage of the evolutionary nature of
 protein sequence, \emph{subsequence} clustering is employed.
