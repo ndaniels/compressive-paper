@@ -613,47 +613,21 @@ One approach to finding structural neighbors is to attempt to align the query pr
 However, performing a full alignment against every entry in the PDB is prohibitively expensive, especially as the database grows.
 Alternately, the approach we use here is the one introduced by FragBag~\cite{budowski2010fragbag}, which describes each protein as a
 ``bag of fragments,'' where each fragment is a small structural motif.
-
-The bag of fragments is essentially
-a term frequency vector representing the number of occurrences of each structural motif within the protein.
-While FragBag does not generate structural alignments the way standard aligners do, it provides an excellent
-filter for computing proteins that are likely to have close alignments; those alignments could then be computed
-with a standard aligner.
-FragBag's accuracy has been reported as comparable to structural aligners such as STRUCTAL and
-ICE.
-FragBag is already quite fast, much faster than these standard aligners, but also importantly for us
-FragBag turns out to be very amenable to acceleration using an entropy-scaling data structure because much of the computation is spent in doing a similarity search on a frequency vector.
+By directly applying our entropy scaling data structure without any additional augmentation, esFragBag (entropy scaling FragBag) is able to achieve a 2-30x speedup of FragBag with less than 0.2\% loss in sensitivity and no loss in specificity.
 
 For this last example, we intentionally approached the application of entropy-scaling data structures to FragBag in a blind manner,
-without using substantial domain-specific knowledge.
+without using any domain-specific knowledge.
 Instead, we used the very same representation (bag of fragments) and distance functions (Euclidean and cosine distances)
 as FragBag, a greedy k-centers algorithm, and vector difference to generate the clustered representation.
 Note that this is in stark contrast to caBlastX and Ammolite, which both exploited domain knowledge to further improve performance.
-Thus, esFragBag, our entropy-scaling augmentation of FragBag, simply involves grafting new database generation and similarity search functions onto an existing codebase.
+Thus, esFragBag only involves grafting new database generation and similarity search functions onto an existing codebase.
 Although using similar techniques to exploit domain specific knowledge as in caBlastX and Ammolite might result in greater speedup, esFragBag here is primarily a proof-of-concept to analyze the performance of a the entropy-scaling data structure alone.
 
-\subsubsection{Clustering}
-For the cluster generation, we used a randomized greedy 2-pass approach.
-First, all proteins in the Protein Data Bank were randomly ordered.
-Then in the first pass, proteins were selected as cluster centers if and only if they were not within a user-specified Euclidean distance $r_c$ from an existing center (i.e. the first protein is always selected, and the second if further away than $r_c$ from the first, etc.).
-Recall that this generation of cluster centers is the same as the one used to generate covering spheres in Figure \ref{fig:tree};
-the covering spheres were overlapping, but we trivially assign every protein uniquely to a single cluster by assigning to the nearest cluster center in the second pass.
-
-\subsubsection{Search}
-Similarity search here is performed exactly as described in the data structure section, with no modifications.
-For a given search query $q$ and search radius $r$,
-\begin{itemize}
-    \item A coarse search is used to find all cluster centers within distance $r+r_c$ of $q$.
-    \item All corresponding clusters were unioned into a set $F$.
-    \item A fine search was performed over the set $F$ to find all proteins within distance $r$ of $q$.
-\end{itemize}
-
-\subsubsection{Benchmarking}
 We explored the increases in speed resulting from applying the entropy-scaling data structure, for both Euclidean and cosine distances (Figure \ref{fig:fragbag}).
 Naturally, as search radii increases, the coarse search expands to encompass the entire database; to fully explore parameters, we made certain to increase search radii until the acceleration effect entirely disappeared.
 Additionally, we explored the effect of using different maximum cluster radii and several different query proteins.
 
-For cosine distance, we generated databases with maximum cluster radii of 0.05, 0.1, 0.2, 0.3, 0.4, and 0.5.
+For cosine distance, we generated databases with maximum cluster radii of 0.1, 0.2, 0.3, 0.4, and 0.5.
 Then, for each query protein from the set \{\texttt{4rhv}, \texttt{1ake}, \texttt{1bmf}, \texttt{1rbp}, \texttt{1b7t}\}, we ran both naive and accelerated similarity searches with radii of $0.02i \forall i \in \{0,\ldots,49\}$.
 This was repeated 5 times for each measurement, and the ratio of average accelerated vs naive times is shown in Figure \ref{fig:fragbag_cosine}.
 
@@ -715,11 +689,9 @@ Whereas there is nearly 30x acceleration for \texttt{4rhv} in cosine space for l
     \label{fig:fragbag}
 \end{figure}
 
-
-\subsubsection{Validation}
-Note that while Euclidean distance is a metric, and thus the triangle inequality guarantees 100\% sensitivity, cosine distance is not.
+Additionally, note that while Euclidean distance is a metric, and thus the triangle inequality guarantees 100\% sensitivity, cosine distance is not.
 Empirically, however, for all of the queries we performed, we achieve $> 99.8\%$ sensitivity (Table \ref{tab:fragbag_cosine_sensitivity}).
-Full results for each data point can be found in supplementary data files.
+%Full results for each data point can be found in supplementary data files.
 
 \begin{table}
     \centering
@@ -757,6 +729,35 @@ acceleration of approximate search.
 However, particularly in the case of metagenomic analysis, the collection of 
 read data presents a problem for storage and transfer, as well as analysis.
 
+\section{Methods}
+\subsection{Cablastx}
+
+\subsection{Ammolite}
+
+\subsection{esFragBag}
+In FragBag, the bag of fragments is essentially
+a term frequency vector representing the number of occurrences of each structural motif within the protein.
+While FragBag does not generate structural alignments the way standard aligners do, it provides an excellent
+filter for computing proteins that are likely to have close alignments; those alignments could then be computed
+with a standard aligner.
+FragBag's accuracy has been reported as comparable to structural aligners such as STRUCTAL and
+ICE.
+FragBag is already quite fast, much faster than these standard aligners, but also importantly for us
+FragBag turns out to be very amenable to acceleration using an entropy-scaling data structure because much of the computation is spent in doing a similarity search on a frequency vector.
+
+For the cluster generation, we used a randomized greedy 2-pass approach.
+First, all proteins in the Protein Data Bank were randomly ordered.
+Then in the first pass, proteins were selected as cluster centers if and only if they were not within a user-specified Euclidean distance $r_c$ from an existing center (i.e. the first protein is always selected, and the second if further away than $r_c$ from the first, etc.).
+Recall that this generation of cluster centers is the same as the one used to generate covering spheres in Figure \ref{fig:tree};
+the covering spheres were overlapping, but we trivially assign every protein uniquely to a single cluster by assigning to the nearest cluster center in the second pass.
+
+Similarity search here is performed exactly as described in the data structure section, with no modifications.
+For a given search query $q$ and search radius $r$,
+\begin{itemize}
+    \item A coarse search is used to find all cluster centers within distance $r+r_c$ of $q$.
+    \item All corresponding clusters were unioned into a set $F$.
+    \item A fine search was performed over the set $F$ to find all proteins within distance $r$ of $q$.
+\end{itemize}
 
 \section{Author Contributions}
 Y.W.Y., N.M.D. and B.B. conceived the project.
