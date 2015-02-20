@@ -553,9 +553,10 @@ Our implementation allows a user to specify whether any atom mismatches or
 bond-type mismatches should be 
 allowed in the maximum common subgraph of two molecules.
 If zero mismatches are allowed, fMCS is just MCS.
-The distance function used is the graph distance metric 
-of~\cite{bunke1998graph},
-specifically $d(G_1,G_2) = 1 - \frac{|mcs(G_1,G_2)}{max(|G_1|,|G_2|)}$.
+The distance function used currently is based on the overlap coefficient 
+defined as $d(G_1,G_2) = 1 - \frac{ |mcs(G_1,G_2)| }{min(|G_1|,|G_2|)}$. This function, unlike 
+the graph distance function  ~\cite{bunke1998graph}, is not a metric. However it does account for
+situations where a large molecule contains a smaller molecule which is important in practice.
 
 As in~\cite{loh2012compressive}, our compression-accelerated search approach 
 relies on a two-stage process.
