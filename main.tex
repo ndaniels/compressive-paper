@@ -534,72 +534,30 @@ popular SDF molecular structure format, such as PubChem, and for searching for
 similar molecular structures in compressed space.
 We designed this compression and search framework around one of the standard 
 techniques for high-throughput screening of potential drug compounds, the use 
-of maximum common subgraph (MCS) to identify similar motifs among molecules.
-Many existing MCS-based tools, such as SMSD~\cite{rahman2009small} and 
-fmcsR~\cite{cao2008maximum} compute the maximum common subgraph on fully 
-labeled graphs; 
-vertices are labeled with chemical elements, and edges are labeled with bond 
-types (such as single or double bonds).
-The `f' in fmcsR, which stands for ``flexible,'' indicates that some bounded 
-number of vertex or edge label mismatches are permitted, at significant 
-computational cost.
+of maximum common subgraph (MCS) to identify similar motifs among molecules \cite{cao2008maximum. rahman2009small}.
+Using an entropy-scaling approach, our new software Ammolite is able to achieve \hl{?????}.
+As intimated above, not only is Ammolite a practical tool ready for use by biochemists, but its results also demonstrate the scalability of entropy scaling methods as databases grow.
 
-\subsubsection{Clustering}
-
-
-Our clustering approach relies on structural similarity.
-In order to more effectively group molecules based on structural motifs,
-each molecule is \emph{simplified} by removing nodes and edges that do not
-participate in simple cycles.
-Clusters are formed of molecules that are isomorphic after this simplification
-step.
-Each cluster can then be represented by a single molecular structure, along 
-with pointers to \emph{difference sets} between that structure and each of the 
-full molecules it represents.
-The difference set contains the nodes and edges that were removed in the 
-simplification step.
-
-\subsubsection{Search}
-
-We implemented a variant of a maximum common subgraph (MCS) algorithm, known as 
+In developing Ammolite, we augmented the entropy-scaling data structure by introducing different but related distance functions for the coarse versus fine search.
+For the fine search, 
+we implemented a variant of the maximum common subgraph (MCS) algorithm, known as 
 \emph{flexible} maximum
 common subgraph (fMCS), as detailed by Cao, et al.~\cite{cao2008maximum}.
-Our implementation allows a user to specify whether any atom mismatches or 
-bond-type mismatches should be 
-allowed in the maximum common subgraph of two molecules.
-If zero mismatches are allowed, fMCS is just MCS.
-The distance function used is the graph distance metric 
-of~\cite{bunke1998graph},
-specifically $d(G_1,G_2) = 1 - \frac{|mcs(G_1,G_2)}{max(|G_1|,|G_2|)}$.
+For the coarse search, however, we first project the space of small molecules onto a subspace by removing nodes and edges that do not particiapte in simple cycles.
+Clusters are exactly pre-images of of this projection operator (i.e. all molecules that are isomorphic after simplification form a cluster).
+Coarse search is performed using fMCS on this much smaller projection subspace, greatly increasing speed.
 
-As in~\cite{loh2012compressive}, our compression-accelerated search approach 
-relies on a two-stage process.
-First, a \emph{coarse} search is performed in compressed space, by searching 
-the coarse database.
-The query molecule is simplified in exactly the same manner as 
-the molecular database during clustering, and this transformed query graph is 
-matched against the coarse database.
-To preserve sensitivity, this coarse search is performed with a permissive 
-similarity score.
-The idea behind coarse search is to identify \emph{possible} hits.
+%Many existing MCS-based tools, such as SMSD~\cite{rahman2009small} and 
+%fmcsR~\cite{cao2008maximum} compute the maximum common subgraph on fully 
+%labeled graphs; 
+%vertices are labeled with chemical elements, and edges are labeled with bond 
+%types (such as single or double bonds).
+%The `f' in fmcsR, which stands for ``flexible,'' indicates that some bounded 
+%number of vertex or edge label mismatches are permitted, at significant 
+%computational cost.
+\hl{Benchmarking paragraph(s)}
 
-
-Any possible hits--molecular graphs from the coarse database whose MCS to 
-the transformed query molecule was within the similarity score threshold--are 
-then reconstructed, by following
-pointers to the removed atom and bond information, and recreating the 
-original molecules.
-
-Next, the \emph{fine search} is performed against these decompressed possible 
-hits.
-Fine search is performed using MCS or fMCS, with user-defined parameters for 
-bond and atom mismatches and similarity-score threshold.
-
-\subsubsection{Benchmarking}
-
-
-
-\subsubsection{Validation}
+\hl{Validation paragraph(s)}
 
 \subsection{Protein Structure Search}
 
@@ -621,7 +579,7 @@ Instead, we used the very same representation (bag of fragments) and distance fu
 as FragBag, a greedy k-centers algorithm, and vector difference to generate the clustered representation.
 Note that this is in stark contrast to caBlastX and Ammolite, which both exploited domain knowledge to further improve performance.
 Thus, esFragBag only involves grafting new database generation and similarity search functions onto an existing codebase.
-Although using similar techniques to exploit domain specific knowledge as in caBlastX and Ammolite might result in greater speedup, esFragBag here is primarily a proof-of-concept to analyze the performance of a the entropy-scaling data structure alone.
+Although using similar techniques to exploit domain specific knowledge as in caBlastX and Ammolite might result in greater speedup, esFragBag here is explored as a proof-of-concept to analyze the performance of a the entropy-scaling data structure alone.
 
 We explored the increases in speed resulting from applying the entropy-scaling data structure, for both Euclidean and cosine distances (Figure \ref{fig:fragbag}).
 Naturally, as search radii increases, the coarse search expands to encompass the entire database; to fully explore parameters, we made certain to increase search radii until the acceleration effect entirely disappeared.
@@ -689,7 +647,7 @@ Whereas there is nearly 30x acceleration for \texttt{4rhv} in cosine space for l
     \label{fig:fragbag}
 \end{figure}
 
-Additionally, note that while Euclidean distance is a metric, and thus the triangle inequality guarantees 100\% sensitivity, cosine distance is not.
+Finally, while Euclidean distance is a metric---for which the triangle inequality guarantees 100\% sensitivity---cosine distance is not.
 Empirically, however, for all of the queries we performed, we achieve $> 99.8\%$ sensitivity (Table \ref{tab:fragbag_cosine_sensitivity}).
 %Full results for each data point can be found in supplementary data files.
 
@@ -733,6 +691,52 @@ read data presents a problem for storage and transfer, as well as analysis.
 \subsection{Cablastx}
 
 \subsection{Ammolite}
+Our clustering approach relies on structural similarity.
+In order to more effectively group molecules based on structural motifs,
+each molecule is \emph{simplified} by removing nodes and edges that do not
+participate in simple cycles.
+Clusters are formed of molecules that are isomorphic after this simplification
+step.
+Each cluster can then be represented by a single molecular structure, along 
+with pointers to \emph{difference sets} between that structure and each of the 
+full molecules it represents.
+The difference set contains the nodes and edges that were removed in the 
+simplification step.
+
+We implemented a variant of a maximum common subgraph (MCS) algorithm, known as 
+\emph{flexible} maximum
+common subgraph (fMCS), as detailed by Cao, et al.~\cite{cao2008maximum}.
+Our implementation allows a user to specify whether any atom mismatches or 
+bond-type mismatches should be 
+allowed in the maximum common subgraph of two molecules.
+If zero mismatches are allowed, fMCS is just MCS.
+The distance function used is the graph distance metric 
+of~\cite{bunke1998graph},
+specifically $d(G_1,G_2) = 1 - \frac{|mcs(G_1,G_2)}{max(|G_1|,|G_2|)}$.
+
+As in~\cite{loh2012compressive}, our compression-accelerated search approach 
+relies on a two-stage process.
+First, a \emph{coarse} search is performed in compressed space, by searching 
+the coarse database.
+The query molecule is simplified in exactly the same manner as 
+the molecular database during clustering, and this transformed query graph is 
+matched against the coarse database.
+To preserve sensitivity, this coarse search is performed with a permissive 
+similarity score.
+The idea behind coarse search is to identify \emph{possible} hits.
+
+
+Any possible hits--molecular graphs from the coarse database whose MCS to 
+the transformed query molecule was within the similarity score threshold--are 
+then reconstructed, by following
+pointers to the removed atom and bond information, and recreating the 
+original molecules.
+
+Next, the \emph{fine search} is performed against these decompressed possible 
+hits.
+Fine search is performed using MCS or fMCS, with user-defined parameters for 
+bond and atom mismatches and similarity-score threshold.
+
 
 \subsection{esFragBag}
 In FragBag, the bag of fragments is essentially
