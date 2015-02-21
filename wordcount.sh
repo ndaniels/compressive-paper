@@ -5,10 +5,18 @@
 file="main.pdf"
 
 pdftotext ${file} ${file}.txt
-methline=`grep -P "Online Methods$" ${file}.txt -n | head -n 1 | cut -sd: -f1`
-refline=`grep -P "^References$" ${file}.txt -n | head -n 1 | cut -sd: -f1`
-sed -n "1,$((${methline}-1))p" ${file}.txt > ${file}.txt.body
-sed -n "${methline},$((${refline}-1))p" ${file}.txt > ${file}.txt.onl_meth
+refline=`grep -P "References$" ${file}.txt -n | head -n 1 | cut -sd: -f1`
+sed -n "1,$((${refline}-1))p" ${file}.txt > ${file}.txt.body
 sed -n "${refline},\$p" ${file}.txt > ${file}.txt.ref
-wc ${file}.txt ${file}.txt.body ${file}.txt.onl_meth ${file}.txt.ref
-rm ${file}.txt ${file}.txt.body ${file}.txt.onl_meth ${file}.txt.ref
+wc ${file}.txt ${file}.txt.body ${file}.txt.ref
+rm ${file}.txt ${file}.txt.body ${file}.txt.ref
+
+
+file="supplement.pdf"
+
+pdftotext ${file} ${file}.txt
+refline=`grep -P "^Supplemental References$" ${file}.txt -n | head -n 1 | cut -sd: -f1`
+sed -n "1,$((${refline}-1))p" ${file}.txt > ${file}.txt.body
+sed -n "${refline},\$p" ${file}.txt > ${file}.txt.ref
+wc ${file}.txt ${file}.txt.body ${file}.txt.ref
+rm ${file}.txt ${file}.txt.body ${file}.txt.ref

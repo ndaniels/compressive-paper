@@ -1,0 +1,436 @@
+\documentclass[review,preprint,12pt]{elsarticle}
+%\biboptions{numbers,super,comma}
+\biboptions{round,authoryear,semicolon}
+\renewcommand{\cite}{\citep} % make default citations parenthetical
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+
+\usepackage{graphicx}
+%\usepackage{natbib}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{hyperref}
+
+\usepackage{color}
+\usepackage{soul}
+
+\usepackage{diagbox}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+
+\rfoot{\center S\thepage}
+
+%\biboptions{numbers,super,comma}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{xca}[theorem]{Exercise}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\renewcommand{\refname}{\normalfont\selectfont\normalsize \textbf{Supplemental References}} 
+
+%\numberwithin{equation}
+
+%    Absolute value notation
+%\newcommand{\abs}[1]{\lvert#1\rvert}
+
+%    Blank box placeholder for figures (to avoid requiring any
+%    particular graphics capabilities for printing this document).
+\newcommand{\blankbox}[2]{%
+  \parbox{\columnwidth}{\centering
+%    Set fboxsep to 0 so that the actual size of the box will match the
+%    given measurements more closely.
+    \setlength{\fboxsep}{0pt}%
+    \fbox{\raisebox{0pt}[#2]{\hspace{#1}}}%
+  }%
+}
+
+\journal{Cell Systems}
+
+\begin{document}
+
+\renewcommand\thefigure{S\arabic{figure}}
+\setcounter{figure}{0}
+\renewcommand\thetable{S\arabic{table}}
+\setcounter{table}{0}
+
+\section{Supplemental Figures}
+\begin{figure}[hbp]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/computeVsData.png}
+        \caption{}
+    \end{subfigure}%
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/storageVsData.png}
+        \caption{}
+    \end{subfigure}
+    \caption{Genomic data available has grown at a faster exponential rate than computer processing power and disk storage.}
+    \label{fig:expdata}
+\end{figure}
+
+\section{Supplemental Methods}
+
+\subsection{Theory}
+\subsubsection{Time-complexity}
+Recall our definition of the entropy-scaling similarity search data structure (Figure 1).
+For ease of analysis, we will work in a high-dimensional metric space and consider the database as a set $D$ of $n$ unique points in that metric space.
+Note however that the metricity requirement is needed only for a 100\% sensitivity guarantee; other distance functions can be used, but result in some loss in sensitivity.
+However, regardless of the distance function chosen, there cannot be a loss of
+specificity; false positives will never be introduced because the fine search is just the original search function on a smaller subset of the database.
+Define $B_S(q,r) = \{ p \in S | ||q-p||<r \}$. The similarity search problem is thus to compute $B_D(q,r)$ for a query $q$ and radius $r$.
+
+The data structure first clusters the points in the set by assigning them to their nearest `cluster center'.
+A set $C$ of $k$ cluster centers are chosen such that no cluster has radius greater than a user-specified parameter $r_c$ and no two cluster centers are within distance $r_c$ of one another.
+Overloading notation a bit, we will identify each cluster with its center, so $C$ is also the set of clusters.
+%We will additionally require that each cluster contain at least $\frac{n}{k \alpha}$ items, for some constant $\alpha \ge 1$ (i.e. that the clusters are balanced).
+For a given similarity search query of all items within distance $r$ of a query $q$, this data structure breaks the query into coarse and fine search stages.
+The coarse search is over the list of cluster centers, returning $B_C(q,r + r_c)$.
+Let \[\displaystyle F = \bigcup_{c \in B_C(q,r+r_c)} c , \] the union of all the returned clusters.
+Then by the triangle inequality, $B_F(q,r) = B_D(q,r)$.
+Thus, a fine search over the set $F$ can return all items within radius $r$ of $q$.
+
+Note that we require the metricity requirement only for the Triangle Inequality.
+It turns out that many interesting distance functions are not metrics, but still almost satisfy the Triangle Inequality, which is nearly sufficient.
+More precisely, if an $\alpha$ fraction of the triples in $S$ do not satisfy the Triangle Inequality, then in expectation, we will have sensitivity $1 - \alpha$.
+As we will see later, empirically, this loss in sensitivity appears to be low, and can likely be ameliorated by increasing the coarse search radius.
+
+%We will prove in this section that 
+This data structure allows for similarity search queries in time roughly linear (provided the fractal dimension of the database is low) to the metric entropy of the database.
+Additionally, under some uniformity assumptions, the data structure can be stored in a compressed form that uses space also linear in the metric entropy of the database.
+Further, as suggested by the last sentence, the metric entropy of the database can be related to the more typical information theoretic notion of entropy (see Supplemental Methods).
+%However, to do this, we will first need to build additional mathematical machinery and make precise our notions of `entropy' and `fractal dimension'.
+
+Note that entropy-scaling data structures are distinct from both succinct data structures and compressed data structures.
+Succinct data structures are ones that use space close to the information-theoretic limit in the worst case while permitting efficient queries; i.e.
+succinct data structures do not depend on the actual entropy of the underlying data set, but have size-dependence on the potential worst-case entropy of the data set \cite{jacobson1988succinct}.
+Compressed (and opportunistic) data structures, on the other hand, bound the amount of the space used by the entropy of the data set while permitting efficient queries \cite{grossi2005compressed, ferragina2000opportunistic}.
+Entropy-scaling data structures are compressed data structures, but can do even more, as
+unlike entropy-scaling data structures though, compressed data structures do not measure time-complexity in terms of the entropy.
+\textbf{The primary theoretical advance of entropy-scaling data structures is that they bound both space and time as functions of the data set entropy.}
+
+\subsubsection{Complexity bounds}
+We first define the concept of metric entropy and entropy dimension in the usual manner:
+\begin{definition}[\cite{tao2008product} Definition 6.1] 
+    Let $X$ be a metric space, let $D$ be a subset of $X$, and let $\rho>0$ be a radius.
+    \begin{itemize}
+        \item The \textit{metric entropy} $N_\rho^(D)$ is the fewest number of points $x_1, \ldots, x_n \in D$ such that the balls $B(x_1,\rho), \ldots B(x_n,\rho)$ cover $D$.
+    \end{itemize}
+\end{definition}
+\begin{definition}[\cite{falconer1990fractal}]
+    The Hausdorff dimension of a set $D$ is given by 
+\[
+    \dim_{Hausdorff}(D) := \lim_{\rho \to 0} \frac{\log N_\rho(D)}{\log 1/\rho}
+\]
+\end{definition}
+Unfortunately, as $D$ is a finite, discrete, set, the given definision always gives $\dim_{Hausdorff}(D) = 0$.
+However, we are only interested in scaling behaviors around large radii, so instead we use:
+\begin{definition}
+    The fractal dimension $d$ of a set $D$ at a scale $[\rho_1,\rho_2]$ is given by
+    \[
+        d = \operatorname*{arg\,max}_{d^*} \{ N_\rho(D) \propto \rho^{d^*} | \rho \in [\rho_1,\rho_2] \}.
+    \]
+\end{definition}
+
+Recall that $k$ entries are selected as cluster centers for partitioning the database to result in clusters with maximum radius $r_c$.
+From the definition above, when setting $\rho = r_c$, it is trivial to verify $ N_{r_c}^{int}(D) \le k \le N_{r_c}^{ent} (D)$.
+The upper bound is guaranteed by our requirement that the cluster centers not be within distance $r_c$ and the lower bound follows from the fact that our clustering is designed to cover the database.
+
+%We will set $r_c = \theta(\frac{1}{k})$.
+Given any query $q$, the coarse search over the cluster centers always requires $k$ comparisons.
+Additionally, the fine search is over the set $F$, the union of clusters with centers within distance $r+r_c$ from $q$.
+As the time-complexity of similarity search is just the total of the coarse and fine searches, this implies that the total search time is $O(k + |F|)$.
+
+By the triangle inequality, $F \subset B_D(q,r+2r_c)$,
+so we can bound $|F| \le |B_D(q,r+2r_c)|$.
+Let the fractal dimension $D$ at the scale between $r_c$ and $2r_c + r$ be $d$.
+Then in expectation over possible queries $q$,
+\[
+    \left|B_D(q, r+2r_c)\right| \sim \left|B_D(q,r)\right|\left(\frac{r+2r_c}{r}\right)^d .
+\]
+Roughly speaking, this scaling argument just says that doubling a search radius only increases the number of hits by a factor of at most $2^d$.
+Thus, total search time is 
+\[
+    O\left(k + \left|B_D(q,r)\right|\left(\frac{r+2r_c}{r}\right)^d \right).
+\]
+However, note that $k$ is linear in metric entropy and $|B_D(q,r)|$ is the output size, so similarity search can be performed in time linear to metric entropy and a polynomial blow-up of output size.
+Provided that the fractal dimension $d$ is small and $k$ is large, the search time will be dominated by the metric entropy component, which turns out to be the regime of greatest interest for us.
+
+We have thus proven bounds for the time-complexity of similarity search.
+Next, we also prove space-complexity bounds for the data structure and connect metric entropy with information-theoretic entropy under some additional uniformity assumptions.
+
+\subsubsection{Space-complexity}
+Here we bound the space-complexity of our entropy-scaling data structure and show that metric entropy bounds can give information-theoretic Shannon entropy bounds.
+To do this, we will need two conditions: (1) that our distance function measures marginal entropies and (2) that all clusters are smaller than some constant $S_c$.
+
+Information-theoretic ``entropy'' is of course a measure of the uncertainty of a distribution or random variable, and is not well-defined for a database.
+However, the term is often used in data compression as a shorthand for the number of bits needed to encode the database, a measure of the randomness of that database.
+We use entropy in the latter sense; precisely, we define the entropy of a database as the number of bits needed to encode the database under some encoding scheme.
+Equivalently, the entropy of a database is the entropy measured in bits of a random variable whose instances are databases that match our database on some structural condition, which we will define later.
+Of course, each encoding scheme thus results in a different definition of entropy, but this simply corresponds to the compressed size of the database under different compression methods.
+We now estimate the entropy of the database by attempting to compress it.
+
+Let $l$ be the number of bits necessary to encode a point $p$ in the space \textit{de novo} without any other information.
+Without any compression, a set of size $n$ then requires $nl$ bits to store.
+Assume that the number of bits necessary to encode a point $p$ as a function of $q$ (and vice versa) is $\theta(||p-q||) \le l$.
+Effectively, we are imposing the condition that the distance is a measure of entropy added by a new point (`pairwise marginal entropy').
+That distance bounds pairwise marginal entropy is clearly true for Hamming distance, and can also be shown for edit distances and more general similarity measures.
+
+Let us consider the spanning trees of the complete distance graph between points in the set.
+The number of bits needed to encode the entire set according to the relationships specified in the spanning tree is then linear in the weight of that tree.
+Thus, the weight of a spanning tree effectively corresponds to the entropy of the distribution over all data sets that are in accordance with the pairwise distances specified in that tree.
+One measure of the entropy of a data set would be the entropy of this distribution over a minimum weight spanning tree of the complete distance graph, and let us call that weight $W_1$.
+However, we have neglected the number of bits needed to encode the tree itself; as this is an arbitrary tree, every node must encode its parent, so the entropy of the tree itself is $ (n-1) \log n$ bits.
+Thus, this encoding is not practical as encoding the tree is already super-linear in data set size.
+In total, including encoding the root node, the database will require $O(l + W + (n-1)\log n$ bits to store.
+
+Alternately, we can also specify a set of $k$ privileged points using which we encode all other points, corresponding to our cluster centers.
+With the additional selection of an arbitrary (or zero) root node, this encoding corresponds to a 2-level spanning tree of the complete distance graph, with pre-selected branches, but leaves selected to minimize total weight.
+Obviously, the weight of this 2-level spanning tree $W_2 \ge W_1$, but
+encoding the tree itself uses only $kl$ bits to specify each of the privileged points and $n \log k$ to encode the tree the cluster identifications.
+Thus, the database will require $O(kl + W_2 + n \log k)$ bits to store.
+%This model of entropy also has the advantage of being much more amenable for proving bounds about the time- and space-complexity of the similarity search data structure we introduce below.
+However, the cluster identifications can be encoded positionally on disk, so we can actually store it in just $O(kl + W_2)$ bits, so the data structure is basically linear in the entropy of a distribution corresponding to a 2-level cluster.
+
+It turns out though, that we can often do even better than that given a metric entropy $N_{r_c}^{ent} = k$, and actually bound the tree weight $W_3$ with a slightly different tree structure.
+Recall that we assumed the maximum cluster size $S_c$, and the maximum cluster radius is $r_c$ if $k$ points chosen to be at least distance $r_c$ from each other are used as the cluster centers.
+We now consider encoding each item by its nearest neighbor within a cluster, which corresponds to a tree made by joining together a forest of minimum spanning trees corresponding to each individual cluster by the roots (i.e. cluster centers).
+Clearly, this decreases the weight of the tree from the previous 2-level spanning tree, so $W_1 \le W_3 \le W_2$.
+As each cluster has at most $S_c$ elements, encoding the tree itself uses $(n-k)\log S_c$, but specifying the privileged points again requires $kl$ bits.
+Thus, total number of bits needed is $O(kl + W_3 + (n-k)\log S_c )$
+
+But because the cluster sizes are bounded by $S_c$, we can effectively still encode positionally by using a large window and a standard text compressor like Gzip or Bzip2 and setting the compression window to be larger than $S_c l$.
+Instead of directly encoding differences, this scheme instead lists all cluster members together and uses a standard text compressor to use the redundancy throughout the cluster, which allows us to not store the forest explicitly and still get compression.
+Thus, the total number of bits needed is roughly $O(kl + W_3)$. Again, we can get a data structure basically linear in the entropy, but here linear in the entropy of a distribution closer to that of the optimal minimum spanning tree.
+
+Furthermore, we can additionally bound the entropy $W_3$ using the metric entropy $k$.
+Because maximum cluster radius is $r_c$, the entropy added to the cluster from any individual item is $O(r_c)$.
+Additionally, each cluster is of size at most $S_c$, so each cluster has $O(r_c \cdot S_c)$ bits of entropy.
+Thus, $W_3 = O(k r_c S_c)$.
+Or, alternately, each individual item must fall in a cluster, so we can also bound $W_3 = O(n r_c)$.
+In this manner, we can relate the Shannon entropy of the database to the metric entropy that we used in the time-complexity bounds.
+
+\subsection{Cablastx}
+
+\subsubsection{Alphabet Reduction}
+
+Alphabet reduction--reducing the 20-letter standard amino acid alphabet to a
+smaller set, in order to accelerate search or improve homology detection--has
+been proposed and implemented several times~\cite{bacardit2007automated, peterson2009reduced}.
+In particular, \citet{murphy2000simplified} considered reducing the
+amino-acid alphabet to 17, 10, or even 4 letters.
+More recently, \citet{zhao2012rapsearch2} and \citet{huson2013poor} applied a reduction to
+a 4-letter alphabet, termed a ``pseudoDNA'' alphabet, in sequence alignment.
+
+In this work, we extend the compression approach of 
+\citet{daniels2013compressive} using a reversible alphabet reduction.
+We use the alphabet reduction of \citet{murphy2000simplified} to map the 
+standard amino
+acid alphabet (along with the four common ambiguous letters ) onto a 4-letter 
+alphabet.
+Specifically, we map F, W, and Y into one cluster; C, I, L, M, V, and J into
+a second cluster, A, G, P, S, and T into a third cluster, and
+D, E, N, Q, K, R, H, B, and Z into a fourth cluster.
+By storing the offset within each cluster of the original letter, the original
+sequence can be reconstructed, making this a reversible reduction.
+
+\subsubsection{Database Compression}
+
+Given a protein sequence database to be compressed, we proceed as follows:
+\begin{enumerate}
+        \item First, initialize a table of all possible $k$-mer ``seeds'' of
+        our 4-letter reduced alphabet, as well as a ``coarse'' database of
+        reduced-alphabet sequences, initially containing the alphabet-reduced
+        version of the first sequence in the input database.
+        %
+        \item For each $k$-mer of the first sequence, store its position in the
+        corresponding entry in the seed table.
+        %
+        \item For each subsequent sequence $s$ in the input, slide a window of 
+        size $k$ along the sequence, skipping single-residue repeats of length
+        greater than 10.
+        %
+        \item Look up these $k$ residues in the seed table.
+        For every entry matching to that $k$-mer in the seed table, follow
+        it to a corresponding subsequence in the coarse database and attempt
+        \textit{extension}.
+        If no subsequences from this window can be extended, move the window
+        by $m$ residues, where $m$ defaults to 10.
+        \item If a match was found via extension, move the $k$-mer window to
+        the first $k$-mer in $s$ after the match, and repeat the extension
+        process.
+\end{enumerate}
+        
+Given a $k$ match between sequence $s$ and a subsequence $s'$ pointed to by the
+seed table, first attempt \textit{ungapped} extension:
+\begin{enumerate}
+        \item Within each window of 10 alphabet-reduced residues, if identical 
+        4-mers in $s$ and $s'$ can be found, and at least 2 additional matching 
+        residues can be found, then there is an ungapped match within that
+        10-mer window between $s$ and $s'$ that exhibits at least 60\% sequence
+        identity.
+        \item Continue ungapped matching using 10-mer windows until no more
+        10-mers of at least 60\% sequence identity are found.
+        \item The result of ungapped extension is that there is an alignment 
+        between $s$ and $s'$ where the only differences are substitutions,
+        at least 60\% of the positions contain exact matches.
+\end{enumerate}
+        
+When ungapped extension terminates, attempt \textit{gapped} extension.
+From the end of the aligned regions thus far, align 25-mer windows of both
+$s$ and $s'$ using the Needleman-Wunsch~\cite{needleman1970general} algorithm 
+using an identity matrix.
+Note that the original caBLASTP~\cite{daniels2013compressive} used BLOSUM62 as 
+it was
+operating in amino acid space; as we are now operating in a reduced-alphabet
+space, an identity matrix is appropriate, just as it is for nucleotide space.
+After gapped extension on a window length of 25, attempt ungapped extension
+again.
+
+If neither gapped nor ungapped extension can continue, end the extension phase.
+If the resulting alignment has less than 70\% sequence identity (in the 
+reduced-alphabet space), or is shorter than 40 residues, discard it, and 
+attempt extension on the next entry in the seed table for the original $k$-mer,
+continuing on to the next $k$-mer if there are no more entries.
+
+If the resulting alignment does have at least 70\% sequence identity in the
+reduced-alphabet space, and is at least 40 residues long, then create a link
+from the entry for $s'$ in the coarse database to the subsequence of $s$
+corresponding to the alignment.
+If there are unaligned ends of $s$ shorter than 30 residues, append them to the
+match.
+Longer unaligned ends that did not match any subsequences reachable from the
+seed table are added into the coarse database themselves, following the same
+$k$-mer indexing procedure as the first sequence.
+
+Finally, in order to be able to recover the original sequence with its original
+amino acid identities, a \textit{difference script} is associated with each
+link.
+This difference script is a representation of the insertions, deletions, and
+substitutions resulting from the Needleman-Wunsch alignment, along with the
+offset in each reduced-alphabet cluster needed to recover the original alphabet.
+Thus, for example, a valine (V) is in the cluster containing C, I, L, M, V, and 
+J.
+Since it is the 4th entry in that 5-entry cluster, we can represent it with
+the offset 4.
+Since the largest cluster contains 9 elements, only four bits are needed to
+store one entry in the difference script.
+More balanced clusters would have allowed 3-bit storage, but at the expense of
+clusters that less faithfully represented the BLOSUM62 matrix and the
+physicochemical properties of the constituent amino acids.
+
+\subsubsection{Further benchmarking and validation}
+
+Although our primary result is the direct acceleration of BLASTX using our
+entropy-scaling data structures, we also compared caBLASTX to 
+RapSearch2~\cite{zhao2012rapsearch2} version 2.22 and the November 29, 2014 
+version of Diamond~\cite{buchfink2014fast}.
+All tests were performed on a 12-core Intel Xeon X5690 running at 3.47GHz with
+88GB RAM and hyperthreading; 24 threads were allowed for all programs.
+Both Diamond was run with the \texttt{--sensitive} option.
+In all cases, an E-value threshold of \texttt{1e-7} was used.
+
+\begin{table}
+\caption{Running time of BLASTX, caBLASTX, RapSearch2, and Diamond. All units in seconds.\label{mgspeed}}
+\begin{tabular}{ccccc}
+\hline
+dataset & BLASTX & caBLASTX & RapSearch2 & Diamond \\
+\hline
+assemblies & 3235 & 123 & 194 & 50 \\
+\hline
+NGS reads & 14423 & 21 & 51 & 13 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}
+\caption{Accuracy of caBLASTX, RapSearch2, and Diamond.\label{mgacc}}
+\begin{tabular}{cccc}
+\hline
+dataset & caBLASTX & RapSearch2 & Diamond \\
+\hline
+assemblies & 99.2\% & 87.7\% & 91.0\% \\
+\hline
+NGS reads & 95.7\% & 79.5\% & 76.9\% \\
+\hline
+\end{tabular}
+\end{table}
+
+While Diamond is notably faster than caBLASTX, it achieves this speed at the
+expense of some accuracy, particularly on raw reads.
+Moreover, caBLASTX actually accelerates standard BLASTX itself, and allows the
+user to pass arbitrary parameters to the underlying BLASTX during fine search.
+Thus, caBLASTX may be suitable to a wider variety of existing analysis 
+pipelines.
+With respect for future work, it may be possible to apply entropy-scaling data
+structures to Diamond itself, achieving even greater speed gains.
+Of course, the accuracy of such an approach would still be limited by Diamond; 
+entropy-scaling data structures cannot themselves improve accuracy,
+except by virtue of making computationally expensive analyses more tractable.
+
+CaBlastx is implemented in Go, and its source code is available on Github.
+
+\subsection{Ammolite}
+
+\subsubsection{Simplification and compression}
+
+First, we remove hydrogen atoms from the molecules; hydrogens can be easily recovered by inferring their 
+presence.
+Next, each molecule's graph structure is converted to an unlabeled one; each atom label is removed, and each
+bond type is represented as just a single bond.
+The removed information--atom and bond type--is stored in an auxiliary data structure, indexed by the molecule's
+PubChem ID and the atom or bond number.
+Next, any vertex or edge that is not part of a simple cycle or a tree is removed, and any edge that is part
+of a tree is removed.
+This preserves the node count, but not the topology, of tree-like structures, and preserves simple cycles,
+which represent rings in chemical compounds.
+For example, as shown in Figure~\ref{}, bicyclohexyl and dicyclohexylamine would appear identical.
+
+After this transformation is applied to each molecule in a database to be compressed, we identify all clusters
+of fully-isomorphic transformed molecular graphs.
+Isomorphism detection is performed using the VF2~\cite{cordella2001improved} 
+algorithm; a simple hash computed from the
+number of vertices and edges in each transformed molecular graph is first used 
+to filter molecular graphs that cannot possibly be isomorphic.
+A representative from each such cluster is stored in SDF format; collectively, these representatives form a 
+``coarse'' database.
+Along with each representative, we preserve the information necessary to reconstruct each original molecule,
+as a pointer to a set of vertices and edges that have been removed or unlabeled.
+
+Ammolite is implemented in Java, and its source code is available on Github.
+
+\subsection{esFragBag}
+We took the existing FragBag method as a black box and by design did not do anything clever in esFragBag except apply the entropy-scaling similarity search data structure.
+Additionally, we removed the sorting-by-distance feature of Andrew Gallant's 
+FragBag search function, which does not improve the all-matching results we 
+were interested in here---it lowers $k$-nearest neighbor search memory 
+requirements while dominating the running time of $\rho$-nearest neighbor, the 
+problem at hand.
+This was done for both the FragBag and the esFragBag benchmarks, to ensure comparability.
+All code was written in Go, and is available on Github.
+
+The entire 2014 Oct 31 version of the Protein Data Bank was downloaded and the 
+database was composed of fragment frequency vectors generated from all of the 
+relevant PDB files using the 400-11.json fragment list, as described in \citep{budowski2010fragbag}.
+For this paper, we implemented the benchmarking in Go, and have provided the 
+source code for the benchmarking routine on Github.
+This allowed us to benchmark just the search time, excluding the time to load the database from disk.
+Note that the prototype implementation of esFragBag available only supports the 
+all $\rho$-nearest neighbor search query found in FragBag.
+
+\bibliographystyle{model5-names-noitalic}
+%\bibliographystyle{plain}
+\bibliography{main}
+
+\end{document}
