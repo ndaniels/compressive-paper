@@ -330,7 +330,93 @@ More balanced clusters would have allowed 3-bit storage, but at the expense of
 clusters that less faithfully represented the BLOSUM62 matrix and the
 physicochemical properties of the constituent amino acids.
 
-\subsubsection{Further benchmarking and validation}
+
+
+\subsubsection{Query Clustering}
+
+Metagenomic reads are themselves nucleotide sequences, so no alphabet reduction
+is performed on them directly.
+Instead, metagenomic reads are compressed using the same approach as the
+protein database, without the alphabet reduction step and with a number of
+different parameters.
+The difference scripts for metagenomic reads do not rely on the cluster offsets,
+but simply store the substituted nucleotides.
+Furthermore, unlike protein databases, where most typical sequences range in 
+length from 100 to over 1000 amino acids, next-generation sequencing reads are 
+typically short and usually of fixed length, which is known in advance.
+Thus, the minimum alignment length required for a match, and the maximum
+length unaligned fragment to append to a match, require different values based
+on the read length.
+An additional complication is that insertions and deletions from one read to
+another will change the reading frame, potentially resulting in significantly
+different amino acid sequences.
+For this reason, query clustering requires long, \emph{ungapped} windows of high
+sequence identity.
+Specifically, for 202-nucleotide reads, for two sequences to cluster together,
+we required a 150-nucleotide ungapped region of at least 80\% sequence identity.
+Effectively, this means that the distance function for query clustering is
+Hamming distance.
+In the future, we may consider first translating the reads, and performing
+clustering in the amino acid space (after alphabet reduction).
+This would have the advantage of allowing reads with insertions or deletions
+to cluster together, without causing reading-frame mismatches.
+However, gapped alignment is significantly slower than ungapped alignment,
+so the resulting cost of query clustering might negate speed gains.
+
+We note that unlike the compression of the database, which can be amortized 
+over future queries, the time spent clustering and compressing the queries 
+cannot be amortized.
+Thus, we would not refer to the query clustering as entropy-scaling, but it
+still provides a practical benefit.
+
+
+\subsubsection{Search}
+
+Given a compressed protein database and a compressed query read set, search
+comprises two phases.
+The first, \emph{coarse search}, considers only the coarse sequences--the
+representatives--resulting from compression of the protein database and the
+query set.
+Just as with standard BLASTX, each coarse nucleotide read is transformed into 
+each of the six possible amino acid sequences that could result from it (three 
+reading frames for both the sequence and its reverse complement).
+Then, each of these amino acid sequences is then reduced back to a four-letter
+alphabet using the same mapping as for protein database compression.
+For convenience, the four-letter alphabet is represented using the standard
+nucleotide bases, though this has no particular biological significance.
+This is done so that the coarse search can rely on BLASTN (nucleotide BLAST) to
+search these sequences against the compressed protein database.
+
+This coarse search uses an E-value threshold that is relaxed from the one a user
+specifies for the overall search, though the user can specify this coarse 
+E-value threshold.
+Coarse search identifies \emph{possible} hits for each query representative from
+among the representative sequences in the database.
+Of course, due to the reduced alphabet, some of these hits may turn out to be
+poor quality when the original amino acid alphabet is considered.
+Each of these coarse hits represents one or more original sequences from the
+protein database; likewise, each coarse query represents one or more original
+reads from the metagenomic data set.
+For each coarse query representative, the set of coarse hits is used to
+reconstruct all corresponding sequences from the original database by following
+links to original sequence matches and applying their difference scripts.
+The resulting \emph{candidates} are thus original sequences from the protein
+database, in their original amino acid alphabet.
+The query representative is also used to reconstruct all corresponding sequences
+from the original read set.
+Thus, for each coarse query representative, there is now a subset of the
+metagenomic read set (the reads represented by that coarse query) and also a
+subset of the protein database (the candidates).
+
+The second phase, \emph{fine search}, uses standard BLASTX to translate each
+of these reads associated with a coarse query representative and search for
+hits only in the subset of the database comprising the candidates.
+This fine search phase relies on a user-specified E-value threshold (defaulting
+to BLASTX's default of 10) to filter hits.
+To ensure that E-value calculation is correct, BLASTX uses a corrected database
+size which is the size of the original, uncompressed protein database.
+
+\subsubsection{Benchmarking}
 
 Although our primary result is the direct acceleration of BLASTX using our
 entropy-scaling data structures, we also compared caBLASTX to 
@@ -340,44 +426,6 @@ All tests were performed on a 12-core Intel Xeon X5690 running at 3.47GHz with
 88GB RAM and hyperthreading; 24 threads were allowed for all programs.
 Both Diamond was run with the \texttt{--sensitive} option.
 In all cases, an E-value threshold of \texttt{1e-7} was used.
-
-\begin{table}
-\caption{Running time of BLASTX, caBLASTX, RapSearch2, and Diamond. All units in seconds.\label{mgspeed}}
-\begin{tabular}{ccccc}
-\hline
-dataset & BLASTX & caBLASTX & RapSearch2 & Diamond \\
-\hline
-assemblies & 3235 & 123 & 194 & 50 \\
-\hline
-NGS reads & 14423 & 21 & 51 & 13 \\
-\hline
-\end{tabular}
-\end{table}
-
-\begin{table}
-\caption{Accuracy of caBLASTX, RapSearch2, and Diamond.\label{mgacc}}
-\begin{tabular}{cccc}
-\hline
-dataset & caBLASTX & RapSearch2 & Diamond \\
-\hline
-assemblies & 99.2\% & 87.7\% & 91.0\% \\
-\hline
-NGS reads & 95.7\% & 79.5\% & 76.9\% \\
-\hline
-\end{tabular}
-\end{table}
-
-While Diamond is notably faster than caBLASTX, it achieves this speed at the
-expense of some accuracy, particularly on raw reads.
-Moreover, caBLASTX actually accelerates standard BLASTX itself, and allows the
-user to pass arbitrary parameters to the underlying BLASTX during fine search.
-Thus, caBLASTX may be suitable to a wider variety of existing analysis 
-pipelines.
-With respect for future work, it may be possible to apply entropy-scaling data
-structures to Diamond itself, achieving even greater speed gains.
-Of course, the accuracy of such an approach would still be limited by Diamond; 
-entropy-scaling data structures cannot themselves improve accuracy,
-except by virtue of making computationally expensive analyses more tractable.
 
 CaBlastx is implemented in Go, and its source code is available on Github.
 

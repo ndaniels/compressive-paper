@@ -14,7 +14,7 @@ for (int i=0; i<20; ++i) {p[i]=(0,0);}
 path[] z=new path[20];
 for (int i=0; i<20; ++i) {z[i]=(0,0);}
 real[] w=new real[20];
-for (int i=0; i<20; ++i) {w[i]=(unitrand())/1.2;}
+for (int i=0; i<20; ++i) {w[i]=(unitrand())/1.4;}
 
 p[0]=(1,8);
 p[1]=(2,7);
@@ -47,7 +47,8 @@ z[5]=p[10]::p[13];
 z[6]=p[12]::p[15];
 
 // Create circles for clustering
-path cle=scale(0.5)*unitcircle;
+var radius = 0.4;
+path cle=scale(radius)*unitcircle;
 //draw(cle,0.5pt+red);
 
 real dist(pair a, pair b)
@@ -72,10 +73,10 @@ real density_map(pair x) {
     return (1 - dist(gp,x))^4;
 }
 
+pair[] allpoints = {};
 for (int i=0; i < 17; ++i)
 {
     path pab = z[i];
-    var oldc = (-100,-100);
     if (arclength(pab)>0) {
         for (real j=0; j<=1; j+= (0.001/arclength(pab)))
         {
@@ -83,11 +84,60 @@ for (int i=0; i < 17; ++i)
             if (density_map(x)>unitrand()) {
                 x = x + (unitrand()-0.5,unitrand()-0.5)*weight_width(x,p);
                 dot(x,linewidth(1));
+                allpoints.push(x);
             }
         }
     }
     //draw(pab);
 }
+
+// need to randomly permute allpoints (implemented Knuth shuffle alg)
+// Gives random integer 0 <= uniform(m) < m
+int uniform(int m) {
+    var x = floor(unitrand()*m);
+    if (x==m) {
+        x=m-1;
+    }
+    return x;
+}
+
+// Knuth shuffle alg
+void permute(pair[] A) {
+    for (int i = A.length - 1; i >= 1; --i) {
+        var j = uniform(i);
+        var swap = A[i];
+        A[i] = A[j];
+        A[j] = swap;
+    }
+}
+
+permute(allpoints);
+
+// Distance from set
+real setdist(pair x, pair[] A) {
+    var mindist = 100000000.0;
+    for (int i=0; i < A.length; ++i) {
+        if (dist(A[i],x)<mindist) {
+            mindist = dist(A[i],x);
+        }
+    }
+    return mindist;
+}
+
+// Finding cluster centers
+pair[] centers = {allpoints[0]};
+for (int i=1; i < allpoints.length; ++i) {
+    if (setdist(allpoints[i],centers)>radius) {
+        centers.push(allpoints[i]);
+    }
+}
+
+// for (int i=0; i<centers.length; ++i)
+// {
+//     var x = centers[i];
+//     draw(shift(x)*cle,grey+linewidth(0.5));
+// }
+
 
 
 for (int i=0; i<20; ++i)
