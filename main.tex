@@ -135,8 +135,8 @@ This approach allows us to achieve massive acceleration of tools drawn from geno
     Luckily, it turns out that many data sets exhibit well-defined structure that can be exploited for the design of 
 smarter analysis tools.
     We introduce an entropy-scaling data structure---which given a low fractal dimension guarantee, scales in both time and space with the entropy of the underlying database---to perform similarity search, a fundamental operation in data science.
-    Using these ideas, we present accelerated versions of standard tools for use by practitioners in the three domains of metagenomics, high-throughput drug screening, and protein structure search:
-    CaBLASTX, 700x speedup of BLASTX with less than 5\% loss in sensitivity and no loss in specificity; Ammolite, \hl{??}x speedup of small molecule similarity search; and, esFragBag, 2-30x speedup of FragBag with less than 0.2\% loss in sensitivity and no loss in specificity.
+    Using these ideas, we present accelerated versions of standard tools for use by practitioners in the three domains of metagenomics, high-throughput drug screening, and protein structure search, none of which have any loss in specificity or significant loss in sensitivity:
+    CaBLASTX, 700x speedup of BLASTX with less than 5\% loss in sensitivity; Ammolite, \hl{??}x speedup of small molecule similarity search with \hl{??} loss in sensitivity; and, esFragBag, 2-30x speedup of FragBag with less than 0.2\% loss in sensitivity.
 
     Source code: \url{http://gems.csail.mit.edu}
 }
@@ -144,7 +144,7 @@ smarter analysis tools.
 \section{Introduction}
 Throughout all areas of data science, scientists are being confronted by an 
 explosion of data.
-In many fields, this increase is exponential in nature, outpacing Moore's and Kryder's laws on the respective doublings of transistors on a chip and long-term data storage density \hl{[cite]}.
+In many fields, this increase is exponential in nature, outpacing Moore's and Kryder's laws on the respective doublings of transistors on a chip and long-term data storage density \hl{[cite Kahn, Science]}.
 As such, the challenges posed by the massive influx of data cannot be solved by waiting for faster and larger capacity computers, but require instead the development of data structures and representations that exploit and simplify complexity in the data set.
 
 Here, we focus our attention on similarity search, where the task at hand is to find all entries in some database that are `similar', or approximate matches, to some query item.
@@ -161,17 +161,17 @@ locality sensitive hashing \cite{indyk1998approximate}, vector approximation \ci
 However, we note that as data increases, very often the redundancy present in the data also increases \cite{loh2012compressive}.
 Existing general purpose methods do not explicitly exploit this particular feature of biological data.
 
-In the specific context of local alignment in genomics, however, the emerging field of ``compressive genomics'' has shown that existing tools such as BLAST and BLAT can be ``compressively accelerated'' by taking advantage of high redundancy between related genomes using link pointers and edit scripts to a database of unique sequences \cite{loh2012compressive}.
+In the specific context of local alignment in genomics, however, the emerging field of `compressive genomics' has shown that existing tools such as BLAST and BLAT can be compressively accelerated by taking advantage of high redundancy between related genomes using link pointers and edit scripts to a database of unique sequences \cite{loh2012compressive}.
 Similar results have been demonstrated for local alignment in proteomics, using much the same strategies \cite{daniels2013compressive}.
 Empirically, this compressive acceleration appears to scale almost linearly in the entropy of the database, often resulting in orders of magnitude better performance.
 
-In this paper, we substantially generalize and formalize this approach by introducing a practical opportunistic data structure for similarity search that \textbf{provably} scales almost linearly in both time and space with the entropy of the database.
+In this paper, we substantially generalize and formalize this approach by introducing a the first analyzed instance of a class of entropy scaling data structures for similarity search: data structures structures that \textbf{provably} scale almost linearly in both time and space with the entropy of the database.
 Specifically, if similarity is defined by a metric-like distance function (e.g., edit or Hamming distance) and the database exhibits both low `metric entropy' and `fractal dimension' (See Supplemental Methods: Theory), this data structure performs much better than na\"ive and even optimized methods.
 This data structure allows for minimal (or even zero) loss in recall, coupled
 with zero loss in specificity.
 %We will define metric entropy and fractal dimension more precisely later, but intuitively, they are respectively measures of the total information content and scaling behavior of number of points contained in spheres of varying radii.
-Although these `entropy-scaling data structures' can in principle be used to organize nearly any large data set for faster and more space-efficient analysis,
-we demonstrate their utility on similarity search problems drawn from the three major biological `big challenges of big data': genomics, pharmaceuticals, and protein structure \cite{marx2013biology}.
+Although these entropy-scaling data structures can in principle be used to organize nearly any large data set for faster and more space-efficient analysis,
+we demonstrate their utility on similarity search problems drawn from the three major biological ``big challenges of big data'': genomics, pharmaceuticals, and protein structure \cite{marx2013biology}.
 
 \section{Results}
 \subsection{Entropy-scaling data structure for similarity search}
@@ -186,11 +186,12 @@ we demonstrate their utility on similarity search problems drawn from the three 
 
 %We present here an opportunistic data structure for similarity search that scales with the entropy of the underlying database.
 In the following we consider entropy to be nearly synonymous with distance between points in a high-dimensional space.
-For genomic sequences, this can be edit distance, for chemical graphs, maximum common subgraph size, and for general vectors, Euclidean or cosine distance.
-The similarity search problem we are most interested in is finding all points in a set that are close to (i.e. similar to) the query point.
-The basics of the data structure itself are presented in Figure \ref{fig:dataStructure}, but understanding why it works requires a bit more intuition.
+For genomic sequences, this can be edit distance; for chemical graphs, maximum common subgraph size; and for general vectors, Euclidean or cosine distance.
+We are interested in the similarity search problem of
+finding all points in a set that are close to (i.e. similar to) the query point.
+The basics of the data structure itself are presented in Figure \ref{fig:dataStructure}, but here we provide conceptual motivation.
 
-Let's first consider what it means for a large biological data set, considered as points in a high-dimensional space, to be highly redundant.
+Let us first consider what it means for a large biological data set, considered as points in a high-dimensional space, to be highly redundant.
 Perhaps many of the points are exact duplicates; this easy scenario is trivially exploited by de-duplication and is already standard practice (e.g. the NR NCBI protein database \cite{pruitt2005ncbi}).
 Or maybe the points mostly live on a low-dimensional subspace; statistical tools such as PCA (Principal Component Analysis) exploit this property in data analysis.
 Furthermore, if the dimension of the subspace is sufficiently low,
@@ -201,7 +202,7 @@ However, when the dimensionality of the subspace increases, cell search time blo
 \begin{figure}[btp]
     \centering
     \includegraphics[width=0.8\textwidth]{assets/treepoints/treepoints2D_clusters.png}
-    \caption{Cartoon depiction of points in a high-dimensional space that live close to a 1D tree-like structure. Although high-dimensional at a fine scale, at the coarser scale of covering spheres, the data cloud looks nearly 1-dimensional. Note that the cluster center generation was performed using the same algorithm used in esFragBag.}
+    \caption{Cartoon depiction of points in a high-dimensional space that live close to a 1D tree-like structure. Although high-dimensional at a fine scale, at the coarser scale of covering spheres the data cloud looks nearly 1-dimensional. The cluster center generation was performed using the same algorithm used in esFragBag.}
     \label{fig:tree}
 \end{figure}
 More importantly, biological data sets generally do not live in low-dimensional subspaces.
@@ -214,13 +215,13 @@ Additionally, because of diffusion due to mutation, each of the branches is also
 Considering this example as a low-dimensional \textit{subspace} is incorrect.
 
 However, the local low-dimensionality can be exploited by looking on the right scales: a coarse scale in which the tree looks 1-dimensional locally and a fine scale where the branch width matters.
-We cover the tree with spheres of radius $r_c$ on the order of the branch widths; these spheres determine our clusters, and the number of them is the ``metric entropy'' of the tree \cite{tao2008product}.
+We cover the tree with spheres of radius $r_c$ on the order of the branch widths; these spheres determine our clusters, and the number of them is the metric entropy of the tree \cite{tao2008product}.
 Because all the points within a sphere are close to each other, they are highly redundant and can be encoded in terms of one another; thus, the metric entropy is a good approximation of the entropy of the entire database.
 
-By the triangle inequality, to search for all points within distance $r$ of a query we need only look in nearby spheres with centers within a distance $r+r_c$ of the query.
+By the triangle inequality, in order to search for all points within distance $r$ of a query we need only look in nearby spheres with centers within a distance $r+r_c$ of the query.
 %ref Figure 1?.
-However, because the spheres have radius comparable to branch width, the tree is locally 1-dimensional on the coarse scale---we will call this the ``fractal dimension'' $d=1$ of the tree at the scale $r_c$ \cite{falconer1990fractal}.
-Increasing the search radius for our coarse search only linearly increases the number of points that need to be searched in a fine search.
+However, because the spheres have radius comparable to branch width, the tree is locally 1-dimensional on the coarse scale---we will call this the fractal dimension $d=1$ of the tree at the scale $r_c$ \cite{falconer1990fractal}.
+Increasing the search radius for coarse search only linearly increases the number of points that need to be searched in a fine search.
 A similar analysis holds in the more general case.
 Given a database with fractal dimension $d$ and metric entropy $k$ at the scale $r_c$, we show in the Supplemental Methods that time-complexity for similarity search with radius $r$ is
 \begin{gather}
@@ -235,53 +236,41 @@ Additionally, because the search only has to look at a small subset of the clust
 %Similarly, using these covering spheres, the database can be stored in a 
 %compressed manner (see Supplemental Methods for further details).
 
-Real data is generally messier than the rosy picture painted here.
+We have presented the simplest such data to analyze.
+However, real data is generally messier than the rosy picture painted here.
 Sometimes the distance function is not a metric, so we lose the triangle inequality guarantee of 100\% sensitivity;
-sometimes some of the points are much larger than others;
-and sometimes even what counts as a point is not entirely clear without domain knowledge.
+sometimes different distance functions can be used for the clustering vs the searches;
+and sometimes even what counts as a distinct point is not entirely clear without domain knowledge.
 %
-However, the diversity of the applications we explore in this paper demonstrate that the general scheme works for massively accelerating similarity search in a robust set of different contexts.
-We expect that so long as the data set exhibits both low entropy (many items are similar to one another, which is nearly always the case when the query is a simlarity search) and low fractal dimension (the data set has some much simpler structure generating it, such as an evolutionary tree), our entropy-scaling data structure has the potential to achieve massive speedup over more naive methods and significant speedup over even other highly optimized methods.
+Through the diversity of the applications we explore in this paper, we demonstrate that the general scheme works for massively accelerating similarity search in a set of different contexts.
+These applications are enabled by augmenting the data structure with the usage of different distance functions in different stages of the algorithm and preprocessing to take advantage of domain specific knowledge.
+We expect that so long as the data set exhibits both low entropy (many items are similar to one another, which is nearly always the case when the query is a similarity search) and low fractal dimension (the data set has some much simpler structure generating it, such as an evolutionary tree), our entropy-scaling data structure has the potential to achieve massive speedup over more naive methods and significant speedup over even other highly optimized methods.
 
 \subsection{Metagenomics}
 
-Metagenomics, the study of genomic data sequenced directly from environmental
-samples, has recently grown in popularity.
-From studies of the human gut microbiome to seawater and soil samples,
-metagenomics has contributed to improved understanding of how ecosystems recover
-from environmental damage~\cite{tyson2004community}, how the human gut responds 
+Metagenomics is the study of genomic data sequenced directly from environmental
+samples.
+It has improved understanding of how ecosystems recover
+from environmental damage~\cite{tyson2004community} and how the human gut responds 
 to diet
-and infection~\cite{david2014host}, and even some surprising clues as to disorders 
+and infection~\cite{david2014host}.
+Metagenomics has even provided some surprising clues as to disorders 
 such as Autism Spectrum Disorder~\cite{macfabe2012short}.
 
-Massive amounts of metagenomic reads are generated every day from 
-next-generation sequencing (NGS) machines.
-These metagenomic reads must be stored and analyzed to do further downstream
-analysis.
-Months of computing time are often required to process data for these 
-large-scale sequencing studies.
-These computational challenges are at present a barrier to widespread use of 
-metagenomic data throughout biotechnology, which impacts genomic medicine and 
-environmental genomics~\cite{frank2008gastrointestinal}.
-
-BLASTX~\cite{altschul1990basic} is widely used, both directly for analysis, as 
+BLASTX~\cite{altschul1990basic} is widely used in metagenomics, both directly for analysis, as 
 well as in  pipelines such as MetaPhlAn~\cite{segata2012metagenomic} and
 PICRUSt~\cite{langille2013predictive}, to map
 reads to protein databases such as KEGG~\cite{kanehisa2000kegg} and NCBI's 
 NR~\cite{sayers2011database}.
-The advantage of the BLASTX approach is that complete reference genomes are not
-required; BLASTX can identify homologs, particularly in the case where the
-nucleotide sequence identity is low but translated protein sequence identity
-is higher~\cite{turnbaugh2006obesity, kurokawa2007comparative}.
-However, because BLASTX must search a protein database for possible hits for
-each nucleotide read from a metagenomic sample, it is computationally intensive.
-For example, \citet{mackelprang2011metagenomic} reported that using BLASTX to 
-map 246
-million reads against KEGG required 800,000 CPU hours at a supercomputing 
-center.
-Moreover, BLASTX's run time requirements scale linearly with the size of the 
+BLASTX's run time requirements scale linearly with the size of the 
 full read dataset, and each year require exponentially more runtime to process 
 the exponentially growing read data. 
+These computational challenges are at present a barrier to widespread use of 
+metagenomic data throughout biotechnology, which impacts genomic medicine and 
+environmental genomics~\cite{frank2008gastrointestinal}.
+For example, \citet{mackelprang2011metagenomic} reported that using BLASTX to map 246
+million reads against KEGG required 800,000 CPU hours at a supercomputing 
+center.
 
 We have applied our entropy-scaling data structure framework to the problem of 
 metagenomic search, and demonstrate caBLASTX, an algorithm and software 
@@ -290,21 +279,27 @@ to 673.
 This illustrates the potential of entropy-scaling data structures, while
 providing a useful tool for metagenomic research.
 
+In developing CaBLASTX, we augmented the entropy scaling data structure by using
+different distance functions for clustering vs search.
+For clustering, we rely on sequence identity, while for search, we use the
+E-value measure that is standard for BLAST.
+Furthermore, during clustering (compression), we apply a preprocessing step that
+identifies subsequences to be treated as distinct points in the database.
+This is because protein sequences commonly contain motifs found in other sequences,
+so the natural lexical unit is the motif.
+
 CaBLASTX is useful for two of the most common metagenomic analysis tasks. 
 The first of these is mapping assembled or partially-assembled
-nucleotide sequences onto a protein database. 
-When these query sequences have
-little in common with one another, caBLASTX maps each sequence separately. 
-
-The second task caBLASTX can accelerate is that of mapping short nucleotide
-reads (generated by next-generation sequencing technology) to a protein
-database. In this instance, there is typically high coverage of the metagenomes
-being sequenced, typically 30x-200x coverage. CaBLASTX takes advantage of this
-redundancy
-by compressing the read set as well, obtaining an additional speed gain that is
+nucleotide sequences onto a protein database,
+while the second is mapping short nucleotide reads (generated by next-generation
+sequencing technology) to a protein database.
+In the latter instance, there is typically high coverage of the metagenomes
+being sequenced, ranging from 30x to 200x coverage.
+CaBLASTX takes advantage of this redundancy
+by clustering the read set as well, obtaining an additional speed gain that is
 proportional to the amount of redundancy in the read data.
-We note that this query-side compression is not part of the entropy-scaling
-framework as described, and as the run-time cost of compressing queries cannot
+We note that this query-side clustering is not part of the entropy-scaling
+framework as described, and as the run-time cost of clustering queries cannot
 be amortized over future queries, we expect this enhancement to provide a 
 constant factor improvement.
 
@@ -313,7 +308,7 @@ BLASTX as well as RapSearch2~\cite{zhao2012rapsearch2} and
 Diamond~\cite{buchfink2014fast}.
 BLASTX is often used to align assemblies thought to be exons to a protein
 database, in which case metagenomic reads have already been assembled.
-In this instance, the query-side compression of caBLASTX is not applicable, so
+In this instance, the query-side clustering of caBLASTX is not applicable, so
 the performance gains are more modest.
 We benchmarked caBLASTX vs. BLASTX on a dataset consisting of 22,778 assemblies
 from human gut microbiota, 3.1 megabases in total, searching against the NCBI's
@@ -385,7 +380,7 @@ As false positive hits with respect to BLASTX are not possible, we report as
 accuracy the fraction of BLASTX hits that are also returned by caBLASTX.
 We note that due to query-side compression, the output order from caBLASTX 
 typically does not match that of BLASTX.
-As show in Table~\ref{mgbench}, on the metagenomic assemblies, where query-side 
+As shown in Table~\ref{mgbench}, on the metagenomic assemblies, where query-side 
 compression was not performed, caBLASTX achieves 99.2\% accuracy, while on the 
 raw reads, caBLASTX achieves 95.7\% accuracy.
 
@@ -399,7 +394,7 @@ wet-lab consideration, but even this screening can be computationally
 intensive, and thus time-consuming.
 PubChem~\cite{bolton2008pubchem} is a repository of molecular compound 
 structures, 
-which has grown exponentially since 2008 (Figure~\ref{pubchemdata}). 
+which has grown greatly since 2008. 
 In October, 2013, PubChem contained roughly 47 million molecular structures; 
 in December, 2014 it contains 61.3 million structures.
 
@@ -410,14 +405,13 @@ We designed this compression and search framework around one of the standard
 techniques for high-throughput screening of potential drug compounds, the use 
 of maximum common subgraph (MCS) to identify similar motifs among molecules \cite{cao2008maximum, rahman2009small}.
 Using an entropy-scaling approach, our new software Ammolite is able to achieve \hl{?????}.
-As intimated above, not only is Ammolite a practical tool ready for use by biochemists, but its results also demonstrate the scalability of entropy scaling methods as databases grow.
+\hl{As intimated above}, not only is Ammolite a practical tool that can dramatically accelerate the workflow of medicinal chemists, but its results also demonstrate the scalability of entropy scaling methods as databases grow.
 
 In developing Ammolite, we augmented the entropy-scaling data structure by introducing different but related distance functions for the coarse versus fine search.
 For the fine search, 
 we implemented a variant of the maximum common subgraph (MCS) algorithm, known as 
 \emph{flexible} maximum
 common subgraph (fMCS), as detailed by Cao, et al.~\cite{cao2008maximum}.
-
 For the coarse search, however, we first project the space of small molecules onto a subspace by removing nodes and edges that do not participate in simple cycles.
 Clusters are exactly pre-images of of this projection operator (i.e. all molecules that are isomorphic after simplification form a cluster).
 Coarse search is performed using fMCS on this much smaller projection subspace, greatly increasing speed.
@@ -432,36 +426,39 @@ Coarse search is performed using fMCS on this much smaller projection subspace, 
 %computational cost.
 \hl{Benchmarking paragraph(s)}
 
+\hl{Did not compare against CDK MCS algorithm because already done by [et al, Thornton] and did not compare against FMCS [Cao, et al] because 100 slower}
+
 \hl{Validation paragraph(s)}
+
+\hl{Typical workflow medicinal chemist using SMSD has week of downtime. With ours, weekend only. Need citesi (otherwise hypothetical).}
 
 \subsection{Protein Structure Search}
 
 The relationship between protein structure and function has been a subject of intense study for decades,
-and this strong link has been used for the fruitful prediction of function from structure \cite{hegyi1999relationship}.
-To wit, given a protein of solved (or predicted) structure but unknown function, the efficient identification
+and this strong link has been used for the prediction of function from structure \cite{hegyi1999relationship}.
+Specifically, given a protein of solved (or predicted) structure but unknown function, the efficient identification
 of structurally similar proteins in the Protein Data Bank is critical to function prediction.
 Relatedly, finding structural neighbors can also give insight into the evolutionary origins of proteins of interest.
 
-One approach to finding structural neighbors is to attempt to align the query protein to all the entries in the Protein Data Bank (PDB) using a structural aligner (e.g. STRUCTAL \cite{subbiah1993structural} or ICE \cite{shindyalov1998protein}).
+One approach to finding structural neighbors is to attempt to align the query protein to all the entries in the Protein Data Bank (PDB) using a structural aligner (e.g. STRUCTAL \cite{subbiah1993structural}, ICE \cite{shindyalov1998protein}, or Matt \hl{[Menke, 2010]}).
 However, performing a full alignment against every entry in the PDB is prohibitively expensive, especially as the database grows.
 Alternately, the approach we use here is the one introduced by FragBag~\cite{budowski2010fragbag}, which describes each protein as a
-``bag of fragments,'' where each fragment is a small structural motif.
+`bag of fragments,' where each fragment is a small structural motif.
 By directly applying our entropy scaling data structure without any additional augmentation, esFragBag (entropy scaling FragBag) is able to achieve a 2-30x speedup of FragBag with less than 0.2\% loss in sensitivity and no loss in specificity.
 
-For this last example, we intentionally approached the application of entropy-scaling data structures to FragBag in a blind manner,
+For this last example, we intentionally approach the application of entropy-scaling data structures to FragBag in a blind manner,
 without using any domain-specific knowledge.
-Instead, we used the very same representation (bag of fragments) and distance functions (Euclidean and cosine distances)
-as FragBag, a greedy k-centers algorithm, and vector difference to generate the clustered representation.
-Note that this is in stark contrast to caBlastX and Ammolite, which both exploited domain knowledge to further improve performance.
+Instead, we use the very same representation (bag of fragments) and distance functions (Euclidean and cosine distances)
+as FragBag, coupled with a greedy k-centers algorithm to generate the clustered representation.
+Note that this is in stark contrast to caBLASTX and Ammolite, which both exploit domain knowledge to further improve performance.
 Thus, esFragBag only involves grafting new database generation and similarity search functions onto an existing codebase.
-Although using similar techniques to exploit domain specific knowledge as in caBlastX and Ammolite might result in greater speedup, esFragBag here is explored as a proof-of-concept to analyze the performance of a the entropy-scaling data structure alone.
 
-We explored the increases in speed resulting from applying the entropy-scaling data structure, for both Euclidean and cosine distances (Figure \ref{fig:fragbag}).
-Naturally, as search radii increases, the coarse search expands to encompass the entire database; to fully explore parameters, we made certain to increase search radii until the acceleration effect entirely disappeared.
-Additionally, we explored the effect of using different maximum cluster radii and several different query proteins.
+We explore the increases in speed resulting from applying the entropy-scaling data structure for both Euclidean and cosine distances (Figure \ref{fig:fragbag}).
+Naturally, as search radii increases, the coarse search expands to encompass the entire database; to fully explore parameters, we make certain to increase search radii until the acceleration effect entirely disappeared.
+Additionally, we explore the effect of using different maximum cluster radii and several different query proteins.
 
 For cosine distance, we generated databases with maximum cluster radii of 0.1, 0.2, 0.3, 0.4, and 0.5.
-Then, for each query protein from the set \{\texttt{4rhv}, \texttt{1ake}, \texttt{1bmf}, \texttt{1rbp}, \texttt{1b7t}\}, we ran both naive and accelerated similarity searches with radii of $0.02i \forall i \in \{0,\ldots,49\}$.
+Then, for each query protein from the set \{\texttt{4rhv}, \texttt{1ake}, \texttt{1bmf}, \texttt{1rbp}, \texttt{1b7t}\} (identified by PDB IDs), we ran both naive and accelerated similarity searches with radii of $0.02i, \forall i \in \{0,\ldots,49\}$.
 This was repeated 5 times for each measurement, and the ratio of average accelerated vs naive times is shown in Figure \ref{fig:fragbag_cosine}.
 
 For euclidean distance, we generated databases with maximum cluster radii of 10, 20, 25, 50, and 100.
@@ -469,13 +466,13 @@ Again, for each query protein drawn from the same set, we compared the average o
 
 As expected, the acceleration is highly dependent on both the search radius $r$ and the maximum cluster radius $r_c$.
 Additionally, the query protein also makes a major difference in the results.
-We suspect that this is due to the geometry of protein fragment frequency space being very ``spiky'' and ``star-like''.
+We suspect that this is due to the geometry of protein fragment frequency space being very `spiky' and `star-like'.
 Proteins that are near the core (and thus similar to many other proteins) show very little acceleration when our data structure is used because the majority of the database is nearby, whereas proteins in the periphery have fewer neighbors and are thus found much more quickly.
 Changing the maximum cluster radius effectively makes more proteins peripheral proteins, but at the cost of overall acceleration.
 
 Naturally, as the search radius expands, it quickly becomes necessary to compare against nearly the entire database, destroying any acceleration.
 For the cosine space in particular, note that the maximum distance between any two points is $1$, so once the coarse search radius of $r+r_c >= 1.0$, there cannot ever be any acceleration as the fine search encompasses the entire database.
-Similarly, once the coarse search encompasses all (or nearly all) the clusters in Euclidean space, the acceleration diminishes to 1x, and the overhead costs make the entropy scaling data structure perform worse than a naive search.
+Similarly, once the coarse search encompasses all (or nearly all) the clusters in Euclidean space, the acceleration diminishes to 1x, and the overhead costs make the entropy scaling data structure perform worse than a na\"ive search.
 However, as we are most interested in proteins that are very similar to the query, the low-radius behavior is of primary interest.
 In the low-radius regime, esFragBag demonstrates varying though substantial acceleration (2x-30x) over FragBag.
 
@@ -518,7 +515,7 @@ Whereas there is nearly 30x acceleration for \texttt{4rhv} in cosine space for l
         \includegraphics[width=1\textwidth]{assets/1rbp_euclid.png}
         %\caption{}
     \end{subfigure}
-    \caption{FragBag benchmarking data. (a) Cosine distance gives on the whole better acceleration, but results in only $>99.8\%$ sensitivity, whereas (b) Euclidean distance as a metric is guaranteed by the Triangle Inequality to get $100\%$ sensitivity.}
+    \caption{FragBag benchmarking data with parameters varied until acceleration disappears. As search radius increases, the fraction of the database returned by the coarse search increases, ultimately returning the whole database. Unsurprisingly, when returning the whole database in the coarse search results, there are no benefits to using entropy scaling data structures. (a) Cosine distance gives on the whole better acceleration, but results in only $>99.8\%$ sensitivity, whereas (b) Euclidean distance as a metric is guaranteed by the Triangle Inequality to get $100\%$ sensitivity.}
     \label{fig:fragbag}
 \end{figure}
 
@@ -559,8 +556,10 @@ search tools that outperform BLASTX.
 In this work, we have not focused on the space-saving compression that is
 possible with entropy-scaling data structures, but rather on the run-time
 acceleration of approximate search.
-However, particularly in the case of metagenomic analysis, the collection of 
-read data presents a problem for storage and transfer, as well as analysis.
+However, as discussed in the Supplementary Theory, entropy scaling data structures
+allow for compressive algorithms under certain additional constraints.
+This is particularly applicable in the case of metagenomic analysis, the collection of 
+read data presents a problem for storage and transfer.
 
 \section{Methods}
 \subsection{Cablastx}
@@ -642,7 +641,7 @@ For a given search query $q$ and search radius $r$,
 \section{Author Contributions}
 Y.W.Y., N.M.D. and B.B. conceived the project.
 Y.W.Y. and B.B. developed the theoretical analyses, with help from N.M.D.
-N.M.D. implemented and benchmarked Cablastx.
+N.M.D. implemented and benchmarked caBLASTX, with help from D.C.D.
 D.C.D. implemented and benchmarked Ammolite, with help from N.M.D.
 Y.W.Y. applied the entropy-scaling data structure to accelerate FragBag, with help from N.M.D.
 B.B. guided all research and provided critical advice on the study.
@@ -652,6 +651,7 @@ Y.W.Y., N.M.D. and B.B. wrote the manuscript.
 Y.W.Y. is supported by a Hertz Foundation fellowship.
 N.M.D. and B.B. are supported by NIH GM108348.
 We thank Andrew Gallant for his implementation of Fragbag.
+We thank Jian Peng for suggesting high-throughput drug screening as an application.
 
 \bibliographystyle{model5-names-noitalic}
 %\bibliographystyle{plain}
