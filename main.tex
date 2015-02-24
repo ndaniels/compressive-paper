@@ -404,27 +404,24 @@ similar molecular structures in compressed space.
 We designed this compression and search framework around one of the standard 
 techniques for high-throughput screening of potential drug compounds, the use 
 of maximum common subgraph (MCS) to identify similar motifs among molecules \cite{cao2008maximum, rahman2009small}.
-Using an entropy-scaling approach, our new software Ammolite is able to achieve \hl{?????}.
-\hl{As intimated above}, not only is Ammolite a practical tool that can dramatically accelerate the workflow of medicinal chemists, but its results also demonstrate the scalability of entropy scaling methods as databases grow.
+Using an entropy-scaling approach, our new software Ammolite performs MCS based search in time that scales with the entropy of a database.\hl{?????}.
+Ammolite demonstrates that entropy scaling methods can be extended to data types that are not inherently sequence based. Ammolite is also a practical 
+tool that provides ~4x speed-up with greater than 95\% accuracy compared to a gold standard.
 
-In developing Ammolite, we augmented the entropy-scaling data structure by introducing different but related distance functions for the coarse versus fine search.
-For the fine search, 
-we implemented a variant of the maximum common subgraph (MCS) algorithm, known as 
-\emph{flexible} maximum
-common subgraph (fMCS), as detailed by Cao, et al.~\cite{cao2008maximum}.
-For the coarse search, however, we first project the space of small molecules onto a subspace by removing nodes and edges that do not participate in simple cycles.
+MCS based search of molecule databases typically matches pairs of molecules by their overlap coefficients. The overlap coefficient of two molecules is not a metric.
+Molecules with a high overlap coefficient may be globally dissimilar if the larger molecule contains a signifigant subgraph of the smaller molecule. This is useful 
+for identifying relevant structures in a molecule database but means that an approach to entropy-scaling based on a metric like graph distance \cite{bunke1998graph}
+may not be particularly useful. Since finding the MCS of two molecules is an extremely costly operation we instead chose to base our approach to entropy-scaling
+off of molecular substructures. 
+
+To compress a molecule database we project the space of small molecules onto a subspace by removing nodes and edges that do not participate in simple cycles.
 Clusters are exactly pre-images of of this projection operator (i.e. all molecules that are isomorphic after simplification form a cluster).
-Coarse search is performed using fMCS on this much smaller projection subspace, greatly increasing speed.
+Coarse search is performed by finding the MCS on this much smaller projection subspace. This increases speed both by reducing the required number of MCS operations 
+and by reducing the time required for each MCS operation which scales with the size of the molecule.
 
-%Many existing MCS-based tools, such as SMSD~\cite{rahman2009small} and 
-%fmcsR~\cite{cao2008maximum} compute the maximum common subgraph on fully 
-%labeled graphs; 
-%vertices are labeled with chemical elements, and edges are labeled with bond 
-%types (such as single or double bonds).
-%The `f' in fmcsR, which stands for ``flexible,'' indicates that some bounded 
-%number of vertex or edge label mismatches are permitted, at significant 
-%computational cost.
 \hl{Benchmarking paragraph(s)}
+
+
 
 \hl{Did not compare against CDK MCS algorithm because already done by [et al, Thornton] and did not compare against FMCS [Cao, et al] because 100 slower}
 
