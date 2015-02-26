@@ -395,8 +395,9 @@ intensive, and thus time-consuming.
 PubChem~\cite{bolton2008pubchem} is a repository of molecular compound 
 structures, 
 which has grown greatly since 2008. 
-In October, 2013, PubChem contained roughly 47 million molecular structures; 
-in December, 2014 it contains 61.3 million structures.
+In July, 2007, Pubchem contained 10.3 million compounds.
+In October, 2013, PubChem contained roughly 47 million compounds, while
+in December, 2014 it contains 61.3 million compounds.
 
 We introduce a framework for clustering molecular databases that use the 
 popular SDF molecular structure format, such as PubChem, and for searching for 
@@ -408,11 +409,16 @@ Using an entropy-scaling approach, our new software Ammolite performs MCS based 
 Ammolite demonstrates that entropy scaling methods can be extended to data types that are not inherently sequence based. Ammolite is also a practical 
 tool that provides ~4x speed-up with greater than 95\% accuracy compared to a gold standard.
 
-MCS based search of molecule databases typically matches pairs of molecules by their overlap coefficients. The overlap coefficient of two molecules is not a metric.
-Molecules with a high overlap coefficient may be globally dissimilar if the larger molecule contains a signifigant subgraph of the smaller molecule. This is useful 
-for identifying relevant structures in a molecule database but means that an approach to entropy-scaling based on a metric like graph distance \cite{bunke1998graph}
-may not be particularly useful. Since finding the MCS of two molecules is an extremely costly operation we instead chose to base our approach to entropy-scaling
-off of molecular substructures. 
+MCS based search of molecule databases typically matches pairs of molecules by 
+their overlap coefficients. The overlap coefficient of two molecules is not a 
+metric.
+Molecules with a high overlap coefficient may be globally dissimilar if the 
+larger molecule contains a significant subgraph of the smaller molecule.
+Thus, overlap coefficient is desirable for identifying relevant structures in a 
+molecule database, despite its not upholding the triangle inequality, in 
+contrast to distance metrics such as graph distance \cite{bunke1998graph}.
+As with caBLASTX, a more mathematically satisfying distance function must give 
+way to one that has more meaning in the domain of interest.
 
 To compress a molecule database we project the space of small molecules onto a subspace by removing nodes and edges that do not participate in simple cycles.
 Clusters are exactly pre-images of of this projection operator (i.e. all molecules that are isomorphic after simplification form a cluster).
