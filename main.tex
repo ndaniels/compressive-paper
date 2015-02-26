@@ -326,7 +326,7 @@ Human Microbiome Project~\cite{turnbaugh2007human}.
 We filtered out reads starting or ending with 10 or more no-calls ('N').
 The running time for BLASTX was 14,423 minutes, 
 while caBLASTX took 21 minutes, a speedup of 673.
-Results appear in Table~\ref{mgbench}.
+Results appear in Table~\ref{mgspeed}.
 
 
 
@@ -380,7 +380,7 @@ As false positive hits with respect to BLASTX are not possible, we report as
 accuracy the fraction of BLASTX hits that are also returned by caBLASTX.
 We note that due to query-side compression, the output order from caBLASTX 
 typically does not match that of BLASTX.
-As shown in Table~\ref{mgbench}, on the metagenomic assemblies, where query-side 
+As shown in Table~\ref{mgacc}, on the metagenomic assemblies, where query-side 
 compression was not performed, caBLASTX achieves 99.2\% accuracy, while on the 
 raw reads, caBLASTX achieves 95.7\% accuracy.
 
