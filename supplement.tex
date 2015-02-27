@@ -174,7 +174,7 @@ Next, we also prove space-complexity bounds for the data structure and connect m
 Here we bound the space-complexity of our entropy-scaling data structure and show that metric entropy bounds can give information-theoretic Shannon entropy bounds.
 To do this, we will need two conditions: (1) that our distance function measures marginal entropies and (2) that all clusters are smaller than some constant $S_c$.
 
-Information-theoretic ``entropy'' is of course a measure of the uncertainty of a distribution or random variable, and is not well-defined for a database.
+Information-theoretic entropy is of course a measure of the uncertainty of a distribution or random variable, and is not well-defined for a database.
 However, the term is often used in data compression as a shorthand for the number of bits needed to encode the database, a measure of the randomness of that database.
 We use entropy in the latter sense; precisely, we define the entropy of a database as the number of bits needed to encode the database under some encoding scheme.
 Equivalently, the entropy of a database is the entropy measured in bits of a random variable whose instances are databases that match our database on some structural condition, which we will define later.
