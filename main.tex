@@ -115,9 +115,9 @@ An entropy-scaling data structure for searching large-scale biological data}
 
 \begin{abstract}
     \begin{itemize}
-        \item Low entropy data sets are common in Biological Big Data problems
-        \item Under common structural assumptions, it is possible to construct a data structure admitting similarity search in time- and space-complexity roughly linear to ``entropy''
-        \item For problems drawn from genomics, small molecule search, and protein structure search, we demonstrate substantial acceleration of analyses using this data structure
+        \item While biological data sets are growing dramatically, they tend to exhibit low entropy
+        \item We have formalized a data structure that allows similarity search in time- and space-complexity asymptotically linear to entropy
+        \item Using this data structure, we demonstrate substantial acceleration of search in the domains of genomics, chemogenomics, and protein structure search
     \end{itemize}
 \noindent\unskip\textbf{eTOC Blurb}
 \par\medskip\noindent\unskip\ignorespaces
@@ -165,7 +165,7 @@ In the specific context of local alignment in genomics, however, the emerging fi
 Similar results have been demonstrated for local alignment in proteomics, using much the same strategies \cite{daniels2013compressive}.
 Empirically, this compressive acceleration appears to scale almost linearly in the entropy of the database, often resulting in orders of magnitude better performance.
 
-In this paper, we substantially generalize and formalize this approach by introducing a the first analyzed instance of a class of entropy scaling data structures for similarity search: data structures structures that \textbf{provably} scale almost linearly in both time and space with the entropy of the database.
+In this paper, we substantially generalize and formalize this approach by introducing the first formally analyzed instance of a class of entropy scaling data structures for similarity search: data structures structures that \textbf{provably} scale almost linearly in both time and space with the entropy of the database.
 Specifically, if similarity is defined by a metric-like distance function (e.g., edit or Hamming distance) and the database exhibits both low `metric entropy' and `fractal dimension' (See Supplemental Methods: Theory), this data structure performs much better than na\"ive and even optimized methods.
 This data structure allows for minimal (or even zero) loss in recall, coupled
 with zero loss in specificity.
@@ -179,7 +179,7 @@ we demonstrate their utility on similarity search problems drawn from the three 
     \centering
     \includegraphics[width=1\textwidth]{assets/dataStructure.png}
     \caption{ Entropy-scaling data structure for similarity search. %
-            (a) The na\"ive approach tests each query against each database entry to find entries within distance $X$  of the query. %
+            (a) The na\"ive approach tests each query against each database entry to find entries within distance $r$  of the query. %
             (b) By selecting appropriate cluster centers with maximum radius $r_c$ to partition the database, we can (c) first do a coarse search to find all cluster centers within distance $r+r_c$ of a query, and then the (d) triangle inequality guarantees that a fine search over all corresponding cluster entries will suffice.}
     \label{fig:dataStructure}
 \end{figure}
@@ -231,7 +231,7 @@ Given a database with fractal dimension $d$ and metric entropy $k$ at the scale 
     \underbrace{\left(\frac{r+2r_c}{r}\right)^d}_{\textrm{scaling factor}}
      \Bigg) .
 \end{gather}
-Thus, for small fractal dimension and output size, similarity search is nearly linear in metric entropy.
+Thus, for small fractal dimension and output size, similarity search is asymptotically linear in metric entropy.
 Additionally, because the search only has to look at a small subset of the clusters, the clusters can be stored in compressed form, and only decompressed as needed, giving space savings that also scale with entropy.
 As an aside, note that the space-complexity actually scales with the sum of metric and information-theoretic entropy, rather than just metric entropy (See Supplemental Methods: Theory).
 %Similarly, using these covering spheres, the database can be stored in a 
@@ -240,11 +240,11 @@ As an aside, note that the space-complexity actually scales with the sum of metr
 We have presented the simplest such data to analyze.
 However, real data is generally messier than the rosy picture painted here.
 Sometimes the distance function is not a metric, so we lose the triangle inequality guarantee of 100\% sensitivity;
-sometimes different distance functions can be used for the clustering vs the searches;
-and sometimes even what counts as a distinct point is not entirely clear without domain knowledge.
+sometimes different distance functions can be used for the clustering versus searche;
+and sometimes even what counts as a distinct data point is not entirely clear without domain knowledge (for example, long genomic sequences might be better broken into shorter subsequences).
 %
 Through the diversity of the applications we explore in this paper, we demonstrate that the general scheme works for massively accelerating similarity search in a set of different contexts.
-These applications are enabled by augmenting the data structure with the usage of different distance functions in different stages of the algorithm and preprocessing to take advantage of domain specific knowledge.
+These applications are enabled by augmenting the data structure with domain-specific distance functions in different stages of the algorithm, as well as preprocessing to take advantage of domain-specific knowledge.
 We expect that so long as the data set exhibits both low entropy (many items are similar to one another, which is nearly always the case when the query is a similarity search) and low fractal dimension (the data set has some much simpler structure generating it, such as an evolutionary tree), our entropy-scaling data structure has the potential to achieve massive speedup over more naive methods and significant speedup over even other highly optimized methods.
 
 \subsection{Metagenomics}
@@ -279,15 +279,6 @@ implementation that provides an acceleration of BLASTX by a factor of up
 to 673.
 This illustrates the potential of entropy-scaling data structures, while
 providing a useful tool for metagenomic research.
-
-In developing caBLASTX, we augmented the entropy scaling data structure by using
-different distance functions for clustering vs search.
-For clustering, we rely on sequence identity, while for search, we use the
-E-value measure that is standard for BLAST.
-Furthermore, during clustering (compression), we apply a preprocessing step that
-identifies subsequences to be treated as distinct points in the database.
-This is because protein sequences commonly contain motifs found in other sequences,
-so the natural lexical unit is the motif.
 
 CaBLASTX is useful for two of the most common metagenomic analysis tasks. 
 The first of these is mapping assembled or partially-assembled
@@ -400,15 +391,14 @@ In July, 2007, Pubchem contained 10.3 million compounds.
 In October, 2013, PubChem contained roughly 47 million compounds, while
 in December, 2014 it contains 61.3 million compounds.
 
-We introduce a framework for clustering molecular databases that use the 
+We introduce a Ammolite, a framework for clustering molecular databases that use the 
 popular SDF molecular structure format, such as PubChem, and for searching for 
 similar molecular structures in compressed space.
 We designed this compression and search framework around one of the standard 
 techniques for high-throughput screening of potential drug compounds, the use 
 of maximum common subgraph (MCS) to identify similar motifs among molecules \cite{cao2008maximum, rahman2009small}.
-Using an entropy-scaling approach, our new software Ammolite performs MCS based search in time that scales with the entropy of a database.\hl{?????}.
 Ammolite demonstrates that entropy scaling methods can be extended to data types that are not inherently sequence based. Ammolite is also a practical 
-tool that provides ~4x speed-up with greater than 95\% accuracy compared to a gold standard.
+tool that provides ~4x speed-up with greater than 95\% accuracy compared to the popular SMSD~\cite{rahman2009small}.
 
 MCS based search of molecule databases typically matches pairs of molecules by 
 their overlap coefficients. The overlap coefficient of two molecules is not a 
@@ -564,9 +554,26 @@ However, as discussed in the Supplementary Theory, entropy scaling data structur
 allow for compressive algorithms under certain additional constraints.
 This is particularly applicable in the case of metagenomic analysis, the collection of 
 read data presents a problem for storage and transfer.
+It is worth noting that implementing this compression is feasible using existing software tools and libraries such as BZGF (Blocked GZip).
 
 \section{Methods}
 \subsection{CaBLASTX}
+
+In CaBLASTX, the clustering framework extends the approach of caBLASTP~\cite{daniels2013compressive}.
+We augmented the entropy scaling data structure by using
+different distance functions for clustering and search.
+For clustering, we rely on sequence identity, while for search, we use the
+E-value measure that is standard for BLAST.
+Furthermore, during clustering (compression), we apply a preprocessing step that
+identifies subsequences to be treated as distinct points in the database.
+This is because protein sequences commonly contain motifs found in other sequences,
+so the natural lexical unit is the motif.
+Also during preprocessing, we apply a reversible alphabet reduction to the
+protein sequences, which further increases clustering effectiveness (see Supplemental Methods).
+
+As further discussed in Supplemental Methods, when applied to high-coverage next-generation sequencing queries, caBLASTX can also perform clustering on the reads.
+In this instance, coarse search is performed by matching each representative query with a set of representative database entries.
+Fine search then matches the original queries within each cluster with the candidate database entries resulting from the coarse search.
 
 \subsection{Ammolite}
 Our clustering approach relies on structural similarity.
