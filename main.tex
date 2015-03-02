@@ -240,7 +240,7 @@ As an aside, note that the space-complexity actually scales with the sum of metr
 We have presented the simplest such data to analyze.
 However, real data is generally messier than the rosy picture painted here.
 Sometimes the distance function is not a metric, so we lose the triangle inequality guarantee of 100\% sensitivity;
-sometimes different distance functions can be used for the clustering versus searches;
+sometimes different distance functions can be used for the clustering versus search;
 and sometimes even what counts as a distinct data point is not entirely clear without domain knowledge (for example, long genomic sequences might be better broken into shorter subsequences).
 %
 Through the diversity of the applications we explore in this paper, we demonstrate that the general scheme works for massively accelerating similarity search in a set of different contexts.
