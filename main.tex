@@ -447,7 +447,7 @@ Specifically, given a protein of solved (or predicted) structure but unknown fun
 of structurally similar proteins in the Protein Data Bank is critical to function prediction.
 Relatedly, finding structural neighbors can also give insight into the evolutionary origins of proteins of interest.
 
-One approach to finding structural neighbors is to attempt to align the query protein to all the entries in the Protein Data Bank (PDB) using a structural aligner (e.g. STRUCTAL \cite{subbiah1993structural}, ICE \cite{shindyalov1998protein}, or Matt \cite{menke2008matt,menke2010markov}).
+One approach to finding structural neighbors is to attempt to align the query protein to all the entries in the Protein Data Bank (PDB) using a structural aligner (e.g. STRUCTAL \cite{subbiah1993structural}, ICE \cite{shindyalov1998protein}, or Matt \cite{menke2008matt}).
 However, performing a full alignment against every entry in the PDB is prohibitively expensive, especially as the database grows.
 Alternately, the approach we use here is the one introduced by FragBag~\cite{budowski2010fragbag}, which describes each protein as a
 `bag of fragments,' where each fragment is a small structural motif.
