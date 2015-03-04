@@ -252,19 +252,20 @@ We expect that so long as the data set exhibits both low entropy (many items are
 
 Metagenomics is the study of genomic data sequenced directly from environmental
 samples.
-It has improved understanding of how ecosystems recover
+It has led to improved understanding of how ecosystems recover
 from environmental damage~\cite{tyson2004community} and how the human gut responds 
 to diet
 and infection~\cite{david2014host}.
-Metagenomics has even provided some surprising clues as to disorders 
+Metagenomics has even provided some surprising insights into disorders 
 such as Autism Spectrum Disorder~\cite{macfabe2012short}.
 
-BLASTX~\cite{altschul1990basic} is widely used in metagenomics, both directly for analysis, as 
-well as in  pipelines such as MetaPhlAn~\cite{segata2012metagenomic} and
-PICRUSt~\cite{langille2013predictive}, to map
+BLASTX~\cite{altschul1990basic} is widely used in metagenomics to map
 reads to protein databases such as KEGG~\cite{kanehisa2000kegg} and NCBI's 
 NR~\cite{sayers2011database}.
-BLASTX's run time requirements scale linearly with the size of the 
+This mapping is additionally used as a primitive in pipelines such as MetaPhlAn~\cite{segata2012metagenomic}, 
+PICRUSt~\cite{langille2013predictive}, and MEGAN~\cite{huson2011integrative} to
+determine the microbial composition of a sequenced sample.
+Unfortunately, BLASTX's run time requirements scale linearly with the size of the 
 full read dataset, and each year require exponentially more runtime to process 
 the exponentially growing read data. 
 These computational challenges are at present a barrier to widespread use of 
@@ -273,6 +274,17 @@ environmental genomics~\cite{frank2008gastrointestinal}.
 For example, \citet{mackelprang2011metagenomic} reported that using BLASTX to map 246
 million reads against KEGG required 800,000 CPU hours at a supercomputing 
 center.
+
+Although this is a problem already for major research centers, it is especially
+hindering for on-site analyses in more remote locations.
+In the surveying the 2014 Ebola outbreak, scientists physically shipped samples on dry
+ice to Harvard for sequencing and analysis \cite{gire2014genomic}.
+Even as sequencers become cheaper, lack of fast Internet connections in remote
+areas can make it impossible to centralize processing (viz. the cloud),
+so local processing on resource-constrained machines remains essential.
+Thus, a better scaling and accurate version of BLASTX promises the possibility of not only faster computing for
+large research centers, but also of enabling the novel workflow of
+entirely on-site local sequencing and metagenomic analyses.
 
 We have applied our entropy-scaling data structure framework to the problem of 
 metagenomic search, and demonstrate caBLASTX, an algorithm and software 
@@ -318,7 +330,7 @@ fecal dataset (SRR059854) from the
 Human Microbiome Project~\cite{turnbaugh2007human}.
 We filtered out reads starting or ending with 10 or more no-calls ('N').
 The running time for BLASTX was 14,423 minutes, 
-while caBLASTX took 21 minutes, a speedup of 673.
+while caBLASTX took 21 minutes, a speedup of 673x.
 Results appear in Table~\ref{mgspeed}.
 
 
@@ -364,8 +376,8 @@ except by virtue of making computationally expensive analyses more tractable.
 
 In order to validate caBLASTX's accuracy, we treated BLASTX as a gold standard. 
 Since caBLASTX accelerates BLASTX
-using entropy-scaling techniques, false positives with respect to BLASTX should 
-not be possible, but false negatives certainly are.
+using entropy-scaling techniques, false positives with respect to BLASTX are 
+not possible, but false negatives certainly are.
 We evaluated the hits from BLASTX and caBLASTX on the same human gut
 assemblies and raw reads used for benchmarking, in order to evaluate the accuracy when
 query-side compression is not used.
