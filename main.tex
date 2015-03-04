@@ -481,7 +481,7 @@ Naturally, as the search radius expands, it quickly becomes necessary to compare
 For the cosine space in particular, note that the maximum distance between any two points is $1$, so once the coarse search radius of $r+r_c >= 1.0$, there cannot ever be any acceleration as the fine search encompasses the entire database.
 Similarly, once the coarse search encompasses all (or nearly all) the clusters in Euclidean space, the acceleration diminishes to 1x, and the overhead costs make the entropy scaling data structure perform worse than a na\"ive search.
 However, as we are most interested in proteins that are very similar to the query, the low-radius behavior is of primary interest.
-In the low-radius regime, esFragBag demonstrates varying though substantial acceleration (2x-30x) over FragBag.
+In the low-radius regime, esFragBag demonstrates varying though substantial acceleration (2x-30x, averaging >10x for both distance functions for the proteins chosen) over FragBag.
 
 Additionally, it is instructive to note that because of the very different geometries of euclidean vs cosine space, acceleration varies tremendously for some proteins, such as \texttt{4rhv} and \texttt{1bmf}, which display nearly opposite behaviors.
 Whereas there is nearly 30x acceleration for \texttt{4rhv} in cosine space for low radius, and the same for \texttt{1bmf} in euclidean space, neither achieves better than $\sim$ 2.5x acceleration in the other space.
