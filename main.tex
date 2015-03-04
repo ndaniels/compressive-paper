@@ -92,7 +92,7 @@ Entropy-scaling search of massive biological data}
 %\ead{ndaniels@csail.mit.edu}
 \author[mitcsail]{David C. Danko}
 %\ead{dcdanko@mit.edu}
-\author[mitmath,mitcsail]{Bonnie Berger\corref{correspond}}
+\author[mitmath,mitcsail]{\\Bonnie Berger\corref{correspond}}
 \ead{bab@mit.edu}
 %    Address of record for the research reported here
 \cortext[co]{These authors contributed equally to this work.}
@@ -116,13 +116,13 @@ Entropy-scaling search of massive biological data}
 \begin{abstract}
     \begin{itemize}
         \item While biological data sets are growing dramatically, they tend to exhibit low entropy
-        \item We have introduced a data structure that allows similarity search in time- and space-complexity asymptotically linear to entropy
-        \item Using this data structure, we demonstrate substantial acceleration of search in the domains of genomics, chemogenomics, and protein structure search
+        \item We introduce a data structure that allows similarity search in time- and space-complexity asymptotically linear to entropy
+        \item Using this data structure, we demonstrate substantial acceleration of search in the domains of metagenomics, chemogenomics, and protein structure search
     \end{itemize}
 \noindent\unskip\textbf{eTOC Blurb}
 \par\medskip\noindent\unskip\ignorespaces
 Massive data sets in biological systems often exhibit high redundancy and thus low entropy.
-We have developed a data structure for similarity search whose complexity scales with entropy.
+We have developed a data structure for similarity search whose complexity scales nearly linearly in entropy.
 This approach allows us to dramatically accelerate analytical tools drawn from genomics, small molecule search, and protein structure search.
 \end{abstract}
 
@@ -134,9 +134,9 @@ This approach allows us to dramatically accelerate analytical tools drawn from g
     The continual onslaught of new data from cell systems has forced upon scientists the fortunate problem of having too much data to analyze.
     Luckily, it turns out that many data sets exhibit well-defined structure that can be exploited for the design of 
 smarter analysis tools.
-    We introduce an entropy-scaling data structure---which given a low fractal dimension guarantee, scales in both time and space with the entropy of the underlying database---to perform similarity search, a fundamental operation in data science.
+    We introduce an entropy-scaling data structure---which given a low fractal dimension database, scales in both time and space with the entropy of that underlying database---to perform similarity search, a fundamental operation in data science.
     Using these ideas, we present accelerated versions of standard tools for use by practitioners in the three domains of metagenomics, high-throughput drug screening, and protein structure search, none of which have any loss in specificity or significant loss in sensitivity:
-    CaBLASTX, 700x speedup of BLASTX with less than 5\% loss in sensitivity; Ammolite, \hl{??}x speedup of small molecule similarity search with \hl{??} loss in sensitivity; and, esFragBag, 2-30x speedup of FragBag with less than 0.2\% loss in sensitivity.
+    CaBLASTX, 700x speedup of BLASTX with less than 5\% loss in sensitivity; Ammolite, \hl{??}x speedup of small molecule similarity search with \hl{??} loss in sensitivity; and, esFragBag, 10x speedup of FragBag with less than 0.2\% loss in sensitivity.
 
     Source code: \url{http://gems.csail.mit.edu}
 }
@@ -144,10 +144,10 @@ smarter analysis tools.
 \section{Introduction}
 Throughout all areas of data science, scientists are being confronted by an 
 explosion of data.
-In many fields, this increase is exponential in nature, outpacing Moore's and Kryder's laws on the respective doublings of transistors on a chip and long-term data storage density \hl{[cite Kahn, Science]}.
+In many fields, this increase is exponential in nature, outpacing Moore's and Kryder's laws on the respective doublings of transistors on a chip and long-term data storage density \cite{kahn2011future}.
 As such, the challenges posed by the massive influx of data cannot be solved by waiting for faster and larger capacity computers, but require instead the development of data structures and representations that exploit and simplify complexity in the data set.
 
-Here, we focus our attention on similarity search, where the task at hand is to find all entries in some database that are `similar', or approximate matches, to some query item.
+Here, we focus on similarity search, where the task at hand is to find all entries in some database that are `similar', or approximate matches, to some query item.
 Much like sorting is a primitive operation in computer science, similarity search is a fundamental operation in data science and lies at the heart of many other problems.
 Traditionally, approximate matching has been studied primarily in the context of strings under edit distance metrics (e.g., for spell-checkers) \cite{ukkonen1985algorithms}.
 However, similarity search has also demonstrated increasing importance in biological system domains, including local alignment of sequences \cite{altschul1990basic, kent2002blat}, chemical graphs \cite{schaeffer2007graph}, and protein structures \cite{budowski2010fragbag}.
@@ -158,14 +158,14 @@ As available data grows exponentially \cite{berger2013computational,yu2015qualit
 algorithms that scale linearly with the amount of data no longer suffice.
 The primary ways the literature addresses this problem (e.g.
 locality sensitive hashing \cite{indyk1998approximate}, vector approximation \cite{ferhatosmanoglu2000vector}, space partitioning \cite{weber1998quantitative}) involve the construction of data structures that admit a more efficient search operation.
-However, we note that as data increases, very often the redundancy present in the data also increases \cite{loh2012compressive}.
-Existing general purpose methods do not explicitly exploit this particular feature of biological data.
+However, we note that as biological data increases, not only does the redundancy present in the data also increase, but also internal structure (such as low fractal dimension) becomes apparent \cite{loh2012compressive}.
+Existing general purpose methods do not explicitly exploit the particular internal structure of biological data to accelerate search.
 
 In the specific context of local alignment in genomics, however, the emerging field of `compressive genomics' has shown that existing tools such as BLAST and BLAT can be compressively accelerated by taking advantage of high redundancy between related genomes using link pointers and edit scripts to a database of unique sequences \cite{loh2012compressive}.
 Similar results have been demonstrated for local alignment in proteomics, using much the same strategies \cite{daniels2013compressive}.
 Empirically, this compressive acceleration appears to scale almost linearly in the entropy of the database, often resulting in orders of magnitude better performance.
 
-In this paper, we substantially generalize and formalize this approach by introducing the first formally analyzed instance of a class of entropy scaling data structures for similarity search: data structures structures that \textbf{provably} scale almost linearly in both time and space with the entropy of the database.
+In this paper, we substantially generalize and formalize this approach by introducing the first formally analyzed instance of a class of entropy scaling data structures for similarity search: data structures that \textbf{provably} scale almost linearly in both time and space with the entropy of the database.
 Specifically, if similarity is defined by a metric-like distance function (e.g., edit or Hamming distance) and the database exhibits both low `metric entropy' and `fractal dimension' (See Supplemental Methods: Theory), this data structure performs much better than na\"ive and even optimized methods.
 This data structure allows for minimal (or even zero) loss in recall, coupled
 with zero loss in specificity.
@@ -179,8 +179,9 @@ we demonstrate their utility on similarity search problems drawn from the three 
     \centering
     \includegraphics[width=1\textwidth]{assets/dataStructure.png}
     \caption{ Entropy-scaling data structure for similarity search. %
-            (a) The na\"ive approach tests each query against each database entry to find entries within distance $r$  of the query. %
-            (b) By selecting appropriate cluster centers with maximum radius $r_c$ to partition the database, we can (c) first do a coarse search to find all cluster centers within distance $r+r_c$ of a query, and then the (d) triangle inequality guarantees that a fine search over all corresponding cluster entries will suffice.}
+            (a) The na\"ive approach tests each query against each database entry to find entries within distance $r$ of the query (inside the small green disc). %
+            (b) By selecting appropriate cluster centers with maximum radius $r_c$ to partition the database, we can (c) first do a coarse search to find all cluster centers within distance $r+r_c$ of a query (larger green disc),%
+ and then the (d) triangle inequality guarantees that a fine search over all corresponding cluster entries will suffice (highlighted blue polygonal regions).}
     \label{fig:dataStructure}
 \end{figure}
 
@@ -434,7 +435,7 @@ Specifically, given a protein of solved (or predicted) structure but unknown fun
 of structurally similar proteins in the Protein Data Bank is critical to function prediction.
 Relatedly, finding structural neighbors can also give insight into the evolutionary origins of proteins of interest.
 
-One approach to finding structural neighbors is to attempt to align the query protein to all the entries in the Protein Data Bank (PDB) using a structural aligner (e.g. STRUCTAL \cite{subbiah1993structural}, ICE \cite{shindyalov1998protein}, or Matt \hl{[Menke, 2010]}).
+One approach to finding structural neighbors is to attempt to align the query protein to all the entries in the Protein Data Bank (PDB) using a structural aligner (e.g. STRUCTAL \cite{subbiah1993structural}, ICE \cite{shindyalov1998protein}, or Matt \cite{menke2008matt,menke2010markov}).
 However, performing a full alignment against every entry in the PDB is prohibitively expensive, especially as the database grows.
 Alternately, the approach we use here is the one introduced by FragBag~\cite{budowski2010fragbag}, which describes each protein as a
 `bag of fragments,' where each fragment is a small structural motif.
