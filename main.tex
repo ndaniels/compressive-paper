@@ -153,19 +153,19 @@ Traditionally, approximate matching has been studied primarily in the context of
 However, similarity search has also demonstrated increasing importance in biological system domains, including local alignment of sequences \cite{altschul1990basic, kent2002blat}, chemical graphs \cite{schaeffer2007graph}, and protein structures \cite{budowski2010fragbag}.
 %In recent years, however, similarity search has become increasingly important for other objects and distance functions (e.g., biological genomes and alignment scores, networks and the Jaccard index) [Altschul et al, 1990; Kent, 2002; Schaeffer, 2007].
 
-As available data grows exponentially \cite{berger2013computational,yu2015quality} (e.g., genomic data in Figure S2), 
+As available data grows exponentially \cite{berger2013computational,yu2015quality} (e.g., genomic data in Figure S3), 
 %move figure to supplement
 algorithms that scale linearly with the amount of data no longer suffice.
 The primary ways the literature addresses this problem (e.g.
 locality sensitive hashing \cite{indyk1998approximate}, vector approximation \cite{ferhatosmanoglu2000vector}, space partitioning \cite{weber1998quantitative}) involve the construction of data structures that admit a more efficient search operation.
-However, we note that as biological data increases, not only does the redundancy present in the data also increase, but also internal structure (such as low fractal dimension) becomes apparent \cite{loh2012compressive}.
+However, we note that as biological data increases, not only does the redundancy present in the data also increase~\cite{loh2012compressive}, but also internal structure (such as low fractal dimension) becomes apparent.
 Existing general purpose methods do not explicitly exploit the particular internal structure of biological data to accelerate search.
 
 In the specific context of local alignment in genomics, however, the emerging field of `compressive genomics' has shown that existing tools such as BLAST and BLAT can be compressively accelerated by taking advantage of high redundancy between related genomes using link pointers and edit scripts to a database of unique sequences \cite{loh2012compressive}.
 Similar results have been demonstrated for local alignment in proteomics, using much the same strategies \cite{daniels2013compressive}.
 Empirically, this compressive acceleration appears to scale almost linearly in the entropy of the database, often resulting in orders of magnitude better performance.
 
-In this paper, we substantially generalize and formalize this approach by introducing the first formally analyzed instance of a class of entropy scaling data structures for similarity search: data structures that \textbf{provably} scale almost linearly in both time and space with the entropy of the database.
+In this paper, we substantially generalize and formalize this approach by introducing the first mathematically rigorous class of entropy scaling data structures for similarity search: data structures that \textbf{provably} scale almost linearly in both time and space with the entropy of the database.
 Specifically, if similarity is defined by a metric-like distance function (e.g., edit or Hamming distance) and the database exhibits both low `metric entropy' and `fractal dimension' (See Supplemental Methods: Theory), this data structure performs much better than na\"ive and even optimized methods.
 This data structure allows for minimal (or even zero) loss in recall, coupled
 with zero loss in specificity.
@@ -180,8 +180,8 @@ we demonstrate their utility on similarity search problems drawn from the three 
     \includegraphics[width=1\textwidth]{assets/dataStructure.png}
     \caption{ Entropy-scaling data structure for similarity search. %
             (a) The na\"ive approach tests each query against each database entry to find entries within distance $r$ of the query (inside the small green disc). %
-            (b) By selecting appropriate cluster centers with maximum radius $r_c$ to partition the database, we can (c) first do a coarse search to find all cluster centers within distance $r+r_c$ of a query (larger green disc),%
- and then the (d) triangle inequality guarantees that a fine search over all corresponding cluster entries will suffice (highlighted blue polygonal regions).}
+            (b) By selecting appropriate cluster centers with maximum radius $r_c$ to partition the database, we can (c) first do a coarse search to find all cluster centers within distance $r+r_c$ of a query (larger green disc), %
+ and then the (d) triangle inequality guarantees that a fine search over all corresponding cluster entries (blue polygonal regions) will suffice.}
     \label{fig:dataStructure}
 \end{figure}
 
@@ -203,28 +203,32 @@ However, when the dimensionality of the subspace increases, cell search time blo
 \begin{figure}[btp]
     \centering
     \includegraphics[width=0.8\textwidth]{assets/treepoints/treepoints2D_clusters.png}
-    \caption{Cartoon depiction of points in a high-dimensional space that live close to a 1D tree-like structure, as might arise from genomes generated by mutation and selection along an evolutionary tree of life. Although high-dimensional at a fine scale, at the coarser scale of covering spheres the data cloud looks nearly 1-dimensional, which enables entropy-scaling of similarity search. The cluster center generation was performed using the same algorithm used in esFragBag.}
+    \caption{Cartoon depiction of points in an arbitrary high-dimensional space that live close to a 1D tree-like structure, as might arise from genomes generated by mutation and selection along an evolutionary tree of life. 
+Although high-dimensional at a fine scale, at the coarser scale of covering spheres, the data cloud looks nearly 1-dimensional, which enables entropy-scaling of similarity search. The cluster center generation was performed using the same method we used for protein structure search.}
     \label{fig:tree}
 \end{figure}
 More importantly, biological data sets generally do not live in low-dimensional subspaces.
 Consider the instructive case of genomes along an evolutionary Tree of Life (Figure \ref{fig:tree}).
-Such a tree has many branches (plus admixture merges branches back together), and looks nearly 1-dimensional locally, but is not globally.
+Such a tree has many branches (plus admixture merges branches back together),
+looks nearly 1-dimensional locally, but it is not globally.
 Additionally, because of diffusion due to mutation, each of the branches is also ``thick'' (high-dimensional) when looked at closely.
 %Figure 1b for illustration.
 %Please look up Jinbo Xu and my work on Tree Decomposition in JACM.
 % NMD: I'm familiar with TreePack, but not seeing how it's relevant.
-Considering this example as a low-dimensional \textit{subspace} is incorrect.
+Considering this example as a low-dimensional \textit{subspace}, as in PCA, is 
+incorrect.
 
 However, the local low-dimensionality can be exploited by looking on the right scales: a coarse scale in which the tree looks 1-dimensional locally and a fine scale where the branch width matters.
 We cover the tree with spheres of radius $r_c$ on the order of the branch widths; these spheres determine our clusters, and the number of them is the metric entropy of the tree \cite{tao2008product}.
 Because all the points within a sphere are close to each other, they are highly redundant and can be encoded in terms of one another, saving space in our representation.
 
-By the triangle inequality, in order to search for all points within distance $r$ of a query we need only look in nearby spheres with centers within a distance $r+r_c$ of the query.
+By the triangle inequality, in order to search for all points within distance $r$ of a query we need only look in nearby spheres with centers within a distance $r+r_c$ of the query (Figure \ref{fig:dataStructure}d).
 %ref Figure 1?.
-However, because the spheres have radius comparable to branch width, the tree is locally 1-dimensional on the coarse scale---we will call this the fractal dimension $d=1$ of the tree at the scale $r_c$ \cite{falconer1990fractal}.
-Increasing the search radius for coarse search only linearly increases the number of points that need to be searched in a fine search.
+However, because the spheres have radius comparable to branch width, the tree is locally 1-dimensional on the coarse scale---we will call this the fractal dimension $d=1$ of the tree at the scale $r_c$ \cite{falconer1990fractal}, where $r_c$ is essentially our ruler size.
+Thus, increasing the search radius for coarse search only linearly increases the number of points that need to be searched in a fine search.
+
 A similar analysis holds in the more general case.
-Given a database with fractal dimension $d$ and metric entropy $k$ at the scale $r_c$, we show in the Supplemental Methods that time-complexity for similarity search with radius $r$ is
+Given a database with fractal dimension $d$ and metric entropy $k$ at the scale $r_c$, we show in the Supplemental Methods that the time-complexity of similarity search for query $q$ with radius $r$ is
 \begin{gather}
     O\Bigg(
     \underbrace{k}_{\textrm{metric entropy}} +
@@ -233,7 +237,7 @@ Given a database with fractal dimension $d$ and metric entropy $k$ at the scale 
      \Bigg) .
 \end{gather}
 Thus, for small fractal dimension and output size, similarity search is asymptotically linear in metric entropy.
-Additionally, because the search only has to look at a small subset of the clusters, the clusters can be stored in compressed form, and only decompressed as needed, giving space savings that also scale with entropy.
+Additionally, because the search has to look at only a small subset of the clusters, the clusters can be stored in compressed form, and only decompressed as needed, giving space savings that also scale with entropy.
 As an aside, note that the space-complexity actually scales with the sum of metric and information-theoretic entropy, rather than just metric entropy (See Supplemental Methods: Theory).
 %Similarly, using these covering spheres, the database can be stored in a 
 %compressed manner (see Supplemental Methods for further details).
@@ -243,10 +247,10 @@ However, real data is generally messier than the rosy picture painted here.
 Sometimes the distance function is not a metric, so we lose the triangle inequality guarantee of 100\% sensitivity;
 sometimes different distance functions can be used for the clustering versus search;
 and sometimes even what counts as a distinct data point is not entirely clear without domain knowledge (for example, long genomic sequences might be better broken into shorter subsequences).
-%
+
 Through the diversity of the applications we explore in this paper, we demonstrate that the general scheme works for massively accelerating similarity search in a set of different contexts.
 These applications are enabled by augmenting the data structure with domain-specific distance functions in different stages of the algorithm, as well as preprocessing to take advantage of domain-specific knowledge.
-We expect that so long as the data set exhibits both low entropy (many items are similar to one another, which is nearly always the case when the query is a similarity search) and low fractal dimension (the data set has some much simpler structure generating it, such as an evolutionary tree), our entropy-scaling data structure has the potential to achieve massive speedup over more naive methods and significant speedup over even other highly optimized methods.
+We expect that so long as the data set exhibits both low entropy (many items are similar to one another, which is nearly always the case when the query is a similarity search) and low fractal dimension (the data set has some much simpler structure generating it, such as an evolutionary tree, as often seems to be the case in biology), our entropy-scaling data structure has the potential to achieve massive speedup over more naive methods and significant speedup over even other highly optimized methods.
 
 \subsection{Metagenomics}
 
@@ -277,11 +281,11 @@ center.
 
 Although this is a problem already for major research centers, it is especially
 limiting for on-site analyses in more remote locations.
-In surveying the 2014 Ebola outbreak, scientists physically shipped samples on dry
-ice to Harvard for sequencing and analysis \cite{gire2014genomic}.
+In surveying the 2014 Ebola outbreak, scientists physically shipped samples on 
+dry ice to Harvard for sequencing and analysis \cite{gire2014genomic}.
 Even as sequencers become more mobile, lack of fast Internet connections in remote
-areas can make it impossible to centralize processing (viz. the cloud),
-so local processing on resource-constrained machines remains essential.
+areas can make it impossible to centralize processing (viz.: the cloud);
+local processing on resource-constrained machines remains essential.
 Thus, a better scaling and accurate version of BLASTX promises the possibility of not only faster computing for
 large research centers, but also of enabling the novel workflow of
 entirely on-site local sequencing and metagenomic analyses.
@@ -309,21 +313,10 @@ be amortized over future queries, we expect this enhancement to provide a
 constant factor improvement.
 
 To evaluate the run-time performance of caBLASTX, we tested it against
-BLASTX as well as RapSearch2~\cite{zhao2012rapsearch2} and
-Diamond~\cite{buchfink2014fast}.
-BLASTX is often used to align assemblies thought to be exons to a protein
-database, in which case metagenomic reads have already been assembled.
-In this instance, the query-side clustering of caBLASTX is not applicable, so
-the performance gains are more modest.
-We benchmarked caBLASTX vs. BLASTX on a dataset consisting of 22,778 assemblies
-from human gut microbiota, 3.1 megabases in total, searching against the NCBI's
-``NR'' non-redundant protein database from September, 2014.
-The running time of BLASTX was 3235 minutes, compared to 123 minutes for 
-caBLASTX, a speedup of 26.3.
+BLASTX as well as RapSearch2~\cite{zhao2012rapsearch2} and the recently-released
+Diamond~\cite{buchfink2014fast}, and found substantial runtime improvements 
+(similar to Diamond) at significantly greater accuracy.
 
-When aligning unassembled next-generation sequencing reads to a protein 
-database, the
-query-side clustering aspect of caBLASTX becomes applicable.
 We benchmarked caBLASTX against BLASTX on a set of 100,000
 next-generation sequencing reads each of length 202 nucleotides from a human 
 fecal dataset (SRR059854) from the
@@ -333,6 +326,18 @@ The running time for BLASTX was 14,423 minutes,
 while caBLASTX took 21 minutes, a speedup of 673x.
 Results appear in Table~\ref{mgspeed}.
 
+BLASTX is also used to align assemblies thought to be exons to a protein
+database, in which case metagenomic reads have already been assembled.
+In this instance, the query-side clustering of caBLASTX is not applicable, so
+the performance gains are more modest.
+We benchmarked caBLASTX vs. BLASTX on a dataset consisting of 22,778 assemblies
+from human gut microbiota, 3.1 megabases in total, searching against the NCBI's
+``NR'' non-redundant protein database from September, 2014.
+The running time of BLASTX was 3235 minutes, compared to 123 minutes for 
+caBLASTX, a speedup of 26.3.
+
+
+
 
 
 \begin{table}
@@ -341,9 +346,9 @@ Results appear in Table~\ref{mgspeed}.
 \hline
 dataset & BLASTX & caBLASTX & RapSearch2 & Diamond \\
 \hline
-assemblies & 3235 & 123 & 194 & 50 \\
-\hline
 NGS reads & 14423 & 21 & 51 & 13 \\
+\hline
+assemblies & 3235 & 123 & 194 & 50 \\
 \hline
 \end{tabular}
 \end{table}
@@ -354,24 +359,12 @@ NGS reads & 14423 & 21 & 51 & 13 \\
 \hline
 dataset & caBLASTX & RapSearch2 & Diamond \\
 \hline
-assemblies & 99.2\% & 87.7\% & 91.0\% \\
-\hline
 NGS reads & 95.7\% & 79.5\% & 76.9\% \\
+\hline
+assemblies & 99.2\% & 87.7\% & 91.0\% \\
 \hline
 \end{tabular}
 \end{table}
-
-While Diamond is notably faster than caBLASTX, it achieves this speed at the
-expense of some accuracy, particularly on raw reads.
-Moreover, caBLASTX actually accelerates standard BLASTX itself, and allows the
-user to pass arbitrary parameters to the underlying BLASTX during fine search.
-Thus, caBLASTX may be suitable to a wider variety of existing analysis 
-pipelines.
-With respect for future work, it may be possible to apply entropy-scaling data
-structures to Diamond itself, achieving even greater speed gains.
-Of course, the accuracy of such an approach would still be limited by Diamond; 
-entropy-scaling data structures cannot themselves improve accuracy,
-except by virtue of making computationally expensive analyses more tractable.
 
 
 In order to validate caBLASTX's accuracy, we treated BLASTX as a gold standard. 
@@ -389,6 +382,17 @@ As shown in Table~\ref{mgacc}, on the metagenomic assemblies, where query-side
 compression was not performed, caBLASTX achieves 99.2\% accuracy, while on the 
 raw reads, caBLASTX achieves 95.7\% accuracy.
 
+While Diamond is notably faster than caBLASTX, it achieves this speed at the
+expense of some accuracy, particularly on raw reads.
+Moreover, caBLASTX actually accelerates standard BLASTX itself, and allows the
+user to pass arbitrary parameters to the underlying BLASTX during fine search.
+Thus, caBLASTX may be suitable to a wider variety of existing analysis 
+pipelines.
+With respect to future work, it may be possible to apply entropy-scaling data
+structures to Diamond itself, achieving even greater speed gains.
+Of course, the accuracy of such an approach would still be limited by Diamond; 
+entropy-scaling data structures cannot themselves improve accuracy,
+except by virtue of making computationally expensive analyses more tractable.
 
 \subsection{High-throughput Drug Screening}
 
