@@ -253,7 +253,7 @@ Through the diversity of the applications we explore in this paper, we demonstra
 These applications are enabled by augmenting the data structure with domain-specific distance functions in different stages of the algorithm, as well as preprocessing to take advantage of domain-specific knowledge.
 We expect that so long as the data set exhibits both low entropy (many items are similar to one another, which is nearly always the case when the query is a similarity search) and low fractal dimension (the data set has some much simpler structure generating it, such as an evolutionary tree, as often seems to be the case in biology), our entropy-scaling data structure has the potential to achieve massive speedup over more naive methods and significant speedup over even other highly optimized methods.
 
-\subsection{Metagenomics}
+\subsection{Application to Metagenomics}
 
 Metagenomics is the study of genomic data sequenced directly from environmental
 samples.
@@ -403,7 +403,7 @@ Of course, the accuracy of such an approach would still be limited by Diamond;
 entropy-scaling data structures cannot themselves improve accuracy,
 except by virtue of making computationally expensive analyses more tractable.
 
-\subsection{High-throughput Drug Screening}
+\subsection{Application to High-throughput Drug Screening}
 
 In the field of drug discovery and drug repurposing, prediction of biologically 
 active compounds is a critical task. 
@@ -456,7 +456,7 @@ and by reducing the time required for each MCS operation, which scales with the 
 
 \hl{Typical workflow medicinal chemist using SMSD has week of downtime. With ours, weekend only. Need citesi (otherwise hypothetical).}
 
-\subsection{Protein Structure Search}
+\subsection{Application to Protein Structure Search}
 
 The relationship between protein structure and function has been a subject of intense study for decades,
 and this strong link has been used for the prediction of function from structure \cite{hegyi1999relationship}.
