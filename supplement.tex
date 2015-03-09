@@ -479,7 +479,7 @@ CaBLASTX is implemented in Go, and its source code is available on Github.
 First, we remove hydrogen atoms from the molecules; hydrogens can be easily recovered by inferring their 
 presence.
 Next, each molecule's graph structure is converted to an unlabeled one; each atom label is removed, and each
-bond type is represented as just a single bond.
+bond type is represented as just a single edge.
 The removed information--atom and bond type--is stored in an auxiliary data structure, indexed by the molecule's
 PubChem ID and the atom or bond number.
 Next, any vertex or edge that is not part of a simple cycle or a tree is removed, and any edge that is part
