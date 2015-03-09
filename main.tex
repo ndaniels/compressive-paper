@@ -580,11 +580,21 @@ search tools that outperform BLASTX.
 In this work, we have not focused on the space-saving compression that is
 possible with entropy-scaling data structures, but rather on the run-time
 acceleration of approximate search.
-However, as discussed in the Supplementary Theory, entropy scaling data structures
+However, as discussed in the Supplemental Theory, entropy scaling data structures
 allow for compressive algorithms under certain additional constraints.
-This is particularly applicable in the case of metagenomic analysis, the collection of 
+This is particularly applicable in the case of metagenomic analysis, where the collection of 
 read data presents a problem for storage and transfer.
 It is worth noting that implementing this compression is feasible using existing software tools and libraries such as BZGF (Blocked GZip).
+
+Entropy-scaling data structures for massive biological data have the great
+advantage of becoming proportionately faster and space-efficient with the
+size of the available data. Although we have demonstrated their scaling 
+behavior for common problems across metagenomics, chemogenomics, and protein
+structure search, they can be applied directly or with simple domain
+knowledge to a vast array of other problems faced in data science. As
+biological data continues to accumulate, entropy-scaling data structures
+will become critical to fully realizing the potential of compressive
+algorithms for biology. 
 
 \section{Methods}
 \subsection{CaBLASTX}
