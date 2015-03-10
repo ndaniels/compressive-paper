@@ -437,22 +437,18 @@ Ammolite is a practical
 tool that provides ~4x speed-up with greater than 95\% accuracy compared to the popular SMSD~\cite{rahman2009small}.
 
 MCS-based search of molecule databases typically matches pairs of molecules by 
-their overlap coefficients. However, the overlap coefficient of two molecules is not a 
-metric, as
-molecules with a high overlap coefficient may be globally dissimilar if the 
-larger molecule contains a significant subgraph of the smaller molecule.
-Nevertheless, overlap coefficient is typically more desirable for identifying relevant structures in a 
-molecule database, despite its not upholding the triangle inequality, in 
-contrast to distance metrics such as graph distance \cite{bunke1998graph}.
-% BAB: We never said why caBLASTx distance didn't have metric entropy. this sentence makes it sound that we have this framework, but it doesn't apply to real problems.
-As with caBLASTX (which uses the non-metric distance of E-values), a more mathematically satisfying distance function must give 
-way to one that has more meaning in the domain of interest; regardless, the
-entropy-scaling still applies.
+Tanimoto coefficient of the maximal common subgraph of the two molecules~\cite{rahman2009small}. 
+Tanimoto distance obeys the triangle inequality, and is more useful in the 
+domain of molecular graphs than other
+distance metrics such as graph distance \cite{bunke1998graph}.
 
 To compress a molecule database, we project the space of small molecules onto a subspace by removing nodes and edges that do not participate in simple cycles.
 Clusters are exactly pre-images of of this projection operator (i.e. all molecules that are isomorphic after simplification form a cluster).
 Coarse search is performed by finding the MCS on this much smaller projection subspace. This increases speed both by reducing the required number of MCS operations 
 and by reducing the time required for each MCS operation, which scales with the size of the molecule.
+It is worth noting that this pre-processing of molecular graphs can cause the 
+triangle inequality to be violated; while the distance function is a metric, it 
+is no longer a metric on the projected subspace.
 
 \hl{Benchmarking paragraph(s)}
 
@@ -580,6 +576,12 @@ We provide open-source software for all three areas: caBLASTX for metagenomic an
 Ammolite for small-molecule structure search, and esFragBag for protein structure search.
 In the case of metagenomic analysis, caBLASTX also compares favorably to recent 
 search tools that outperform BLASTX.
+It is worth noting that entropy-scaling data structures do not themselves 
+improve accuracy, except by virtue of making computationally expensive analyses 
+more tractable.
+It may be possible to apply entropy-scaling data
+structures to Diamond itself, achieving even greater speed gains, though 
+accuracy would still be limited to that of Diamond.
 
 In the main paper, we have not focused on the space-saving compression that is
 possible with entropy-scaling data structures, but rather on the run-time
