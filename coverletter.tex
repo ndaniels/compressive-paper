@@ -28,22 +28,22 @@ to \textit{Cell Systems} as an Article.
 One of the principal challenges facing biologists of every stripe \hl{(alternate wording: in nearly every area)} is the task of organizing, searching, and analyzing vast amounts of data.
 Because computing resources cannot keep pace with this explosion of data, in order to capitalize on the promise of Big Data, sophisticated algorithms and data structures are needed, as well as fast practical software implementations.
 
-We \underline{meet this demand}, by demonstrating a general scheme for accelerating search in life sciences databases, proving time-complexity bounds in terms of entropy by exploiting the low fractal dimension of the underlying database, and releasing three new implementations of practical software for practitioners to use.
-
+We \underline{meet this demand} by substantiall generalizing and formalizing compressive genomics: we demonstrate a general scheme for accelerating search in life science databases, proving time and space complexity bounds in terms of entropy by exploiting the typically low fractal dimension of the underlying database, and releasing three new practical software tools for practitioners to use.
+ 
 To demonstrate the broad applicability of entropy-scaling search, we present acceleration of standard tools drawn from metagenomics, high-throughput drug screening, and protein structure search.
 Respectively, caBLASTX achieves 700x speedup of BLASTX with $<5\%$ loss in sensitivity; Ammolite achieves 10x speedup of small molecule similarity search; and esFragBag achieves 10x speedup of FragBag with $<0.2\%$ loss in sensitivity.
 
-Not only do these order of magnitude improvements in running time promise to enable new workflows for practitioners (e.g. local analyses of sequencing data in remote areas for real-time epidemic monitoring, fast first-pass computational potential drug screens), but the general theory of entropy-scaling data structures that we introduce can be additionally applied to accelerate other search tools.
+Not only do these order of magnitude improvements in running time promise to enable new workflows for practitioners (e.g. local analyses of sequencing data in remote areas for real-time epidemic monitoring, fast first-pass computational potential drug screens), but the general theory of entropy-scaling data structures that we introduce can be straightforwardly applied to accelerate other search tools.
 
-It is for these reasons that we believe our work is of broad interest to the readership of Cell Systems.
+It is for these reasons that we believe our work will become an important tool in the biologist's toolkit by allowing analyses to scale with with massive biological data, and is of broad interest to the readership of Cell Systems.
 
 The manuscript has been seen and approved by all listed authors; no permissions or statements of personal communication are required.
 
 The following are suggestions for referees:
 \begin{itemize}
-\item[] \textbf{Peter S. Kim}, Stanford Universityi, \email{kimpeter@stanford.edu} %-- drugs
 \item[] \textbf{Sorin Istrail}, Brown University, \email{sorin\_istrail@brown.edu}  %- theory
 \item[] \textbf{Teresa Przytycka}, NIH, \email{przytyck@ncbi.nlm.nih.gov}  %-theory, molecule and fragment search
+\item[] \textbf{Peter S. Kim}, Stanford Universityi, \email{kimpeter@stanford.edu} %-- drugs
 \item[] \textbf{Nir Ben-Tal}, Tel Aviv University, \email{bental@tauex.tau.ac.il} %- fragment search
 \item[] \textbf{Michal Linial}, Hebrew University, \email{michal.linial@huji.ac.il}
 \item[] \textbf{Martin Vingron}, Max Planck Institute, \email{martin.vingron@molgen.mpg.de}
@@ -61,6 +61,7 @@ Sincerely,
 
 Bonnie Berger  \\
 Professor of Applied Mathematics and Computer Science, MIT  \\
+Faculty Member, Harvard-MIT Health Science and Technology\\
 Associate Member, Broad Institute of MIT and Harvard \\
 Affiliated Faculty, Harvard Medical School
 
