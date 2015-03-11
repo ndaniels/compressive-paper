@@ -408,18 +408,22 @@ accuracy the fraction of BLASTX hits that are also returned by caBLASTX.
 %We note that due to query-side compression, the output order from caBLASTX 
 %typically does not match that of BLASTX.
 
-While Diamond is somewhat faster than caBLASTX, it achieves this speed at the
-expense of accuracy, particularly on raw reads.
-% BAB: how about space?
+
+While Diamond is somewhat faster than caBLASTX, its running time still scales
+linearly with database size.
+In contrast, as an entropy-scaling search, caBLASTX will demonstrate greater
+acceleration as database sizes grow, as demonstrated 
+in~\citep{daniels2013compressive}.
+Furthermore, Diamond achieves its constant acceleration at the expense of 
+accuracy, particularly on raw reads.
 Moreover, caBLASTX actually accelerates standard BLASTX itself, and allows the
 user to pass arbitrary parameters to the underlying BLASTX during fine search.
 Thus, caBLASTX may be suitable to a wider variety of existing analysis 
 pipelines.
-% BAB: Maybe move this entire end of paragraph to Discussion and reverse in the context of entropy-scaling speedup and accuracy.
+
 It may be possible to apply entropy-scaling data
 structures to Diamond itself, achieving even greater speed gains.
 Of course, the accuracy of such an approach would still be limited by Diamond; 
-% BAB: Following clause: main point in Discussion and use Diamond as an example.
 entropy-scaling data structures do not themselves improve accuracy,
 except by virtue of making computationally expensive analyses more tractable.
 
@@ -464,7 +468,7 @@ is no longer a metric on the projected subspace.
 
 \hl{Benchmarking paragraph(s)}
 
-
+Fine search: distance 0.2; coarse 0.4 (Tanimoto distance)
 % BAB: reverse with actual results--positive things first!
 \hl{Did not compare against CDK MCS algorithm because already done by [et al, Thornton] and did not compare against FMCS [Cao, et al] because 100 slower}
 
@@ -652,8 +656,9 @@ Our implementation allows a user to specify whether any atom mismatches or
 bond-type mismatches should be 
 allowed in the maximum common subgraph of two molecules.
 If zero mismatches are allowed, fMCS is just MCS.
-The distance function used currently is based on the overlap coefficient 
-defined as $d(G_1,G_2) = 1 - \frac{ |mcs(G_1,G_2)| }{min(|G_1|,|G_2|)}$. This function, unlike 
+The distance function used is the Tanimoto distance, defined as 
+$d(G_1,G_2) = 1 - \frac{ |mcs(G_1,G_2)| }{|G_1|+|G_2|-|mcs(G_1,G_2)|}$. 
+This function, unlike 
 the graph distance function  ~\cite{bunke1998graph}, is not a metric. However it does account for
 situations where a large molecule contains a smaller molecule which is important in practice.
 
