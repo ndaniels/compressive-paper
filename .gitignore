@@ -38,3 +38,5 @@ main.pdf
 supplement.pdf
 .supplement.lb
 coverletter.pdf
+*.fff
+*.ttt
