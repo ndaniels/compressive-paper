@@ -101,11 +101,11 @@ More precisely, if an $\alpha$ fraction of the triples in $S$ do not satisfy the
 As we will see later, empirically, this loss in sensitivity appears to be low, and can likely be ameliorated by increasing the coarse search radius.
 
 %We will prove in this section that 
-This data structure allows for similarity search queries in time roughly linear (provided the fractal dimension of the database is low) to the metric entropy of the database.
+This data structure allows for similarity search queries in time roughly linear (provided the fractal dimension of the database is low) in the metric entropy of the database.
 Additionally, without increasing the asymptotic time-complexity, this data structure can also be stored in an \textit{information theoretic} entropy-compressed form.
 %Further, as suggested by the last sentence, the metric entropy of the database can be related to the more typical information theoretic notion of entropy (see Supplemental Methods).
 %However, to do this, we will first need to build additional mathematical machinery and make precise our notions of `entropy' and `fractal dimension'.
-o
+
 Note that entropy-scaling data structures are distinct from both succinct data structures and compressed data structures.
 Succinct data structures are ones that use space close to the information-theoretic limit in the worst case while permitting efficient queries; i.e.
 succinct data structures do not depend on the actual entropy of the underlying data set, but have size-dependence on the potential worst-case entropy of the data set \cite{jacobson1988succinct}.

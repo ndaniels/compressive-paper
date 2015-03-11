@@ -119,14 +119,14 @@ Entropy-scaling search of massive biological data}
 %\dedicatory{This paper is dedicated to our advisors.}
 
 %\begin{keyword}
-%Similarity search, approximate matching, entropy scaling algorithms
+%Similarity search, approximate matching, entropy-scaling algorithms
 %\end{keyword}
 
 \begin{abstract}
     \begin{itemize}
         \item While biological data sets are growing dramatically, they tend to exhibit low entropy
         \item We introduce a data structure that allows similarity search in time- and space-complexity asymptotically linear to entropy
-        \item Using this data structure, we demonstrate substantial acceleration of search in the domains of metagenomics, chemogenomics, and protein structure search
+        \item Using this data structure, we demonstrate at least an order of magnitude acceleration of search in the domains of metagenomics, chemogenomics, and protein structure search
     \end{itemize}
 \noindent\unskip\textbf{eTOC Blurb}
 \par\medskip\noindent\unskip\ignorespaces
@@ -145,7 +145,7 @@ This approach allows us to dramatically accelerate analytical tools drawn from g
 smarter analysis tools.
     We introduce an entropy-scaling data structure---which given a low fractal dimension database, scales in both time and space with the entropy of that underlying database---to perform similarity search, a fundamental operation in data science.
     Using these ideas, we present accelerated versions of standard tools for use by practitioners in the three domains of metagenomics, high-throughput drug screening, and protein structure search, none of which have any loss in specificity or significant loss in sensitivity:
-    CaBLASTX, 700x speedup of BLASTX with less than 5\% loss in sensitivity; Ammolite, \hl{??}x speedup of small molecule similarity search with \hl{??} loss in sensitivity; and, esFragBag, 10x speedup of FragBag with less than 0.2\% loss in sensitivity.
+    CaBLASTX, 673x speedup of BLASTX with less than 5\% loss in sensitivity; Ammolite, \hl{??}x speedup of small molecule similarity search with \hl{??} loss in sensitivity; and, esFragBag, 10x speedup of FragBag with less than 0.2\% loss in sensitivity.
 
     Source code: \url{http://gems.csail.mit.edu}
 }
@@ -174,7 +174,7 @@ In the specific context of local alignment in genomics, however, the emerging fi
 Similar results have been demonstrated for local alignment in proteomics, using much the same strategies \cite{daniels2013compressive}.
 Empirically, this compressive acceleration appears to scale almost linearly in the entropy of the database, often resulting in orders of magnitude better performance.
 
-In this paper, we substantially generalize and formalize this approach by introducing the first mathematically rigorous class of entropy scaling data structures for similarity search: data structures that \textbf{provably} scale almost linearly in both time and space with the entropy of the database.
+In this paper, we substantially generalize and formalize this approach by introducing the first mathematically rigorous class of entropy-scaling data structures for similarity search: data structures that \textbf{provably} scale almost linearly in both time and space with the entropy of the database.
 Specifically, if similarity is defined by a metric-like distance function (e.g., edit or Hamming distance) and the database exhibits both low `metric entropy' and `fractal dimension' (See Supplemental Methods: Theory), this data structure performs much better than na\"ive and even optimized methods.
 This data structure allows for minimal (or even zero) loss in recall, coupled
 with zero loss in specificity.
@@ -412,7 +412,7 @@ Moreover, caBLASTX actually accelerates standard BLASTX itself, and allows the
 user to pass arbitrary parameters to the underlying BLASTX during fine search.
 Thus, caBLASTX may be suitable to a wider variety of existing analysis 
 pipelines.
-% BAB: Maybe move this entire end of paragraph to Discussion and reverse in the context of entropy scaling speedup and accuracy.
+% BAB: Maybe move this entire end of paragraph to Discussion and reverse in the context of entropy-scaling speedup and accuracy.
 It may be possible to apply entropy-scaling data
 structures to Diamond itself, achieving even greater speed gains.
 Of course, the accuracy of such an approach would still be limited by Diamond; 
@@ -441,7 +441,7 @@ We introduce Ammolite, a framework for clustering molecular databases that uses 
 popular SDF molecular structure format, such as found in PubChem, and for quickly searching for 
 similar molecular structures in compressed space.
 % BAB: reverse last two sentences if we get better speedup.
-Ammolite demonstrates that entropy scaling methods can be extended to data types that are not inherently sequence based.
+Ammolite demonstrates that entropy-scaling methods can be extended to data types that are not inherently sequence based.
 Ammolite is a practical 
 tool that provides ~4x speed-up with greater than 95\% accuracy compared to the popular SMSD~\cite{rahman2009small}.
 
@@ -481,7 +481,7 @@ One approach to finding structural neighbors is to attempt to align the query pr
 However, performing a full alignment against every entry in the PDB is prohibitively expensive, especially as the database grows.
 Alternately, the approach we use here is the one introduced by FragBag~\cite{budowski2010fragbag}, which describes each protein as a
 `bag of fragments,' where each fragment is a small structural motif.
-By directly applying our entropy scaling data structure without any additional augmentation, esFragBag (entropy scaling FragBag) is able to achieve a 2-30x speedup of the highly-optimized FragBag with less than 0.2\% loss in sensitivity and no loss in specificity.
+By directly applying our entropy-scaling data structure without any additional augmentation, esFragBag (entropy-scaling FragBag) is able to achieve a 2-30x speedup of the highly-optimized FragBag with less than 0.2\% loss in sensitivity and no loss in specificity.
 
 For this last example, we intentionally approach the application of entropy-scaling data structures to FragBag in a blind manner,
 without using any domain-specific knowledge.
@@ -505,7 +505,7 @@ Changing the maximum cluster radius effectively makes more proteins peripheral p
 
 Naturally, as the search radius expands, it quickly becomes necessary to compare against nearly the entire database, destroying any acceleration.
 For the cosine space in particular, note that the maximum distance between any two points is $1$, so once the coarse search radius of $r+r_c >= 1.0$, there cannot ever be any acceleration as the fine search encompasses the entire database.
-Similarly, once the coarse search encompasses all (or nearly all) the clusters in Euclidean space, the acceleration diminishes to 1x, and the overhead costs make the entropy scaling data structure perform worse than a na\"ive search.
+Similarly, once the coarse search encompasses all (or nearly all) the clusters in Euclidean space, the acceleration diminishes to 1x, and the overhead costs make the entropy-scaling data structure perform worse than a na\"ive search.
 However, as we are most interested in proteins that are very similar to the query, the low-radius behavior is of primary interest.
 In the low-radius regime, esFragBag demonstrates varying though substantial acceleration (2-30x, averaging $>$10x for both distance functions for the proteins chosen) over FragBag.
 
@@ -595,7 +595,7 @@ accuracy would still be limited to that of Diamond.
 In the main paper, we have not focused on the space-saving compression that is
 possible with entropy-scaling data structures, but rather on the run-time
 acceleration of approximate search.
-However, as discussed in the Supplemental Theory, entropy scaling data structures
+However, as discussed in the Supplemental Theory, entropy-scaling data structures
 allow for compressive algorithms under certain additional constraints.
 This compression is particularly applicable in the case of metagenomic analysis, where the collection of 
 read data presents a major problem for storage and transfer.
@@ -613,20 +613,19 @@ algorithms for biology.
 
 \section{Methods}
 \subsection{CaBLASTX}
-
-The clustering framework extends the approach of caBLASTP~\cite{daniels2013compressive}.
-We augmented the entropy scaling data structure by using
+Our clustering approach relies on sequence similarity.
+We augmented the entropy-scaling data structure by using
 different distance functions for clustering and search.
 For clustering, we rely on sequence identity, while for search, we use the
 E-value measure that is standard for BLAST.
 Furthermore, during clustering (compression), we apply a preprocessing step that
-identifies subsequences to be treated as distinct points in the database.
-This is because protein sequences commonly contain motifs found in other sequences,
+identifies subsequences to be treated as distinct points in the database;
+protein sequences commonly contain motifs found in other sequences,
 so the natural lexical unit is the motif.
-Also during preprocessing, we apply a reversible alphabet reduction to the
-protein sequences, which further increases clustering effectiveness (see Supplemental Methods).
+We apply a reversible alphabet reduction to the
+protein sequences, which projects them into a subspace (Supplemental Methods).
 
-As further discussed in Supplemental Methods, when applied to high-coverage next-generation sequencing queries, caBLASTX can also perform clustering on the reads.
+When applied to high-coverage next-generation sequencing queries, caBLASTX can also perform clustering on the reads (Supplemental Methods).
 In this instance, coarse search is performed by matching each representative query with a set of representative database entries.
 Fine search then matches the original queries within each cluster with the candidate database entries resulting from the coarse search.
 
