@@ -5,6 +5,11 @@
 
 \setcounter{secnumdepth}{0}
 
+\usepackage{titlesec}
+\titleformat*{\section}{\Large\bfseries}
+\titleformat*{\subsection}{\large\bfseries}
+\titleformat*{\subsubsection}{\normalsize\itshape}
+
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
@@ -42,7 +47,7 @@
 \theoremstyle{remark}
 \newtheorem{remark}[theorem]{Remark}
 
-\renewcommand{\refname}{\normalfont\selectfont\normalsize \textbf{Supplemental References}} 
+\renewcommand{\refname}{\normalfont\selectfont\Large \textbf{Supplemental References}} 
 
 %\numberwithin{equation}
 
@@ -68,37 +73,6 @@
 \setcounter{figure}{0}
 \renewcommand\thetable{S\arabic{table}}
 \setcounter{table}{0}
-
-\section{Supplemental Figures}
-\begin{figure}[hbp]
-    \centering
-    \begin{subfigure}[b]{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{assets/computeVsData.png}
-        \caption{}
-    \end{subfigure}%
-    \begin{subfigure}[b]{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{assets/storageVsData.png}
-        \caption{}
-    \end{subfigure}
-    \caption{Genomic data available has grown at a faster exponential rate than computer processing power and disk storage.
-    These plots represent, on a log scale, the daily growth in sequence data 
-    from GenBank along with (a) the combined computing power (in TeraFLOPs) of 
-    the Top 500 Supercomputer list, and (b) the largest commercially-available 
-    hard disk drives.}
-    \label{fig:expdata}
-\end{figure}
-
-\begin{figure}[hbp]
-    \centering
-    \includegraphics[width=1\textwidth]{assets/ammolite-simplification.pdf}
-    \caption{ Ammolite's preprocessing during the clustering phase. Ammolite 
-    removes nodes and edges that do not participate in simple cycles, and 
-    treats all edges as simple, unlabeled edges. In this example, both caffeine 
-    and adenine become a purine-like graph structure. Note that the resulting 
-    graph has no implicit hydrogens.
-    }
-    \label{fig:ammolite}
-\end{figure}
 
 \section{Supplemental Methods}
 
@@ -535,5 +509,37 @@ all $\rho$-nearest neighbor search query found in FragBag.
 \bibliographystyle{model5-names-noitalic}
 %\bibliographystyle{plain}
 \bibliography{main}
+
+\section{Supplemental Figures}
+\begin{figure}[hbp]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/computeVsData.png}
+        \caption{}
+    \end{subfigure}%
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/storageVsData.png}
+        \caption{}
+    \end{subfigure}
+    \caption{Genomic data available has grown at a faster exponential rate than computer processing power and disk storage.
+    These plots represent, on a log scale, the daily growth in sequence data 
+    from GenBank along with (a) the combined computing power (in TeraFLOPs) of 
+    the Top 500 Supercomputer list, and (b) the largest commercially-available 
+    hard disk drives.}
+    \label{fig:expdata}
+\end{figure}
+
+\begin{figure}[hbp]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/ammolite-simplification.pdf}
+    \caption{ Ammolite's preprocessing during the clustering phase. Ammolite 
+    removes nodes and edges that do not participate in simple cycles, and 
+    treats all edges as simple, unlabeled edges. In this example, both caffeine 
+    and adenine become a purine-like graph structure. Note that the resulting 
+    graph has no implicit hydrogens.
+    }
+    \label{fig:ammolite}
+\end{figure}
+
 
 \end{document}
