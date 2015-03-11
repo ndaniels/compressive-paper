@@ -234,7 +234,7 @@ However, the local low-dimensionality can be exploited by looking on the right s
 We cover the tree with spheres of radius $r_c$ on the order of the branch widths; these spheres determine our clusters, and the number of them is the metric entropy of the tree \cite{tao2008product}.
 Because all the points within a sphere are close to each other, they are highly redundant and can be encoded in terms of one another, saving space in our representation.
 
-By the triangle inequality, in order to search for all points within distance $r$ of a query we need only look in nearby spheres with centers within a distance $r+r_c$ of the query (Figure \ref{fig:dataStructure}d).
+By the triangle inequality, in order to search for all points within distance $r$ of a query we need only look in nearby spheres with centers (i.e. representatives) within a distance $r+r_c$ of the query (Figure \ref{fig:dataStructure}d).
 %ref Figure 1?.
 However, because the spheres have radius comparable to branch width, the tree is locally 1-dimensional on the coarse scale---we will call this the fractal dimension $d=1$ of the tree at the scale $r_c$ \cite{falconer1990fractal}, where $r_c$ is essentially our ruler size.
 Thus, increasing the search radius for coarse search only linearly increases the number of points that need to be searched in a fine search.
