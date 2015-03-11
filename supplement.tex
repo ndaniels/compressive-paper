@@ -25,7 +25,7 @@
 
 \usepackage{diagbox}
 
-%\usepackage[nomarkers,tablesfirst,]{endfloat}
+\usepackage[nomarkers,tablesfirst,]{endfloat}
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -73,6 +73,37 @@
 \setcounter{figure}{0}
 \renewcommand\thetable{S\arabic{table}}
 \setcounter{table}{0}
+
+%\section{Supplemental Figures}
+\begin{figure}[hbp]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/computeVsData.png}
+        \caption{}
+    \end{subfigure}%
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{assets/storageVsData.png}
+        \caption{}
+    \end{subfigure}
+    \caption{Genomic data available has grown at a faster exponential rate than computer processing power and disk storage.
+    These plots represent, on a log scale, the daily growth in sequence data 
+    from GenBank along with (a) the combined computing power (in TeraFLOPs) of 
+    the Top 500 Supercomputer list, and (b) the largest commercially-available 
+    hard disk drives.}
+    \label{fig:expdata}
+\end{figure}
+
+\begin{figure}[hbp]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/ammolite-simplification.pdf}
+    \caption{ Ammolite's preprocessing during the clustering phase. Ammolite 
+    removes nodes and edges that do not participate in simple cycles, and 
+    treats all edges as simple, unlabeled edges. In this example, both caffeine 
+    and adenine become a purine-like graph structure. Note that the resulting 
+    graph has no implicit hydrogens.
+    }
+    \label{fig:ammolite}
+\end{figure}
 
 \section{Supplemental Methods}
 
@@ -377,7 +408,7 @@ Thus, the minimum alignment length required for a match, and the maximum
 length unaligned fragment to append to a match, require different values based
 on the read length.
 An additional complication is that insertions and deletions from one read to
-another will change the reading frame, potentially resulting in significantly
+another will change the reading frame, potentially resulting in 
 different amino acid sequences.
 For this reason, query clustering requires long, \emph{ungapped} windows of high
 sequence identity.
@@ -389,7 +420,7 @@ In the future, we may consider first translating the reads, and performing
 clustering in the amino acid space (after alphabet reduction).
 This would have the advantage of allowing reads with insertions or deletions
 to cluster together, without causing reading-frame mismatches.
-However, gapped alignment is significantly slower than ungapped alignment,
+However, gapped alignment is much slower than ungapped alignment,
 so the resulting cost of query clustering might negate speed gains.
 
 We note that unlike the compression of the database, which can be amortized 
@@ -505,37 +536,6 @@ source code for the benchmarking routine on Github.
 This allowed us to benchmark just the search time, excluding the time to load the database from disk.
 Note that the prototype implementation of esFragBag available only supports the 
 all $\rho$-nearest neighbor search query found in FragBag.
-
-\section{Supplemental Figures}
-\begin{figure}[hbp]
-    \centering
-    \begin{subfigure}[b]{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{assets/computeVsData.png}
-        \caption{}
-    \end{subfigure}%
-    \begin{subfigure}[b]{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{assets/storageVsData.png}
-        \caption{}
-    \end{subfigure}
-    \caption{Genomic data available has grown at a faster exponential rate than computer processing power and disk storage.
-    These plots represent, on a log scale, the daily growth in sequence data 
-    from GenBank along with (a) the combined computing power (in TeraFLOPs) of 
-    the Top 500 Supercomputer list, and (b) the largest commercially-available 
-    hard disk drives.}
-    \label{fig:expdata}
-\end{figure}
-
-\begin{figure}[hbp]
-    \centering
-    \includegraphics[width=1\textwidth]{assets/ammolite-simplification.pdf}
-    \caption{ Ammolite's preprocessing during the clustering phase. Ammolite 
-    removes nodes and edges that do not participate in simple cycles, and 
-    treats all edges as simple, unlabeled edges. In this example, both caffeine 
-    and adenine become a purine-like graph structure. Note that the resulting 
-    graph has no implicit hydrogens.
-    }
-    \label{fig:ammolite}
-\end{figure}
 
 \bibliographystyle{model5-names-noitalic}
 %\bibliographystyle{plain}
