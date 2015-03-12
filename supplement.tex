@@ -467,6 +467,9 @@ search these sequences against the compressed protein database.
 This coarse search uses an E-value threshold that is relaxed from the one a user
 specifies for the overall search, though the user can specify this coarse 
 E-value threshold.
+We used a coarse E-value of 1000, along with the BLASTN arguments
+\texttt{-task blastn-short -penalty -1}, in order to account for the short
+query sequences.
 Coarse search identifies \emph{possible} hits for each query representative from
 among the representative sequences in the database.
 Of course, due to the reduced alphabet, some of these hits may turn out to be
