@@ -504,8 +504,13 @@ Relatedly, finding structural neighbors can also give insight into the evolution
 
 One approach to finding structural neighbors is to attempt to align the query protein to all the entries in the Protein Data Bank (PDB) using a structural aligner (e.g. STRUCTAL \cite{subbiah1993structural}, ICE \cite{shindyalov1998protein}, or Matt \cite{menke2008matt}).
 However, performing a full alignment against every entry in the PDB is prohibitively expensive, especially as the database grows.
-Alternately, the approach we use here is the one introduced by FragBag~\cite{budowski2010fragbag}, which describes each protein as a
-`bag of fragments,' where each fragment is a small structural motif.
+Alternately, \citep{budowski2010fragbag} introduced the tool FragBag, which avoids performing full alignments but rather describes each protein as a
+`bag of fragments,' where each fragment is a small structural motif,
+FragBag has been reported as comparable to structural aligners such as STRUCTAL or ICE,
+and its bag of fragments approach
+allows it to to comparisons much faster than standard aligners.
+Importantly for us, the bag of fragments is just a frequency vector, making
+FragBag very amenable to acceleration through entropy-scaling.
 By directly applying our entropy-scaling data structure without any additional augmentation, esFragBag (entropy-scaling FragBag) is able to achieve a 2-30x speedup of the highly-optimized FragBag with less than 0.2\% loss in sensitivity and no loss in specificity.
 
 For this last example, we intentionally approach the application of entropy-scaling data structures to FragBag in a blind manner,
@@ -661,7 +666,7 @@ In this instance, coarse search is performed by matching each representative que
 Fine search then matches the original queries within each cluster with the candidate database entries resulting from the coarse search.
 
 \subsection{Ammolite}
-Our clustering approach relies on structural similarity.
+Ammolite's clustering approach relies on structural similarity.
 In order to more effectively group molecules based on structural motifs,
 each molecule is \emph{simplified} by removing nodes and edges that do not
 participate in simple cycles.
@@ -711,13 +716,7 @@ bond and atom mismatches and similarity-score threshold.
 \subsection{esFragBag}
 In FragBag, the bag of fragments is essentially
 a term frequency vector representing the number of occurrences of each structural motif within the protein.
-While FragBag does not generate structural alignments the way standard aligners do, it provides an excellent
-filter for computing proteins that are likely to have close alignments; those alignments could then be computed
-with a standard aligner.
-FragBag's accuracy has been reported as comparable to structural aligners such as
- STRUCTAL \cite{subbiah1993structural} or ICE \cite{shindyalov1998protein}.
-FragBag is already quite fast, much faster than these standard aligners, but also importantly for us
-FragBag turns out to be very amenable to acceleration using an entropy-scaling data structure because much of the computation is spent in doing a similarity search on a frequency vector.
+FragBag turns out to be very amenable to acceleration using an entropy-scaling data structure because much of the computation is spent in doing a similarity search on that frequency vector.
 
 For the cluster generation, we trivially used a na\"ive randomized greedy 2-pass approach.
 First, all proteins in the Protein Data Bank were randomly ordered.
