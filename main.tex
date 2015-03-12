@@ -479,6 +479,9 @@ and by reducing the time required for each MCS operation, which scales with the 
 It is worth noting that this pre-processing of molecular graphs can cause the 
 triangle inequality to be violated; while the distance function is a metric, the
 clustering does not respect that metric.
+Ammolite can be readily plugged in to existing analysis pipelines for 
+high-throughput drug screening.
+
 
 \hl{Benchmarking paragraph(s)}
 
@@ -636,8 +639,10 @@ structures to Diamond itself, achieving even greater speed gains, but
 accuracy would then be limited to that of Diamond,
 as entropy-scaling data structures do not themselves 
 improve accuracy.
-%, except by virtue of making computationally expensive analyses 
-%more tractable.
+All of our software is open-source, and not only can the tools we are 
+releasing be readily plugged into existing pipelines, but the code and 
+underlying methods can be easily incorporated into the original 
+software that we are accelerating.
 
 Entropy-scaling data structures for massive biological data have the great
 advantage of becoming proportionately faster and space-efficient with the

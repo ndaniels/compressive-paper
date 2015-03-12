@@ -145,7 +145,7 @@ Thus, a fine search over the set $F$ will return all items within radius $r$ of 
 
 Note that we require the metricity requirement only for the Triangle Inequality.
 It turns out that many interesting distance functions are not metrics, but still almost satisfy the Triangle Inequality, which is nearly sufficient.
-More precisely, if an fraction $\alpha$ of the triples in $S$ do not satisfy the Triangle Inequality, then in expectation, we will have sensitivity $1 - \alpha$.
+More precisely, if a fraction $\alpha$ of the triples in $S$ do not satisfy the Triangle Inequality, then in expectation, we will have sensitivity $1 - \alpha$.
 As shown in the results, empirically, this loss in sensitivity appears to be low and can likely be ameliorated by increasing the coarse search radius.
 
 %We will prove in this section that 
@@ -502,7 +502,7 @@ RapSearch2~\cite{zhao2012rapsearch2} version 2.22 and the November 29, 2014
 version of Diamond~\cite{buchfink2014fast}.
 All tests were performed on a 12-core Intel Xeon X5690 running at 3.47GHz with
 88GB RAM and hyperthreading; 24 threads were allowed for all programs.
-Both Diamond was run with the \texttt{--sensitive} option.
+Diamond was run with the \texttt{--sensitive} option.
 In all cases, an E-value threshold of \texttt{1e-7} was used.
 
 For the raw-read dataset, we filtered out reads starting or ending with 10 or 
