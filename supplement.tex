@@ -19,6 +19,10 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{hyperref}
+% Turn off hyperlinking in list of tables and figures
+\makeatletter
+\let\Hy@linktoc\Hy@linktoc@none
+\makeatother
 
 \usepackage{color}
 \usepackage{soul}
@@ -26,6 +30,18 @@
 \usepackage{diagbox}
 
 \usepackage[nomarkers,tablesfirst,]{endfloat}
+%\captionsetup[figure]{labelsep=none,textformat=empty}
+\usepackage{floatpag}
+\floatpagestyle{empty}
+% Rename List of Figures and Tables
+\renewcommand\listfigurename{Supplemental Figures}
+\renewcommand\listtablename{Table Captions}
+% Remove page numbers from List of Figures
+\usepackage{tocloft}
+\cftpagenumbersoff{figure}
+\cftpagenumbersoff{table}
+% Make List of Figures have better spacing
+\setlength\cftparskip{1em}
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -77,14 +93,15 @@
 %\section{Supplemental Figures}
 \begin{figure}[hbp]
     \centering
-    \begin{subfigure}[b]{0.49\textwidth}
+    \centerline{
+    \begin{subfigure}[b]{4in}
         \includegraphics[width=1\textwidth]{assets/computeVsData.png}
         \caption{}
     \end{subfigure}%
-    \begin{subfigure}[b]{0.49\textwidth}
+    \begin{subfigure}[b]{4in}
         \includegraphics[width=1\textwidth]{assets/storageVsData.png}
         \caption{}
-    \end{subfigure}
+    \end{subfigure}}
     \caption{Genomic data available has grown at a faster exponential rate than computer processing power and disk storage.
     These plots represent, on a log scale, the daily growth in sequence data 
     from GenBank along with (a) the combined computing power (in TeraFLOPs) of 
