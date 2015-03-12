@@ -529,7 +529,7 @@ Proteins that are near the core (and thus similar to many other proteins) show v
 Changing the maximum cluster radius effectively makes more proteins peripheral proteins, but at the cost of overall acceleration.
 
 Naturally, as the search radius expands, it quickly becomes necessary to compare against nearly the entire database, destroying any acceleration.
-For the cosine space in particular, note that the maximum distance between any two points is $1$, so once the coarse search radius of $r+r_c >= 1.0$, there cannot ever be any acceleration as the fine search encompasses the entire database.
+For the cosine space in particular, note that the maximum distance between any two points is $1$, so once the coarse search radius of $r+r_c \ge 1.0$, there cannot ever be any acceleration as the fine search encompasses the entire database.
 Similarly, once the coarse search encompasses all (or nearly all) the clusters in Euclidean space, the acceleration diminishes to 1x, and the overhead costs make the entropy-scaling data structure perform worse than a na\"ive search.
 However, as we are most interested in proteins that are very similar to the query, the low-radius behavior is of primary interest.
 In the low-radius regime, esFragBag demonstrates varying though substantial acceleration (2-30x, averaging $>$10x for both distance functions for the proteins chosen) over FragBag.
@@ -646,15 +646,13 @@ algorithms for biology.
 
 \section{Methods}
 \subsection{CaBLASTX}
-Our clustering approach relies on sequence similarity.
+CaBLASTX's clustering approach relies on sequence similarity.
 We augmented the entropy-scaling data structure by using
 different distance functions for clustering and search.
 For clustering, we rely on sequence identity, while for search, we use the
 E-value measure that is standard for BLAST.
 Furthermore, during clustering (compression), we apply a preprocessing step that
-identifies subsequences to be treated as distinct points in the database;
-protein sequences commonly contain motifs found in other sequences,
-so the natural lexical unit is the motif.
+identifies subsequences to be treated as distinct points in the database.
 We apply a reversible alphabet reduction to the
 protein sequences, which projects them into a subspace (Supplemental Methods).
 
