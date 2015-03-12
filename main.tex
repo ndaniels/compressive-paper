@@ -667,33 +667,30 @@ Fine search then matches the original queries within each cluster with the candi
 
 \subsection{Ammolite}
 Ammolite's clustering approach relies on structural similarity.
-In order to more effectively group molecules based on structural motifs,
-each molecule is \emph{simplified} by removing nodes and edges that do not
+We augmented the entropy-scaling data structure by using a clustering scheme based on molecular structural motifs instead of a distance function.
+Each molecule is `simplified' by removing nodes and edges that do not
 participate in simple cycles.
 Clusters are formed of molecules that are isomorphic after this simplification
 step.
 Each cluster can then be represented by a single molecular structure, along 
-with pointers to \emph{difference sets} between that structure and each of the 
-full molecules it represents.
-The difference set contains the nodes and edges that were removed in the 
-simplification step.
-
-We implemented a variant of a maximum common subgraph (MCS) algorithm, known as 
-\emph{flexible} maximum
-common subgraph (fMCS), as detailed by ~\citet{cao2008maximum}.
-Our implementation allows a user to specify whether any atom mismatches or 
-bond-type mismatches should be 
-allowed in the maximum common subgraph of two molecules.
-If zero mismatches are allowed, fMCS is just MCS.
-The distance function used is the Tanimoto distance, defined as 
-$d(G_1,G_2) = 1 - \frac{ |mcs(G_1,G_2)| }{|G_1|+|G_2|-|mcs(G_1,G_2)|}$. 
-This function, unlike 
-the graph distance function  ~\cite{bunke1998graph}, is not a metric. However it does account for
-situations where a large molecule contains a smaller molecule which is important in practice.
+with pointers to `difference sets'  between that structure and each of the 
+full molecules in the cluster it represents.
+%The difference set contains the nodes and edges that were removed in the 
+%simplification step.
+For both coarse and fine search, we use the Tanimoto distance metric, defined as
+\[d(G_1,G_2) = 1 - \frac{ |mcs(G_1,G_2)| }{|G_1|+|G_2|-|mcs(G_1,G_2)|},\]
+where $mcs$ refers to the maximum common subgraph of two chemical graphs. 
+We implemented a variant known as 
+flexible maximum common subgraph (fMCS), which unlike standard MCS allows user-defined parameters for atom and bond-type mismatches \cite{cao2008maximum}.
+% BAB/YWY: Maybe move next sentence to discussion?
+%Our implementation allows a user to specify whether any atom mismatches or 
+%bond-type mismatches should be 
+%allowed in the maximum common subgraph of two molecules.
+%If zero mismatches are allowed, fMCS is just MCS.
 
 %our compression-accelerated search approach 
 %relies on a two-stage process.
-A coarse search is performed in compressed space, by searching 
+The coarse search is performed in compressed space, by searching 
 the coarse database with the goal of identifying possible hits.
 The query molecule is simplified in exactly the same manner as 
 the molecular database during clustering, and this transformed query graph is 
@@ -706,11 +703,10 @@ the transformed query molecule was within the similarity score threshold--are
 then reconstructed, by following
 pointers to the removed atom and bond information, and recreating the 
 original molecules.
-
-Next, the \emph{fine search} is performed against these decompressed possible 
+Finally, the fine search is performed against these decompressed possible 
 hits.
-Fine search is performed using MCS or fMCS, with user-defined parameters for 
-bond and atom mismatches and similarity-score threshold.
+%Fine search is performed using MCS or fMCS, with user-defined parameters for 
+%bond and atom mismatches and similarity-score threshold.
 
 
 \subsection{esFragBag}
