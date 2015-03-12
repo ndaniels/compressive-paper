@@ -128,28 +128,28 @@
 \subsubsection{Time-complexity}
 We introduced the definition of the entropy-scaling similarity search data structure in Figure 1.
 For ease of analysis, we will work in a high-dimensional metric space and consider the database as a set $D$ of $n$ unique points in that metric space.
+Define $B_S(q,r) = \{ p \in S : ||q-p||<r \}$. The similarity search problem is thus to compute $B_D(q,r)$ for a query $q$ and radius $r$.
 Note however that the metricity requirement is needed only for a 100\% sensitivity guarantee; other distance functions can be used, but result in some loss in sensitivity.
 However, regardless of the distance function chosen, there cannot be a loss of
 specificity; false positives will never be introduced because the fine search is just the original search function on a smaller subset of the database.
-Define $B_S(q,r) = \{ p \in S : ||q-p||<r \}$. The similarity search problem is thus to compute $B_D(q,r)$ for a query $q$ and radius $r$.
 
-The data structure first clusters the points in the set by assigning them to their nearest `cluster center'.
 A set $C$ of $k$ cluster centers are chosen such that no cluster has radius greater than a user-specified parameter $r_c$ and no two cluster centers are within distance $r_c$ of one another.
+The data structure then clusters the points in the set by assigning them to their nearest cluster center.
 Overloading notation a bit, we will identify each cluster with its center, so $C$ is also the set of clusters.
 %We will additionally require that each cluster contain at least $\frac{n}{k \alpha}$ items, for some constant $\alpha \ge 1$ (i.e. that the clusters are balanced).
-For a given similarity search query of all items within distance $r$ of a query $q$, this data structure breaks the query into coarse and fine search stages.
+For a given similarity search query for all items within distance $r$ of a query $q$, this data structure breaks the query into coarse and fine search stages.
 The coarse search is over the list of cluster centers, returning $B_C(q,r + r_c)$.
 Let \[\displaystyle F = \bigcup_{c \in B_C(q,r+r_c)} c , \] the union of all the returned clusters.
-Then by the triangle inequality, $B_F(q,r) = B_D(q,r)$.
-Thus, a fine search over the set $F$ can return all items within radius $r$ of $q$.
+By the Triangle Inequality, $B_D(q,r) \subseteq F$, which combined with $F \subseteq D$ implies that $B_F(q,r) = B_D(q,r)$.
+Thus, a fine search over the set $F$ will return all items within radius $r$ of $q$.
 
 Note that we require the metricity requirement only for the Triangle Inequality.
 It turns out that many interesting distance functions are not metrics, but still almost satisfy the Triangle Inequality, which is nearly sufficient.
-More precisely, if an $\alpha$ fraction of the triples in $S$ do not satisfy the Triangle Inequality, then in expectation, we will have sensitivity $1 - \alpha$.
-As we will see later, empirically, this loss in sensitivity appears to be low, and can likely be ameliorated by increasing the coarse search radius.
+More precisely, if an fraction $\alpha$ of the triples in $S$ do not satisfy the Triangle Inequality, then in expectation, we will have sensitivity $1 - \alpha$.
+As shown in the results, empirically, this loss in sensitivity appears to be low and can likely be ameliorated by increasing the coarse search radius.
 
 %We will prove in this section that 
-This data structure allows for similarity search queries in time roughly linear (provided the fractal dimension of the database is low) in the metric entropy of the database.
+Provided the fractal dimension of the database is low, this data structure allows for similarity search queries in time roughly linear in the metric entropy of the database.
 Additionally, without increasing the asymptotic time-complexity, this data structure can also be stored in an \textit{information theoretic} entropy-compressed form.
 %Further, as suggested by the last sentence, the metric entropy of the database can be related to the more typical information theoretic notion of entropy (see Supplemental Methods).
 %However, to do this, we will first need to build additional mathematical machinery and make precise our notions of `entropy' and `fractal dimension'.
@@ -169,7 +169,7 @@ We first define the concept of metric entropy and entropy dimension in the usual
 \begin{definition}[\cite{tao2008product} Definition 6.1] 
     Let $X$ be a metric space, let $D$ be a subset of $X$, and let $\rho>0$ be a radius.
     \begin{itemize}
-        \item The \textit{metric entropy} $N_\rho^(D)$ is the fewest number of points $x_1, \ldots, x_n \in D$ such that the balls $B(x_1,\rho), \ldots B(x_n,\rho)$ cover $D$.
+        \item The \textit{metric entropy} $N_\rho(D)$ is the fewest number of points $x_1, \ldots, x_n \in D$ such that the balls $B(x_1,\rho), \ldots B(x_n,\rho)$ cover $D$.
     \end{itemize}
 \end{definition}
 \begin{definition}[\cite{falconer1990fractal}]
@@ -178,7 +178,7 @@ We first define the concept of metric entropy and entropy dimension in the usual
     \dim_{\text{Hausdorff}}(D) := \lim_{\rho \to 0} \frac{\log N_\rho(D)}{\log 1/\rho}
 \]
 \end{definition}
-Unfortunately, as $D$ is a finite, discrete, set, the given definision always gives $\dim_{Hausdorff}(D) = 0$.
+Unfortunately, as $D$ is a finite, discrete, set, the given definision always gives $\dim_{\text{Hausdorff}}(D) = 0$.
 However, we are only interested in scaling behaviors around large radii, so instead we use:
 \begin{definition}
     The fractal dimension $d$ of a set $D$ at a scale $[\rho_1,\rho_2]$ is given by
@@ -188,12 +188,12 @@ However, we are only interested in scaling behaviors around large radii, so inst
 \end{definition}
 
 Recall that $k$ entries are selected as cluster centers for partitioning the database to result in clusters with maximum radius $r_c$.
-From the definition above, when setting $\rho = r_c$, it is trivial to verify $ N_{r_c}^{int}(D) \le k \le N_{r_c}^{ent} (D)$.
-The upper bound is guaranteed by our requirement that the cluster centers not be within distance $r_c$ and the lower bound follows from the fact that our clustering is designed to cover the database.
+From the definition above, when setting $\rho = r_c$, it is trivial to verify $ k \le N_{r_c} (D)$.
+This upper bound is guaranteed by our requirement that the cluster centers not be within distance $r_c$.
 
 %We will set $r_c = \theta(\frac{1}{k})$.
 Given any query $q$, the coarse search over the cluster centers always requires $k$ comparisons.
-Additionally, the fine search is over the set $F$, the union of clusters with centers within distance $r+r_c$ from $q$.
+Additionally, the fine search is over the set $F$, defined to be the union of clusters with centers within distance $r+r_c$ from $q$.
 As the time-complexity of similarity search is just the total of the coarse and fine searches, this implies that the total search time is $O(k + |F|)$.
 
 By the triangle inequality, $F \subset B_D(q,r+2r_c)$,
@@ -208,15 +208,13 @@ Thus, total search time is
 \[
     O\left(k + \left|B_D(q,r)\right|\left(\frac{r+2r_c}{r}\right)^d \right).
 \]
-However, note that $k$ is linear in metric entropy and $|B_D(q,r)|$ is the output size, so similarity search can be performed in time linear to metric entropy and a polynomial blow-up of output size.
+However, note that $k$ is linear in metric entropy and $|B_D(q,r)|$ is the output size, so similarity search can be performed in time linear to metric entropy and a polynomial factor of output size.
 Provided that the fractal dimension $d$ is small and $k$ is large, the search time will be dominated by the metric entropy component, which turns out to be the regime of greatest interest for us.
-
 We have thus proven bounds for the time-complexity of similarity search.
-Next, we relate the space complexity of our data structure to information-theoretic entropy.
 
 \subsubsection{Space-complexity}
 Here we relate the space-complexity of our entropy-scaling similarity search data structure to information-theoretic entropy.
-Naturally, information-theoretic entropy is a measure of the uncertainty of a distribution or random variable, and is not well-defined for a finite database.
+Traditionally, information-theoretic entropy is a measure of the uncertainty of a distribution or random variable and is not well-defined for a finite database.
 However, the notion of information-theoretic entropy is often used in data compression as a shorthand for the number of bits needed to encode the database, or a measure of the randomness of that database.
 We use entropy in the latter sense; precisely, we define the entropy of a database as the number of bits needed to encode that database, a standard practice in the field.
 Thus, we consider entropy-compressed forms of the original database, such as that obtained by Prediction by Partial Matching (PPM), Lempel-Ziv compression (e.g. Gzip), or a Burrows-Wheeler Transform (as in Bzip2), and use their size as an estimate of the entropy $S_{orig}$ of the database.
@@ -224,27 +222,27 @@ Thus, we consider entropy-compressed forms of the original database, such as tha
 For all commonly used compression techniques, decompression time is linear in the size of the uncompressed data.
 Obviously, even with linear decompression, decompressing the entire database for each similarity search would squander the entropy-scaling benefits of our
 approach.
-However, note that the fine search detailed above only needs access to a subset of clusters, and, furthermore, needs full access to that set of clusters.
+However, note that the fine search detailed above only needs access to a subset of clusters and furthermore needs full access to that set of clusters.
 It is therefore always asymptotically `free' to decompress an entire cluster at once, if any member of that cluster needs to accessed.
 Thus, one ready solution is to simply store entropy-compressed forms of each cluster separately.
 
 Compressing each cluster separately preserves runtime bounds, but makes it difficult to compare the compressed clustered database size to the original compressed database size.
 This results from the possibility that redundancy across clusters that would originally have been exploited by the compressor can no longer be exploited 
 once the database is partitioned.
-Intuitively, for any fixed-window or block compressor, grouping together similar items into clusters, should increase the performance of the compressor, but it is unclear \textit{a priori} if that balances out the loss of redundancy across clusters.
+Intuitively, for any fixed-window or block compressor, grouping together similar items into clusters should increase the performance of the compressor, but it is unclear \textit{a priori} if that balances out the loss of redundancy across clusters.
 
 A somewhat more sophisticated solution is to reorder the entries of the database by cluster, compress the entire database, and then store indexes into the starting offset of each cluster.
 For popular tools such as Gzip or Bzip2, this is possible with constant overhead $\kappa$ per index.
 Because the entire database is still being compressed, redundancy across clusters can be exploited to reduce compressed size, while still taking advantage of similar items being grouped together.
 Thus, in expectation over uniformly-randomly chosen orderings of the database entries (obviously, there is some optimal ordering, but computing that is computationally infeasible), the compressed clustered database size $S_{clust} \le S_{orig}$.
-Then, total expected space-complexity of our data structure is $O(\kappa k + S_{orig})$; recall here that $k$ is the number of clusters and by definition equal to the metric entropy of the database.
+Then, total expected space-complexity of our data structure is $O(\kappa k + S_{orig})$; recall here that $k$ is the number of clusters and is bounded by the metric entropy of the database.
 Thus, space complexity is linear in metric entropy plus information-theoretic entropy.
 
 Additionally, given that our distance function measures marginal information-theoretic entropies, we can also give a bound on the total information-theoretic entropy of the database by using metric entropy and the cluster radius.
 Let $l$ be the maximum distance of two points in the space.
 The na\"ive upper bound on total entropy is then $O(nl)$, where $n$ is the total number of points in the database, because distance and entropy are related.
-Recall that we chose $k$ points as cluster centers, where $k$ is equal to metric entropy, for a maximum cluster radius $r_c$.
-Encoding each non-center point $p$ as a function of the nearest cluster center requires $O(n + r_c)$ bits.
+Recall that we chose $k$ points as cluster centers, where $k$ is bounded by metric entropy, for a maximum cluster radius $r_c$.
+Encoding each non-center point $p$ as a function of the nearest cluster center requires $O(n  r_c)$ bits.
 Specifying the privileged points again requires $O(kl)$ bits, so together the total information-theoretic entropy is $O(kl + n r_c)$.
 In other words, not only is space complexity linear in metric entropy plus information-theoretic entropy, but information-theoretic entropy itself is also bounded by to low-dimensional coarse structure of the database.
 
