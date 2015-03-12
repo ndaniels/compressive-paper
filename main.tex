@@ -609,39 +609,38 @@ Empirically, however, for all of the queries we performed, we achieve $> 99.8\%$
 
 \section{Discussion}
 
-We have introduced a data structure for accelerating approximate search, and
-demonstrated its effectiveness in three distinct areas of computational
-molecular biology.
-This data structure provably scales almost linearly with the entropy of the 
-database, allowing search on large data sets to scale even as these data sets
-grow exponentially.
-We provide open-source software for all three areas: caBLASTX for metagenomic analysis,
-Ammolite for small-molecule structure search, and esFragBag for protein structure search.
-In the case of metagenomic analysis, caBLASTX also compares favorably to recent 
-search tools that outperform BLASTX.
-It is worth noting that entropy-scaling data structures do not themselves 
-improve accuracy, except by virtue of making computationally expensive analyses 
-more tractable.
-It may be possible to apply entropy-scaling data
-structures to Diamond itself, achieving even greater speed gains, though 
-accuracy would still be limited to that of Diamond.
-
-In the main paper, we have not focused on the space-saving compression that is
-possible with entropy-scaling data structures, but rather on the run-time
-acceleration of approximate search.
-However, as discussed in the Supplemental Theory, entropy-scaling data structures
-allow for compressive algorithms under certain additional constraints.
+\textbf{The primary advance of entropy-scaling data structures is that they bound both time and space as functions of the data set entropy (albeit using two different notions of entropy).}
+In this work, we have introduced an entropy-scaling data structure for accelerating approximate search,
+allowing search on large data sets to scale even as those data sets grow exponentially.
+Although we proved in the main paper only that runtime scales linearly with the entropy of the 
+database, we show in Supplemental Theory that under certain additional constraints, this data structure permits a compressed representation on disk.
 This compression is particularly applicable in the case of metagenomic analysis, where the collection of 
 read data presents a major problem for storage and transfer.
-It is worth noting that implementing this compression is feasible using existing software tools and libraries such as BZGF (Blocked GZip).
+Implementing this compression is feasible using existing software tools and libraries such as BZGF (Blocked GZip).
+
+Furthermore, we have demonstrated the effectiveness of this data structure in
+three distinct areas of computational molecular biology, providing the
+following open-source software: caBLASTX for metagenomic analysis, Ammolite for
+small-molecule structure search, and esFragBag for protein structure search.
+In the case of metagenomic analysis, caBLASTX also compares favorably to recent 
+search tools that outperform BLASTX.
+It may be possible to apply entropy-scaling data
+structures to Diamond itself, achieving even greater speed gains, but
+accuracy would then be limited to that of Diamond,
+as entropy-scaling data structures do not themselves 
+improve accuracy.
+%, except by virtue of making computationally expensive analyses 
+%more tractable.
 
 Entropy-scaling data structures for massive biological data have the great
 advantage of becoming proportionately faster and space-efficient with the
-size of the available data. Although we have demonstrated their scaling 
-behavior for common problems across metagenomics, chemogenomics, and protein
-structure search, they can be applied directly or with simple domain
-knowledge to a vast array of other problems faced in data science. As
-biological data continues to accumulate, entropy-scaling data structures
+size of the available data.
+Although the component pieces (e.g. the clustering method chosen) of the data structure can be either standard (in esFragBag) or novel (in Ammolite), the key point is that these pieces are used in a larger framework to exploit the underlying complex structure of biological systems, enabling massive acceleration by scaling with entropy.
+We have demonstrated this scaling behavior for common problems drawn from
+metagenomics, chemogenomics, and protein structure search, but the general strategy can be applied
+directly or with simple domain knowledge to a vast array of other problems
+faced in data science.
+As biological data continues to accumulate, entropy-scaling data structures
 will become critical to fully realizing the potential of compressive
 algorithms for biology. 
 
