@@ -504,6 +504,9 @@ All tests were performed on a 12-core Intel Xeon X5690 running at 3.47GHz with
 Both Diamond was run with the \texttt{--sensitive} option.
 In all cases, an E-value threshold of \texttt{1e-7} was used.
 
+For the raw-read dataset, we filtered out reads starting or ending with 10 or 
+more no-calls ('N').
+
 CaBLASTX is implemented in Go, and its source code is available on Github.
 
 \subsection{Ammolite}
