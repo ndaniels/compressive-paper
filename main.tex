@@ -186,10 +186,10 @@ applies to any space with a well-behaved distance function.
 As available data grows exponentially \cite{berger2013computational,yu2015quality} (e.g., genomic data in Figure S3), 
 %move figure to supplement
 algorithms that scale linearly with the amount of data no longer suffice.
-The primary ways the literature addresses this problem--locality sensitive 
+The primary ways the literature addresses this problem---locality sensitive 
 hashing \cite{indyk1998approximate}, vector approximation 
 \cite{ferhatosmanoglu2000vector}, and space partitioning 
-\cite{weber1998quantitative}--involve the construction of data structures that admit a more efficient search operation.
+\cite{weber1998quantitative}---involve the construction of data structures that admit a more efficient search operation.
 However, we note that as biological data increases, not only does the redundancy present in the data also increase~\cite{loh2012compressive}, but 
 internal structure (such as low fractal dimension) also becomes apparent.
 Existing general purpose methods do not explicitly exploit the particular 
@@ -294,7 +294,7 @@ We show in the following that entropy-scaling data structures are robust to the 
 Through the diversity of the applications we explore in this paper, we demonstrate that the general scheme works for massively accelerating similarity search in a set of different contexts.
 These applications are enabled by augmenting the data structure with domain-specific distance functions in different stages of the algorithm, as well as preprocessing to take advantage of domain-specific knowledge.
 We expect that so long as the data set exhibits both low entropy and low 
-fractal dimension--and this is empirically true in biological systems--our 
+fractal dimension---and this is empirically true in biological systems---our 
 entropy-scaling data structure has the potential to achieve massive speedup 
 over more na\"ive methods and significant speedup over even other highly 
 optimized methods.
@@ -705,8 +705,8 @@ matched against the coarse database.
 To preserve sensitivity, this coarse search is performed with a permissive 
 similarity score.
 %The idea behind coarse search is to identify \emph{possible} hits.
-Any possible hits--molecular graphs from the coarse database whose MCS to 
-the transformed query molecule was within the similarity score threshold--are 
+Any possible hits---molecular graphs from the coarse database whose MCS to 
+the transformed query molecule was within the similarity score threshold---are 
 then reconstructed, by following
 pointers to the removed atom and bond information, and recreating the 
 original molecules.

@@ -300,8 +300,8 @@ In other words, not only is space complexity linear in metric entropy plus infor
 
 \subsubsection{Alphabet Reduction}
 
-Alphabet reduction--reducing the 20-letter standard amino acid alphabet to a
-smaller set, in order to accelerate search or improve homology detection--has
+Alphabet reduction---reducing the 20-letter standard amino acid alphabet to a
+smaller set, in order to accelerate search or improve homology detection---has
 been proposed and implemented several times~\cite{bacardit2007automated, peterson2009reduced}.
 In particular, \citet{murphy2000simplified} considered reducing the
 amino-acid alphabet to 17, 10, or even 4 letters.
@@ -449,8 +449,8 @@ still provides a practical benefit.
 
 Given a compressed protein database and a compressed query read set, search
 comprises two phases.
-The first, \emph{coarse search}, considers only the coarse sequences--the
-representatives--resulting from compression of the protein database and the
+The first, \emph{coarse search}, considers only the coarse sequences---the
+representatives---resulting from compression of the protein database and the
 query set.
 Just as with standard BLASTX, each coarse nucleotide read is transformed into 
 each of the six possible amino acid sequences that could result from it (three 
@@ -518,7 +518,7 @@ First, we remove hydrogen atoms from the molecules; hydrogens can be easily reco
 presence.
 Next, each molecule's graph structure is converted to an unlabeled one; each atom label is removed, and each
 bond type is represented as just a single edge.
-The removed information--atom and bond type--is stored in an auxiliary data structure, indexed by the molecule's
+The removed information---atom and bond type---is stored in an auxiliary data structure, indexed by the molecule's
 PubChem ID and the atom or bond number.
 Next, any vertex or edge that is not part of a simple cycle or a tree is removed, and any edge that is part
 of a tree is removed.
