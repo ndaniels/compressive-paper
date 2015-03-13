@@ -359,10 +359,8 @@ proportional to the amount of redundancy in the read data.
 We note that this query-side clustering is in addition to the entropy-scaling
 framework as described and the run-time cost of clustering queries cannot
 be amortized over future queries, so
-%BAB Maybe it can?
 we expect this enhancement to provide a 
 constant factor improvement.
-%BAB why so?
 
 To evaluate the run-time performance of caBLASTX, we tested it against
 BLASTX and two other top performing tools: RapSearch2~\cite{zhao2012rapsearch2} and the recently-released
@@ -491,7 +489,7 @@ high-throughput drug screening.
 
 \begin{subtable}{1\textwidth}
 \caption{Ammolite benchmark on database of 1 million molecules}
-\label{ammo}
+\label{ammo1m}
 \begin{tabular}{ccccc}
 \hline
 PubChem ID & SMSD (hours) & Ammolite (hours) & Speedup & Recall \\
@@ -507,32 +505,32 @@ PubChem ID & SMSD (hours) & Ammolite (hours) & Speedup & Recall \\
 
 \begin{subtable}{1\textwidth}
 \caption{Ammolite benchmark on database of 10 million molecules}
-\label{ammo}
+\label{ammo10m}
 \begin{tabular}{ccc}
 \hline
 PubChem ID & Ammolite (hours) & Speedup \\
 \hline
-28250541 & 14423 & 21 & 51 & 13 \\
+28250541 & 14423 & 21 \\
 \hline
-1504670 & 3235 & 123 & 194 & 50 \\
+1504670 & 3235 & 123 \\
 \hline
-19170294 & 3235 & 123 & 194 & 50 \\
+19170294 & 3235 & 123 \\
 \hline
 \end{tabular}
 \end{subtable}
 
 \begin{subtable}{1\textwidth}
 \caption{Ammolite benchmark on entire PubChem database}
-\label{ammo}
+\label{ammo47m}
 \begin{tabular}{ccc}
 \hline
 PubChem ID & Ammolite (hours) & Speedup \\
 \hline
-28250541 & 14423 & 21 & 51 & 13 \\
+28250541 & 14423 & 21 \\
 \hline
-1504670 & 3235 & 123 & 194 & 50 \\
+1504670 & 3235 & 123 \\
 \hline
-19170294 & 3235 & 123 & 194 & 50 \\
+19170294 & 3235 & 123 \\
 \hline
 \end{tabular}
 \end{subtable}
@@ -702,19 +700,16 @@ releasing be readily plugged into existing pipelines, but the code and
 underlying methods can be easily incorporated into the original 
 software that we are accelerating.
 
-\hl{Why can't we just project onto a lower-dimensional subspace?
-Something about the variation in each basis vector?
-Locally you can project, globally you cannot!}
-
 As discussed in the theory, although the data live locally on a low dimension subspace, the data is truly high-dimensional globally.
 At small scales, biological data often lives on a low dimensional polytope~\cite{hart2015inferring}; however, omics data is by nature comprehensive, and includes not just one but many such polytopes.
-Although each polytope can be individually projected onto a subspace using techniques such as PCA, the same projection cannot be used for all the polytopes because they live on \textit{different} low-dimensional subspaces.
-Furthermore, as in the case of genomes, the low dimensional polytopes are also often connected (e.g. through evolutionary history); thus, collections of local projections become unwieldy.
-By using our clustering approach, we are able to take advantage of the existence of these low dimensional polytopes for accelerated search without having to explicitly characterize each.
+Although each polytope can be individually projected onto a subspace using techniques such as PCA, the same projection cannot be used for all the polytopes at once because they live on \textit{different} low-dimensional 
+subspaces.
+Furthermore, as is the case with genomes, the low dimensional polytopes are also often connected (e.g. through evolutionary history); thus, collections of local projections become unwieldy.
+By using our clustering approach, we are able to take advantage of the existence of these low dimensional polytopes for accelerated search without having to explicitly characterize each one.
 
-\hl{How do we know the reason for our speedups IS the fractal dimension? Can we measure the fractal dimension and the metric entropy?}
+
 The reason for the speedup is the combination of low fractal dimension and low metric entropy.
-Low fractal dimension is what ensures that runtime is dominated by metric entropy.
+Low fractal dimension ensures that runtime is dominated by metric entropy.
 Metric entropy is trivially approximated by looking at the size of the coarse database.
 Furthermore, we can directly measure the local fractal dimension of the database by sampling points from the database and looking at the scaling behavior of volume in spheres of increasing radii.
 
@@ -737,6 +732,8 @@ We augmented the entropy-scaling data structure by using
 different distance functions for clustering and search.
 For clustering, we rely on sequence identity, while for search, we use the
 E-value measure that is standard for BLAST.
+All benchmarks were performed with an E-value of $10^{-7}$, while the 
+caBLASTX coarse search uses an E-value of 1000.
 Furthermore, during clustering (compression), we apply a preprocessing step that
 identifies subsequences to be treated as distinct points in the database.
 We apply a reversible alphabet reduction to the
