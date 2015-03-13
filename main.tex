@@ -650,9 +650,17 @@ software that we are accelerating.
 Something about the variation in each basis vector?
 Locally you can project, globally you cannot!}
 
-At small scales~\cite{hart2015inferring}... at large scales...
+As discussed in the theory, although the data live locally on a low dimension subspace, the data is truly high-dimensional globally.
+At small scales, biological data often lives on a low dimensional polytope~\cite{hart2015inferring}; however, omics data is by nature comprehensive, and includes not just one but many such polytopes.
+Although each polytope can be individually projected onto a subspace using techniques such as PCA, the same projection cannot be used for all the polytopes because they live on \textit{different} low-dimensional subspaces.
+Furthermore, as in the case of genomes, the low dimensional polytopes are also often connected (e.g. through evolutionary history); thus, collections of local projections become unwieldy.
+By using our clustering approach, we are able to take advantage of the existence of these low dimensional polytopes for accelerated search without having to explicitly characterize each.
 
 \hl{How do we know the reason for our speedups IS the fractal dimension? Can we measure the fractal dimension and the metric entropy?}
+The reason for the speedup is the combination of low fractal dimension and low metric entropy.
+Low fractal dimension is what ensures that runtime is dominated by metric entropy.
+Metric entropy is trivially approximated by looking at the size of the coarse database.
+Furthermore, we can directly measure the local fractal dimension of the database by sampling points from the database and looking at the scaling behavior of volume in spheres of increasing radii.
 
 Entropy-scaling data structures for massive biological data have the great
 advantage of becoming proportionately faster and space-efficient with the
