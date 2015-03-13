@@ -622,8 +622,10 @@ Empirically, however, for all of the queries we performed, we achieve $> 99.8\%$
 \textbf{The primary advance of entropy-scaling data structures is that they bound both time and space as functions of the data set entropy (albeit using two different notions of entropy).}
 In this paper, we have introduced an entropy-scaling data structure for accelerating approximate search,
 allowing search on large omics data sets to scale even as those data sets grow exponentially.
-Although we proved in the main paper only that runtime scales linearly with the entropy of the 
-database, we show in Supplemental Theory that under certain additional constraints, this data structure permits a compressed representation on disk.
+Although related to compressed and opportunistic data structures such as the compressed suffix array and the FM-index~\cite{grossi2005compressed, ferragina2000opportunistic} that solve the problem of fast and scalable pattern matching,
+here we solve the much more general similarity search problem.
+Additionally, our bounds are explicitly in terms of entropy: in the main paper we proved that runtime scales linearly with the entropy of the 
+database, but we also show in Supplemental Theory that under certain additional constraints, this data structure permits a compressed representation on disk.
 This compression is particularly applicable in the case of metagenomic analysis, where the collection of 
 read data presents a major problem for storage and transfer.
 Implementing this compression is feasible using existing software tools and libraries such as BZGF (Blocked GZip).
