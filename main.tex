@@ -181,7 +181,6 @@ However, similarity search has also demonstrated increasing importance in biolog
 Importantly, while there exist compressed data structures such as the 
 compressed suffix array and the FM-index~\cite{grossi2005compressed, ferragina2000opportunistic}, they only apply to strings, while our approach 
 applies to any space with a well-behaved distance function.
-%In recent years, however, similarity search has become increasingly important for other objects and distance functions (e.g., biological genomes and alignment scores, networks and the Jaccard index) [Altschul et al, 1990; Kent, 2002; Schaeffer, 2007].
 
 As available data grows exponentially \cite{berger2013computational,yu2015quality} (e.g., genomic data in Figure S3), 
 %move figure to supplement
@@ -283,6 +282,19 @@ As an aside, note that the space-complexity actually scales with the sum of metr
 (Supplemental Methods: Theory).
 %Similarly, using these covering spheres, the database can be stored in a 
 %compressed manner (see Supplemental Methods for further details).
+
+Entropy-scaling data structures can be expected to provide a boost to 
+approximate search when fractal dimension is low (i.e. close to 1) and metric
+entropy is low.
+Specifically, the ratio $\frac{|D|}{k}$ provides an estimate of time spent in
+coarse search.
+Local fractal dimension around a data point can be computed by determining the
+number of other data points within two radii $r_1$ and $r_2$ of that point;
+given those point counts ($n_1$ and $n_2$ respectively), fractal dimension $d$
+is simply $d=\frac{log \frac{n_2}{n_1}}{log \frac{r_2}{r_1}}$.
+Sampling this property over a dataset can provide a global average fractal 
+dimension; low fractal dimension will indicate that fine search time will not
+obviate the gains provided by an entropy-scaling data structure.
 
 We have presented the simplest such data to analyze for clarity of exposition.
 However, real data is generally messier.
