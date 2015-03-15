@@ -569,6 +569,7 @@ allows it to perform comparisons much faster than standard aligners.
 Importantly for us, the bag of fragments is just a frequency vector, making
 FragBag amenable to acceleration through entropy-scaling.
 
+By first verifying that the local fractal dimension of PDB FragBag frequency vectors is low in most regimes ($d \approx 2-3)$, Figure S3), we are given reason to think that this problem is amenable to entropy-scaling search.
 We directly applied our entropy-scaling data structure without any additional 
 augmentation: esFragBag (entropy-scaling FragBag) is able to achieve an average
 factor of 10 speedup of the highly-optimized FragBag with less than 0.2\% loss 
