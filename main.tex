@@ -143,13 +143,13 @@ Entropy-scaling search of massive biological data}
     \begin{itemize}
         \item While biological data sets are growing dramatically, they tend to exhibit low entropy
         \item We introduce a data structure that allows similarity search in time- and space-complexity asymptotically linear in entropy
-        \item Using this data structure, we demonstrate at least an order of magnitude acceleration of omics search: metagenomics, chemogenomics, and protein structure search
+        \item Using this data structure, we demonstrate at least an order of magnitude acceleration of omics search: chemogenomics, metagenomics, and protein structure search
     \end{itemize}
 \noindent\unskip\textbf{eTOC Blurb}
 \par\medskip\noindent\unskip\ignorespaces
 Massive data sets in biological systems often exhibit high redundancy and thus low entropy.
 We have developed a data structure for similarity search whose complexity scales linearly in entropy.
-This approach allows us to dramatically accelerate analytical tools drawn from genomics, small molecule search, and protein structure search.
+This approach allows us to dramatically accelerate analytical tools drawn from small molecule search, genomics, and protein structure search.
 \end{abstract}
 
 \end{frontmatter}
@@ -161,8 +161,8 @@ This approach allows us to dramatically accelerate analytical tools drawn from g
     Luckily, it turns out that many data sets exhibit well-defined structure that can be exploited for the design of 
 smarter analysis tools.
     We introduce an entropy-scaling data structure---which given a low fractal dimension database, scales in both time and space with the entropy of that underlying database---to perform similarity search, a fundamental operation in data science.
-    Using these ideas, we present accelerated versions of standard tools for use by practitioners in the three domains of metagenomics, high-throughput drug screening, and protein structure search, none of which have any loss in specificity or significant loss in sensitivity:
-    CaBLASTX, 673x speedup of BLASTX with less than 5\% loss in sensitivity; Ammolite, \hl{??}x speedup of small molecule similarity search with \hl{??} loss in sensitivity; and esFragBag, 10x speedup of FragBag with less than 0.2\% loss in sensitivity.
+    Using these ideas, we present accelerated versions of standard tools for use by practitioners in the three domains of high-throughput drug screening, metagenomics, and protein structure search, none of which have any loss in specificity or significant loss in sensitivity:
+    Ammolite, 10x speedup of small molecule similarity search with less than 4\% loss in sensitivity; CaBLASTX, 673x speedup of BLASTX with less than 5\% loss in sensitivity; and esFragBag, 10x speedup of FragBag with less than 0.2\% loss in sensitivity.
 
     Source code: \url{http://gems.csail.mit.edu} (username: cs; password: cs2015)
 }
@@ -177,12 +177,12 @@ structure in the data set.
 Here, we focus on similarity search, where the task at hand is to find all entries in some database that are `similar,' or approximate matches, to some query item.
 Much like sorting is a primitive operation in computer science, similarity search is a fundamental operation in data science and lies at the heart of many other problems.
 Traditionally, approximate matching has been studied primarily in the context of strings under edit distance metrics (e.g., for spell-checkers) \cite{ukkonen1985algorithms}.
-However, similarity search has also demonstrated increasing importance in biological system domains, including local alignment of sequences \cite{altschul1990basic, kent2002blat}, chemical graphs \cite{schaeffer2007graph}, and protein structures \cite{budowski2010fragbag}.
+However, similarity search has also demonstrated increasing importance in biological system domains, including chemical graphs \cite{schaeffer2007graph}, local alignment of sequences \cite{altschul1990basic, kent2002blat}, and protein structures \cite{budowski2010fragbag}.
 Importantly, while there exist compressed data structures such as the 
 compressed suffix array and the FM-index~\cite{grossi2005compressed, ferragina2000opportunistic}, they only apply to strings, while our approach 
 applies to any space with a well-behaved distance function.
 
-As available data grows exponentially \cite{berger2013computational,yu2015quality} (e.g., genomic data in Figure S3), 
+As available data grows exponentially \cite{berger2013computational,yu2015quality} (e.g., genomic data in Figure S2), 
 %move figure to supplement
 algorithms that scale linearly with the amount of data no longer suffice.
 The primary ways the literature addresses this problem---locality sensitive 
@@ -208,7 +208,7 @@ This data structure allows for minimal (or even zero) loss in recall, coupled
 with zero loss in specificity.
 These entropy-scaling data structures can in principle be used to organize nearly any large data set for faster and more space-efficient analysis,
 and we provide guidance as to how to determine their efficacy for any data set.
-Moreover, we demonstrate their utility on similarity search problems drawn from the three major biological ``big challenges of big data:'' genomics, pharmaceuticals, and protein structure \cite{marx2013biology}.
+Moreover, we demonstrate their utility on similarity search problems drawn from the three major biological ``big challenges of big data:'' pharmaceuticals, genomics, and protein structure \cite{marx2013biology}.
 
 \section{Results}
 
@@ -312,6 +312,129 @@ fractal dimension---and this is empirically true in biological systems---our
 entropy-scaling data structure has the potential to achieve massive speedup 
 over more na\"ive methods and significant speedup over even other highly 
 optimized methods.
+
+\subsection{Application to high-throughput drug screening}
+
+Chemogenomics is the study of drug and target discovery by using chemical
+compounds to probe and characterize proteomic 
+functions~\cite{bredel2004chemogenomics}.
+Particularly in the fields of drug discovery and drug repurposing, prediction 
+of biologically active compounds is a critical task. 
+Computational high-throughput screening can eliminate many compounds from 
+wet-lab consideration, but even this screening can be time-consuming.
+PubChem~\cite{bolton2008pubchem}, a widely-used repository of molecular compound 
+structures, 
+has grown greatly since 2008. 
+In July, 2007, PubChem contained 10.3 million compounds.
+In October, 2013, PubChem contained roughly 47 million compounds, while
+in December, 2014 it contained 61.3 million compounds.
+
+We designed this compression and search framework around one of the standard 
+techniques for high-throughput screening of potential drug compounds, the use 
+of maximum common subgraph (MCS) to identify similar motifs among molecules \cite{cao2008maximum, rahman2009small}.
+We introduce Ammolite, a method for clustering molecular databases such as 
+PubChem, and for quickly searching for 
+similar molecular structures in compressed space.
+Ammolite demonstrates that entropy-scaling methods can be extended to data types that are not inherently sequence based.
+Ammolite is a practical 
+tool that provides approximately a factor of 10 speed-up with greater than 95\% accuracy compared to the popular SMSD~\cite{rahman2009small}.
+
+MCS-based search of molecule databases typically matches pairs of molecules by 
+Tanimoto distance~\cite{rahman2009small}. 
+Tanimoto distance obeys the triangle inequality, and is more useful in the 
+domain of molecular graphs than other
+distance metrics such as graph distance \cite{bunke1998graph}.
+
+To compress a molecule database, we project the space of small molecules onto a subspace by removing nodes and edges that do not participate in simple cycles
+(Figure S1).
+Clusters are exactly pre-images of of this projection operator (i.e.~all molecules that are isomorphic after simplification form a cluster).
+Coarse search is performed by finding the MCS on this much smaller projection subspace. This increases speed both by reducing the required number of MCS operations 
+and by reducing the time required for each MCS operation, which scales with the size of the molecule.
+It is worth noting that this pre-processing of molecular graphs can cause the 
+triangle inequality to be violated; while the distance function is a metric, the
+clustering does not respect that metric.
+Ammolite can be readily plugged in to existing analysis pipelines for 
+high-throughput drug screening.
+
+We determined the mean local fractal dimension of the PubChem to be 
+approximately 0.2 in the neighborhood between 0.2 and 0.4 Tanimoto distance,
+and approximately 1.9 in the neighborhood between 0.4 and 0.5.
+This suggests that the PubChem database is suitable for entropy-scaling 
+approximate search.
+
+Because SMSD is not computationally tractable on the entire PubChem database,
+we benchmarked Ammolite against SMSD on a subset of 1 million molecules from PubChem.
+Since SMSD's running time should scale linearly with the size of the database, we extrapolated the
+running time of SMSD on a subset of 10 million molecules, as well as on the entire PubChem database.
+For these benchmarks, we used three query molecules with at least two cyclohexane rings, namely PubChem IDs 28250541, 1504670, and 19170294.
+We also used SMSD as a gold standard against which we measured Ammolite's recall.
+As shown in Table~\ref{ammo1m}, Ammolite achieves at least 96\% recall with respect to SMSD.
+Furthermore, as shown in Tables~\ref{ammo10m} and \ref{ammo47m}, Ammolite's speed gains with respect to SMSD grow as the database grows.
+Figure~\ref{ammoscale} illustrates this scaling for one query.
+
+\begin{table}
+\caption{Benchmarks of Ammolite vs. SMSD on databases of (a) 1 million molecules (b) 10 million molecules (c) All of PubChem (47 million molecules)}
+
+
+\begin{subtable}{1\textwidth}
+\caption{Ammolite benchmark on database of 1 million molecules}
+\label{ammo1m}
+\begin{tabular}{ccccc}
+\hline
+PubChem ID & SMSD (hours) & Ammolite (hours) & Speedup & Recall \\
+\hline
+28250541 & 14423 & 21 & 51 & 13 \\
+\hline
+1504670 & 3235 & 123 & 194 & 50 \\
+\hline
+19170294 & 3235 & 123 & 194 & 50 \\
+\hline
+\end{tabular}
+\end{subtable}
+
+\begin{subtable}{1\textwidth}
+\caption{Ammolite benchmark on database of 10 million molecules}
+\label{ammo10m}
+\begin{tabular}{ccc}
+\hline
+PubChem ID & Ammolite (hours) & Speedup \\
+\hline
+28250541 & 14423 & 21 \\
+\hline
+1504670 & 3235 & 123 \\
+\hline
+19170294 & 3235 & 123 \\
+\hline
+\end{tabular}
+\end{subtable}
+
+\begin{subtable}{1\textwidth}
+\caption{Ammolite benchmark on entire PubChem database}
+\label{ammo47m}
+\begin{tabular}{ccc}
+\hline
+PubChem ID & Ammolite (hours) & Speedup \\
+\hline
+28250541 & 14423 & 21 \\
+\hline
+1504670 & 3235 & 123 \\
+\hline
+19170294 & 3235 & 123 \\
+\hline
+\end{tabular}
+\end{subtable}
+\end{table}
+
+
+Something about extrapolating SMSD time for 10M and 47M.
+
+Fine search: distance 0.2; coarse 0.4 (Tanimoto distance)
+% BAB: reverse with actual results--positive things first!
+\hl{Did not compare against CDK MCS algorithm because already done by [et al, Thornton] and did not compare against FMCS [Cao, et al] because 100 slower}
+
+\hl{Validation paragraph(s)}
+
+\hl{Typical workflow medicinal chemist using SMSD has week of downtime. With ours, weekend only. Need citesi (otherwise hypothetical).}
 
 \subsection{Application to metagenomics}
 
@@ -458,123 +581,6 @@ user to pass arbitrary parameters to the underlying BLASTX during fine search.
 Thus, caBLASTX may be suitable for a wider variety of existing analysis 
 pipelines.
 
-\subsection{Application to high-throughput drug screening}
-
-Chemogenomics is the study of drug and target discovery by using chemical
-compounds to probe and characterize proteomic 
-functions~\cite{bredel2004chemogenomics}.
-Particularly in the fields of drug discovery and drug repurposing, prediction 
-of biologically active compounds is a critical task. 
-Computational high-throughput screening can eliminate many compounds from 
-wet-lab consideration, but even this screening can be time-consuming.
-PubChem~\cite{bolton2008pubchem}, a widely-used repository of molecular compound 
-structures, 
-has grown greatly since 2008. 
-In July, 2007, PubChem contained 10.3 million compounds.
-In October, 2013, PubChem contained roughly 47 million compounds, while
-in December, 2014 it contained 61.3 million compounds.
-
-We designed this compression and search framework around one of the standard 
-techniques for high-throughput screening of potential drug compounds, the use 
-of maximum common subgraph (MCS) to identify similar motifs among molecules \cite{cao2008maximum, rahman2009small}.
-We introduce Ammolite, a method for clustering molecular databases such as 
-PubChem, and for quickly searching for 
-similar molecular structures in compressed space.
-Ammolite demonstrates that entropy-scaling methods can be extended to data types that are not inherently sequence based.
-Ammolite is a practical 
-tool that provides approximately a factor of 10 speed-up with greater than 95\% accuracy compared to the popular SMSD~\cite{rahman2009small}.
-
-MCS-based search of molecule databases typically matches pairs of molecules by 
-Tanimoto distance~\cite{rahman2009small}. 
-Tanimoto distance obeys the triangle inequality, and is more useful in the 
-domain of molecular graphs than other
-distance metrics such as graph distance \cite{bunke1998graph}.
-
-To compress a molecule database, we project the space of small molecules onto a subspace by removing nodes and edges that do not participate in simple cycles
-(Figure S2).
-Clusters are exactly pre-images of of this projection operator (i.e.~all molecules that are isomorphic after simplification form a cluster).
-Coarse search is performed by finding the MCS on this much smaller projection subspace. This increases speed both by reducing the required number of MCS operations 
-and by reducing the time required for each MCS operation, which scales with the size of the molecule.
-It is worth noting that this pre-processing of molecular graphs can cause the 
-triangle inequality to be violated; while the distance function is a metric, the
-clustering does not respect that metric.
-Ammolite can be readily plugged in to existing analysis pipelines for 
-high-throughput drug screening.
-
-We determined the mean local fractal dimension of the PubChem to be 
-approximately 0.2 in the neighborhood between 0.2 and 0.4 Tanimoto distance,
-and approximately 1.9 in the neighborhood between 0.4 and 0.5.
-This suggests that the PubChem database is suitable for entropy-scaling 
-approximate search.
-
-\hl{Benchmarking paragraph(s)}
-
-We benchmarked ....
-
-\begin{table}
-\caption{Benchmarks of Ammolite vs. SMSD on databases of (a) 1 million molecules (b) 10 million molecules (c) All of PubChem (47 million molecules)}
-
-
-\begin{subtable}{1\textwidth}
-\caption{Ammolite benchmark on database of 1 million molecules}
-\label{ammo1m}
-\begin{tabular}{ccccc}
-\hline
-PubChem ID & SMSD (hours) & Ammolite (hours) & Speedup & Recall \\
-\hline
-28250541 & 14423 & 21 & 51 & 13 \\
-\hline
-1504670 & 3235 & 123 & 194 & 50 \\
-\hline
-19170294 & 3235 & 123 & 194 & 50 \\
-\hline
-\end{tabular}
-\end{subtable}
-
-\begin{subtable}{1\textwidth}
-\caption{Ammolite benchmark on database of 10 million molecules}
-\label{ammo10m}
-\begin{tabular}{ccc}
-\hline
-PubChem ID & Ammolite (hours) & Speedup \\
-\hline
-28250541 & 14423 & 21 \\
-\hline
-1504670 & 3235 & 123 \\
-\hline
-19170294 & 3235 & 123 \\
-\hline
-\end{tabular}
-\end{subtable}
-
-\begin{subtable}{1\textwidth}
-\caption{Ammolite benchmark on entire PubChem database}
-\label{ammo47m}
-\begin{tabular}{ccc}
-\hline
-PubChem ID & Ammolite (hours) & Speedup \\
-\hline
-28250541 & 14423 & 21 \\
-\hline
-1504670 & 3235 & 123 \\
-\hline
-19170294 & 3235 & 123 \\
-\hline
-\end{tabular}
-\end{subtable}
-\end{table}
-
-
-Something about extrapolating SMSD time for 10M and 47M.
-
-Fine search: distance 0.2; coarse 0.4 (Tanimoto distance)
-% BAB: reverse with actual results--positive things first!
-\hl{Did not compare against CDK MCS algorithm because already done by [et al, Thornton] and did not compare against FMCS [Cao, et al] because 100 slower}
-
-\hl{Validation paragraph(s)}
-
-\hl{Typical workflow medicinal chemist using SMSD has week of downtime. With ours, weekend only. Need citesi (otherwise hypothetical).}
-
 \subsection{Application to protein structure search}
 
 The relationship between protein structure and function has been a subject of intense study for decades,
@@ -718,8 +724,8 @@ Implementing this compression is feasible using existing software tools and libr
 
 Furthermore, we have justified and demonstrated the effectiveness of this data structure in
 three distinct areas of computational molecular biology, providing the
-following open-source software: caBLASTX for metagenomic analysis, Ammolite for
-small-molecule structure search, and esFragBag for protein structure search.
+following open-source software: Ammolite for
+small-molecule structure search, caBLASTX for metagenomic analysis, and esFragBag for protein structure search.
 All of our software is open-source, and not only can the tools we are 
 releasing be readily plugged into existing pipelines, but the code and 
 underlying methods can be easily incorporated into the original 
@@ -762,22 +768,6 @@ will become critical to fully realizing the potential of compressive
 algorithms for biology. 
 
 \section{Methods}
-\subsection{CaBLASTX}
-CaBLASTX's clustering approach relies on sequence similarity.
-We augmented the entropy-scaling data structure by using
-different distance functions for clustering and search.
-For clustering, we rely on sequence identity, while for search, we use the
-E-value measure that is standard for BLAST.
-All benchmarks were performed with an E-value of $10^{-7}$, while the 
-caBLASTX coarse search uses an E-value of 1000.
-Furthermore, during clustering (compression), we apply a preprocessing step that
-identifies subsequences to be treated as distinct points in the database.
-We apply a reversible alphabet reduction to the
-protein sequences, which projects them into a subspace (Supplemental Methods).
-
-When applied to high-coverage next-generation sequencing queries, caBLASTX can also perform clustering on the reads (Supplemental Methods).
-In this instance, coarse search is performed by matching each representative query with a set of representative database entries.
-Fine search then matches the original queries within each cluster with the candidate database entries resulting from the coarse search.
 
 \subsection{Ammolite}
 Ammolite's clustering approach relies on structural similarity.
@@ -821,6 +811,23 @@ Finally, the fine search is performed against these decompressed possible
 hits.
 %Fine search is performed using MCS or fMCS, with user-defined parameters for 
 %bond and atom mismatches and similarity-score threshold.
+
+\subsection{CaBLASTX}
+CaBLASTX's clustering approach relies on sequence similarity.
+We augmented the entropy-scaling data structure by using
+different distance functions for clustering and search.
+For clustering, we rely on sequence identity, while for search, we use the
+E-value measure that is standard for BLAST.
+All benchmarks were performed with an E-value of $10^{-7}$, while the 
+caBLASTX coarse search uses an E-value of 1000.
+Furthermore, during clustering (compression), we apply a preprocessing step that
+identifies subsequences to be treated as distinct points in the database.
+We apply a reversible alphabet reduction to the
+protein sequences, which projects them into a subspace (Supplemental Methods).
+
+When applied to high-coverage next-generation sequencing queries, caBLASTX can also perform clustering on the reads (Supplemental Methods).
+In this instance, coarse search is performed by matching each representative query with a set of representative database entries.
+Fine search then matches the original queries within each cluster with the candidate database entries resulting from the coarse search.
 
 
 \subsection{esFragBag}
