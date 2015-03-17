@@ -374,6 +374,12 @@ be amortized over future queries, so
 we expect this enhancement to provide a 
 constant factor improvement.
 
+We determined the mean local fractal dimension of the NCBI's NR database, using 
+sequence identity of alignment as a distance function, to be approximately 2.3 
+in the neighborhood between 80\% and 90\% sequence identity.
+This suggests that the NR database is suitable for entropy-scaling approximate
+search.
+
 To evaluate the run-time performance of caBLASTX, we tested it against
 BLASTX and two other top performing tools: RapSearch2~\cite{zhao2012rapsearch2} and the recently-released
 Diamond~\cite{buchfink2014fast}.
