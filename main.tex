@@ -202,13 +202,15 @@ Empirically, this compressive acceleration appears to scale almost linearly in t
 
 In this paper, we generalize and formalize this approach by introducing 
 a mathematically rigorous class of entropy-scaling data structures for 
-omics similarity search: data structures that \textbf{provably} scale almost linearly in both time and space with the entropy of the database.
-Specifically, if similarity is defined by a metric-like distance function (e.g., edit or Hamming distance) and the database exhibits both low `metric entropy' and `fractal dimension' (Supplemental Methods: Theory), this data structure performs much better than na\"ive and even optimized methods.
+omics similarity search: data structures that \textbf{provably} scale linearly in both time and space with the entropy of the database, and thus sublinearly with the entire database.
+Specifically, if similarity is defined by a metric-like distance function (e.g., edit or Hamming distance) and the database exhibits both low `metric entropy' and `fractal dimension', this data structure performs much better than na\"ive and even optimized methods.
+Note that metric entropy is not to be confused with the notion of a distance metric.
 This data structure allows for minimal (or even zero) loss in recall, coupled
 with zero loss in specificity.
 These entropy-scaling data structures can in principle be used to organize nearly any large data set for faster and more space-efficient analysis,
 and we provide guidance as to how to determine their efficacy for any data set.
 Moreover, we demonstrate their utility on similarity search problems drawn from the three major biological ``big challenges of big data:'' pharmaceuticals, genomics, and protein structure \cite{marx2013biology}.
+Not only do these order-of-magnitude improvements in running time promise to enable new workflows for practitioners (e.g. fast first-pass computational drug screens and local analyses of sequencing data in remote field sites for real-time epidemic monitoring), but the general theory of entropy-scaling data structures that we introduce can be straightforwardly applied to accelerate other search tools.
 
 \section{Results}
 
@@ -356,11 +358,12 @@ clustering does not respect that metric.
 Ammolite can be readily plugged in to existing analysis pipelines for 
 high-throughput drug screening.
 
-We determined the mean local fractal dimension of the PubChem to be 
+Our entropy-scaling data structure can be applied to PubChem because it has both low fractal
+dimension and low metric entropy.
+In particular, we determined the mean local fractal dimension of the PubChem to be 
 approximately 0.2 in the neighborhood between 0.2 and 0.4 Tanimoto distance,
 and approximately 1.9 in the neighborhood between 0.4 and 0.5.
-This suggests that the PubChem database is suitable for entropy-scaling 
-approximate search.
+The expected speedup is measured by the ratio of database size to metric entropy, which for PubChem is approximately 11:1.
 
 Because SMSD is not computationally tractable on the entire PubChem database,
 we benchmarked Ammolite against SMSD on a subset of 1 million molecules from PubChem.
@@ -373,11 +376,11 @@ Furthermore, as shown in Tables~\ref{ammo10m} and \ref{ammo47m}, Ammolite's spee
 Figure~\ref{ammoscale} illustrates this scaling for one query.
 
 \begin{table}
-\caption{Benchmarks of Ammolite vs. SMSD on databases of (a) 1 million molecules (b) 10 million molecules (c) All of PubChem (47 million molecules)}
+\caption{\textbf{Benchmarks of Ammolite vs. SMSD on databases of (a) 1 million molecules (b) 10 million molecules (c) All of PubChem (47 million molecules)}}
 
 
 \begin{subtable}{1\textwidth}
-\caption{Ammolite benchmark on database of 1 million molecules}
+\caption{\textbf{Ammolite benchmark on database of 1 million molecules}}
 \label{ammo1m}
 \begin{tabular}{ccccc}
 \hline
@@ -393,7 +396,7 @@ PubChem ID & SMSD (hours) & Ammolite (hours) & Speedup & Recall \\
 \end{subtable}
 
 \begin{subtable}{1\textwidth}
-\caption{Ammolite benchmark on database of 10 million molecules}
+\caption{\textbf{Ammolite benchmark on database of 10 million molecules}}
 \label{ammo10m}
 \begin{tabular}{ccc}
 \hline
@@ -409,7 +412,7 @@ PubChem ID & Ammolite (hours) & Speedup \\
 \end{subtable}
 
 \begin{subtable}{1\textwidth}
-\caption{Ammolite benchmark on entire PubChem database}
+\caption{\textbf{Ammolite benchmark on entire PubChem database}}
 \label{ammo47m}
 \begin{tabular}{ccc}
 \hline
@@ -424,17 +427,6 @@ PubChem ID & Ammolite (hours) & Speedup \\
 \end{tabular}
 \end{subtable}
 \end{table}
-
-
-Something about extrapolating SMSD time for 10M and 47M.
-
-Fine search: distance 0.2; coarse 0.4 (Tanimoto distance)
-% BAB: reverse with actual results--positive things first!
-\hl{Did not compare against CDK MCS algorithm because already done by [et al, Thornton] and did not compare against FMCS [Cao, et al] because 100 slower}
-
-\hl{Validation paragraph(s)}
-
-\hl{Typical workflow medicinal chemist using SMSD has week of downtime. With ours, weekend only. Need citesi (otherwise hypothetical).}
 
 \subsection{Application to metagenomics}
 
@@ -499,12 +491,15 @@ be amortized over future queries, so
 we expect this enhancement to provide a 
 constant factor improvement.
 
+Our entropy-scaling data structure can be applied to the NCBI's NR database because it, 
+like PubChem, exhibits low fractal dimension and metric entropy.
 We determined the mean local fractal dimension of the NCBI's NR database, using 
 sequence identity of alignment as a distance function, to be approximately 1.6 
 in the neighborhood between 70\% and 80\% protein sequence identity.
-This suggests that the NR database is suitable for entropy-scaling approximate
-search.
-Indeed, the notion that protein sequence space exhibits structure has precedent~\cite{linial1997global}.
+The ratio of database size to metric entropy, which gives an indicator of expected speedup,
+is approximately 30:1.
+Indeed, the notion that protein sequence space exhibits structure, 
+and lends itself to clustering, has precedent~\cite{linial1997global}.
 
 To evaluate the run-time performance of caBLASTX, we tested it against
 BLASTX and two other top performing tools: RapSearch2~\cite{zhao2012rapsearch2} and the recently-released
@@ -527,9 +522,9 @@ the performance gains are more modest.
 For both next-generation sequencing (NGS) reads and assemblies, Diamond had slightly faster running time than caBLASTX, albeit at the expense of accuracy, while RapSearch2 was slower.
 
 \begin{table}
-\caption{(a) Running time and (b) accuracy of BLASTX, caBLASTX, RapSearch2, and Diamond}
+\caption{\textbf{(a) Running time and (b) accuracy of BLASTX, caBLASTX, RapSearch2, and Diamond}}
 \begin{subtable}{1\textwidth}
-\caption{Running time}
+\caption{\textbf{Running time}}
 \label{mgspeed}
 \begin{tabular}{ccccc}
 \hline
@@ -543,15 +538,15 @@ assemblies (sec) & 3235 & 123 & 194 & 50 \\
 \end{subtable}
 
 \begin{subtable}{1\textwidth}
-\caption{Accuracy against BLASTX}
+\caption{\textbf{Accuracy against BLASTX}}
 \label{mgacc}
 \begin{tabular}{ccccc}
 \hline
 dataset & BLASTX & caBLASTX & RapSearch2 & Diamond \\
 \hline
-NGS reads (sec) & 100\% & 95.7\% & 79.5\% & 76.9\% \\
+NGS reads & 100\% & 95.7\% & 79.5\% & 76.9\% \\
 \hline
-assemblies (sec) & 100\% & 99.2\% & 87.7\% & 91.0\% \\
+assemblies & 100\% & 99.2\% & 87.7\% & 91.0\% \\
 \hline
 \end{tabular}
 \end{subtable}
@@ -602,6 +597,8 @@ Importantly for us, the bag of fragments is just a frequency vector, making
 FragBag amenable to acceleration through entropy-scaling.
 
 By first verifying that the local fractal dimension of PDB FragBag frequency vectors is low in most regimes ($d \approx 2-3)$, Figure S3), we are given reason to think that this problem is amenable to entropy-scaling search.
+As an estimate of potential speedup, the ratio of PDB database size to metric 
+entropy at appropriate cluster radii is approximately 10:1.
 We directly applied our entropy-scaling data structure without any additional 
 augmentation: esFragBag (entropy-scaling FragBag) is able to achieve an average
 factor of 10 speedup of the highly-optimized FragBag with less than 0.2\% loss 
@@ -681,7 +678,7 @@ Whereas there is nearly 30x acceleration for \texttt{4rhv} in cosine space for l
         %\caption{}
     \end{subfigure}
     }
-    \caption{FragBag benchmarking data with parameters varied until the acceleration advantage of esFragBag disappears. As search radius increases, the fraction of the database returned by the coarse search increases, ultimately returning the whole database. Unsurprisingly, when returning the whole database in the coarse search results, there are no benefits to using entropy-scaling data structures. (a) Cosine distance gives on the whole better acceleration, but results in $>99.8\%$ sensitivity, whereas (b) Euclidean distance as a metric is guaranteed by the Triangle Inequality to get $100\%$ sensitivity.}
+    \caption{Scaling behavior of esFragBag. EsFragBag benchmarking data with parameters varied until the acceleration advantage of esFragBag disappears. As search radius increases, the fraction of the database returned by the coarse search increases, ultimately returning the whole database. Unsurprisingly, when returning the whole database in the coarse search results, there are no benefits to using entropy-scaling data structures. (a) Cosine distance gives on the whole better acceleration, but results in $>99.8\%$ sensitivity, whereas (b) Euclidean distance as a metric is guaranteed by the Triangle Inequality to get $100\%$ sensitivity.}
     \label{fig:fragbag}
 \end{figure}
 
@@ -769,7 +766,7 @@ algorithms for biology.
 
 \section{Methods}
 
-\subsection{Ammolite}
+\subsection{Ammolite small molecule search}
 Ammolite's clustering approach relies on structural similarity.
 We augmented the entropy-scaling data structure by using a clustering scheme based on molecular structural motifs instead of a distance function.
 Each molecule is `simplified' by removing nodes and edges that do not
@@ -784,13 +781,6 @@ full molecules in the cluster it represents.
 For both coarse and fine search, we use the Tanimoto distance metric, defined as
 \[d(G_1,G_2) = 1 - \frac{ |mcs(G_1,G_2)| }{|G_1|+|G_2|-|mcs(G_1,G_2)|},\]
 where $mcs$ refers to the maximum common subgraph of two chemical graphs. 
-We implemented a variant known as 
-flexible maximum common subgraph (fMCS), which unlike standard MCS allows user-defined parameters for atom and bond-type mismatches \cite{cao2008maximum}.
-% BAB/YWY: Maybe move next sentence to discussion?
-%Our implementation allows a user to specify whether any atom mismatches or 
-%bond-type mismatches should be 
-%allowed in the maximum common subgraph of two molecules.
-%If zero mismatches are allowed, fMCS is just MCS.
 
 %our compression-accelerated search approach 
 %relies on a two-stage process.
@@ -812,7 +802,7 @@ hits.
 %Fine search is performed using MCS or fMCS, with user-defined parameters for 
 %bond and atom mismatches and similarity-score threshold.
 
-\subsection{CaBLASTX}
+\subsection{CaBLASTX metagenomic search}
 CaBLASTX's clustering approach relies on sequence similarity.
 We augmented the entropy-scaling data structure by using
 different distance functions for clustering and search.
@@ -830,7 +820,7 @@ In this instance, coarse search is performed by matching each representative que
 Fine search then matches the original queries within each cluster with the candidate database entries resulting from the coarse search.
 
 
-\subsection{esFragBag}
+\subsection{esFragBag protein structure search}
 In FragBag, the bag of fragments is essentially
 a term frequency vector representing the number of occurrences of each structural motif within the protein.
 FragBag turns out to be amenable to acceleration using an entropy-scaling data structure because much of the computation is spent in doing a similarity search on that frequency vector.

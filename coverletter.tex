@@ -34,13 +34,14 @@ genomics: we demonstrate a general scheme for accelerating omics search, on whic
 of entropy by exploiting the typically low fractal dimension of the underlying 
 data. 
 Our method enables sublinear scaling of omics search.
-We also releasing three new practical software tools for practitioners to use.
+We are also releasing three new practical software tools for practitioners to use.
  
-To demonstrate the broad applicability of entropy-scaling search, we present acceleration of standard tools drawn from metagenomics, high-throughput drug screening, and protein structure search.
-CaBLASTX achieves 700x speedup of BLASTX with $<5\%$ loss in sensitivity, Ammolite achieves 10x speedup of small molecule similarity search with $<1\%$ 
-loss in sensitivity, and esFragBag achieves 10x speedup of FragBag with $<0.2\%$ loss in sensitivity.
+To demonstrate the broad applicability of entropy-scaling search, we present acceleration of standard tools drawn from high-throughput drug screening, metagenomics, and protein structure search.
+Ammolite achieves 10x speedup of small molecule similarity search with $<4\%$ loss in sensitivity,
+caBLASTX achieves 700x speedup of BLASTX with $<5\%$ loss in sensitivity,  and esFragBag achieves 10x speedup of FragBag with $<0.2\%$ loss in sensitivity.
 
-Not only do these order-of-magnitude improvements in running time promise to enable new workflows for practitioners (e.g. local analyses of sequencing data in remote field sites for real-time epidemic monitoring, fast first-pass computational drug screens), but the general theory of entropy-scaling data structures that we introduce can be straightforwardly applied to accelerate other search tools.
+Not only do these order-of-magnitude improvements in running time promise to enable new workflows for practitioners (e.g. fast first-pass computational drug screens and local analyses of sequencing data in remote field sites for real-time epidemic 
+monitoring), but the general theory of entropy-scaling data structures that we introduce can be straightforwardly applied to accelerate other search tools.
 
 It is for these reasons that we believe our work will become an important tool in the biologist's toolkit by allowing analyses to scale with massive biological data, and is of broad interest to the readership of Cell Systems.
 
