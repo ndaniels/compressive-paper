@@ -16,7 +16,7 @@
 
 \usepackage{graphicx}
 %\usepackage{natbib}
-\usepackage{caption}
+\usepackage[labelfont=bf]{caption}
 \usepackage{subcaption}
 \usepackage{hyperref}
 % Turn off hyperlinking in list of tables and figures
@@ -376,11 +376,11 @@ Furthermore, as shown in Tables~\ref{ammo10m} and \ref{ammo47m}, Ammolite's spee
 Figure~\ref{ammoscale} illustrates this scaling for one query.
 
 \begin{table}
-\caption{\textbf{Benchmarks of Ammolite vs. SMSD on databases of (a) 1 million molecules (b) 10 million molecules (c) All of PubChem (47 million molecules)}}
+\caption{Benchmarks of Ammolite vs. SMSD on databases of (a) 1 million molecules (b) 10 million molecules (c) All of PubChem (47 million molecules)}
 
 
 \begin{subtable}{1\textwidth}
-\caption{\textbf{Ammolite benchmark on database of 1 million molecules}}
+\caption{Ammolite benchmark on database of 1 million molecules}
 \label{ammo1m}
 \begin{tabular}{ccccc}
 \hline
@@ -396,7 +396,7 @@ PubChem ID & SMSD (hours) & Ammolite (hours) & Speedup & Recall \\
 \end{subtable}
 
 \begin{subtable}{1\textwidth}
-\caption{\textbf{Ammolite benchmark on database of 10 million molecules}}
+\caption{Ammolite benchmark on database of 10 million molecules}
 \label{ammo10m}
 \begin{tabular}{ccc}
 \hline
@@ -412,7 +412,7 @@ PubChem ID & Ammolite (hours) & Speedup \\
 \end{subtable}
 
 \begin{subtable}{1\textwidth}
-\caption{\textbf{Ammolite benchmark on entire PubChem database}}
+\caption{Ammolite benchmark on entire PubChem database}
 \label{ammo47m}
 \begin{tabular}{ccc}
 \hline
@@ -522,9 +522,9 @@ the performance gains are more modest.
 For both next-generation sequencing (NGS) reads and assemblies, Diamond had slightly faster running time than caBLASTX, albeit at the expense of accuracy, while RapSearch2 was slower.
 
 \begin{table}
-\caption{\textbf{(a) Running time and (b) accuracy of BLASTX, caBLASTX, RapSearch2, and Diamond}}
+\caption{(a) Running time and (b) accuracy of BLASTX, caBLASTX, RapSearch2, and Diamond}
 \begin{subtable}{1\textwidth}
-\caption{\textbf{Running time}}
+\caption{Running time}
 \label{mgspeed}
 \begin{tabular}{ccccc}
 \hline
@@ -538,7 +538,7 @@ assemblies (sec) & 3235 & 123 & 194 & 50 \\
 \end{subtable}
 
 \begin{subtable}{1\textwidth}
-\caption{\textbf{Accuracy against BLASTX}}
+\caption{Accuracy against BLASTX}
 \label{mgacc}
 \begin{tabular}{ccccc}
 \hline
