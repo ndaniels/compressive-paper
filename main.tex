@@ -231,7 +231,7 @@ In the following we consider entropy to be nearly synonymous with distance betwe
 For genomic sequences, this can be edit distance; for chemical graphs, Tanimoto 
 distance; and for general vectors, Euclidean or cosine distance.
 We are interested in the similarity search problem of
-finding all points in a set that are close to (i.e. similar to) the query point.
+finding all points in a set that are close to (i.e., similar to) the query point.
 The basics of the data structure itself are presented in Figure \ref{fig:dataStructure}, but here we provide conceptual motivation.
 
 Let us first consider what it means for a large biological data set, considered as points in a high-dimensional space, to be highly redundant.
@@ -266,7 +266,7 @@ We cover the tree with spheres of radius $r_c$, where $r_c$ is on the order of t
 Because all the points within a sphere are close to each other, they are highly 
 redundant and can be encoded in terms of one another, saving space.
 
-By the triangle inequality, in order to search for all points within distance $r$ of a query we need only look in nearby spheres with centers (i.e. representatives) within a distance $r+r_c$ of the query (Figure \ref{fig:dataStructure}d).
+By the triangle inequality, in order to search for all points within distance $r$ of a query we need only look in nearby spheres with centers (i.e., representatives) within a distance $r+r_c$ of the query (Figure \ref{fig:dataStructure}d).
 %ref Figure 1?.
 However, because the spheres have radius comparable to branch width, the tree is locally 1-dimensional on the coarse scale; we will call this the fractal dimension $d=1$ of the tree at the scale $r_c$ \cite{falconer1990fractal}, where $r_c$ is essentially our ruler size.
 Thus, increasing the search radius for coarse search only linearly increases the number of points that need to be searched in a fine search.
@@ -288,13 +288,13 @@ As an aside, note that the space-complexity actually scales with the sum of metr
 %compressed manner (see Supplemental Methods for further details).
 
 Entropy-scaling data structures can be expected to provide a boost to 
-approximate search when fractal dimension is low (i.e. close to 1) and metric
+approximate search when fractal dimension is low (i.e., close to 1) and metric
 entropy is low.
 Specifically, the ratio $\frac{|D|}{k}$ provides an estimate of the acceleration factor
 for just the coarse search component compared to a full linear search.
 Local fractal dimension around a data point can be computed by determining the
 number of other data points within two radii $r_1$ and $r_2$ of that point;
-given those point counts ($n_1$ and $n_2$ respectively), fractal dimension $d$
+given those point counts ($n_1$ and $n_2$, respectively), fractal dimension $d$
 is simply $d=\frac{\log (n_2 / n_1)}{ \log (r_2 / r_1)}$.
 Sampling this property over a dataset can provide a global average fractal 
 dimension; low fractal dimension will indicate that fine search time will not
@@ -349,7 +349,7 @@ distance metrics such as graph distance \cite{bunke1998graph}.
 
 To compress a molecule database, we project the space of small molecules onto a subspace by removing nodes and edges that do not participate in simple cycles
 (Figure S1).
-Clusters are exactly pre-images of of this projection operator (i.e.~all molecules that are isomorphic after simplification form a cluster).
+Clusters are exactly pre-images of of this projection operator (i.e.,~all molecules that are isomorphic after simplification form a cluster).
 Coarse search is performed by finding the MCS on this much smaller projection subspace. This increases speed both by reducing the required number of MCS operations 
 and by reducing the time required for each MCS operation, which scales with the size of the molecule.
 It is worth noting that this pre-processing of molecular graphs can cause the 
@@ -842,7 +842,7 @@ FragBag turns out to be amenable to acceleration using an entropy-scaling data s
 
 For the cluster generation, we trivially used a na\"ive randomized greedy 2-pass approach.
 First, all proteins in the Protein Data Bank were randomly ordered.
-Then in the first pass, proteins were selected as cluster centers if and only if they were not within a user-specified Euclidean distance $r_c$ from an existing center (i.e. the first protein is always selected, and the second if further away than $r_c$ from the first, etc.).
+Then in the first pass, proteins were selected as cluster centers if and only if they were not within a user-specified Euclidean distance $r_c$ from an existing center (i.e., the first protein is always selected, and the second if further away than $r_c$ from the first, etc.).
 Recall that this generation of cluster centers is the same as the one used to generate covering spheres in Figure \ref{fig:tree};
 the covering spheres were overlapping, but we assign every protein uniquely to a single cluster by assigning to the nearest cluster center in the second pass.
 
