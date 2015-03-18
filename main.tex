@@ -162,7 +162,7 @@ This approach allows us to dramatically accelerate analytical tools drawn from s
 smarter analysis tools.
     We introduce an entropy-scaling data structure---which given a low fractal dimension database, scales in both time and space with the entropy of that underlying database---to perform similarity search, a fundamental operation in data science.
     Using these ideas, we present accelerated versions of standard tools for use by practitioners in the three domains of high-throughput drug screening, metagenomics, and protein structure search, none of which have any loss in specificity or significant loss in sensitivity:
-    Ammolite, 10x speedup of small molecule similarity search with less than 4\% loss in sensitivity; CaBLASTX, 673x speedup of BLASTX with less than 5\% loss in sensitivity; and esFragBag, 10x speedup of FragBag with less than 0.2\% loss in sensitivity.
+    Ammolite, 12x speedup of small molecule similarity search with less than 4\% loss in sensitivity; CaBLASTX, 673x speedup of BLASTX with less than 5\% loss in sensitivity; and esFragBag, 10x speedup of FragBag with less than 0.2\% loss in sensitivity.
 
     Source code: \url{http://gems.csail.mit.edu} (username: cs; password: cs2015)
 }
@@ -369,11 +369,11 @@ Because SMSD is not computationally tractable on the entire PubChem database,
 we benchmarked Ammolite against SMSD on a subset of 1 million molecules from PubChem.
 Since SMSD's running time should scale linearly with the size of the database, we extrapolated the
 running time of SMSD on a subset of 10 million molecules, as well as on the entire PubChem database.
-For these benchmarks, we used three query molecules with at least two cyclohexane rings, namely PubChem IDs 28250541, 1504670, and 19170294.
+For these benchmarks, we used three query molecules with at least two cyclohexane rings, namely PubChem IDs 28250541, 1504670, and 23743178.
 We also used SMSD as a gold standard against which we measured Ammolite's recall.
 As shown in Table~\ref{ammo1m}, Ammolite achieves at least 96\% recall with respect to SMSD.
 Furthermore, as shown in Tables~\ref{ammo10m} and \ref{ammo47m}, Ammolite's speed gains with respect to SMSD grow as the database grows.
-Figure~\ref{ammoscale} illustrates this scaling for one query.
+Figure~\ref{fig:ammoscale} illustrates this scaling for one query.
 
 \begin{table}
 \caption{Benchmarks of Ammolite vs. SMSD on databases of (a) 1 million molecules (b) 10 million molecules (c) All of PubChem (47 million molecules)}
@@ -386,11 +386,11 @@ Figure~\ref{ammoscale} illustrates this scaling for one query.
 \hline
 PubChem ID & SMSD (hours) & Ammolite (hours) & Speedup & Recall \\
 \hline
-28250541 & 14423 & 21 & 51 & 13 \\
+28250541 & 43.3 & 12.2 & 3.5 & 100\% \\
 \hline
-1504670 & 3235 & 123 & 194 & 50 \\
+1504670 & 8.1 & 3.6 & 2.3 & 96.3\% \\
 \hline
-19170294 & 3235 & 123 & 194 & 50 \\
+23743178 & 21.7 & 2.7 & 8.2 & 100\% \\
 \hline
 \end{tabular}
 \end{subtable}
@@ -404,12 +404,12 @@ PubChem ID & SMSD (hours) & Ammolite (hours) & Speedup & Recall \\
 \hline
 PubChem ID & Ammolite (hours) & Speedup \\
 \hline
-28250541 & 14423 & 21 \\
+28250541 & 97.7 & 3.2 \\
 \hline
-1504670 & 3235 & 123 \\
+1504670 & 25.4 & 4.4 \\
 \hline
-19170294 & 3235 & 123 \\
-\hline
+% 23743178 & 1. & 10.2 \\
+% \hline
 \end{tabular}
 \end{subtable}
 
@@ -421,16 +421,27 @@ PubChem ID & Ammolite (hours) & Speedup \\
 \begin{tabular}{ccc}
 \hline
 PubChem ID & Ammolite (hours) & Speedup \\
+% \hline
+% 28250541 & 14423 & 21 \\
+% \hline
+% 1504670 & 3235 & 123 \\
 \hline
-28250541 & 14423 & 21 \\
-\hline
-1504670 & 3235 & 123 \\
-\hline
-19170294 & 3235 & 123 \\
+23743178 & 81.5 & 12.5 \\
 \hline
 \end{tabular}
 \end{subtable}
 \end{table}
+
+\begin{figure}[hbp]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/ammolite-speedup.png}
+    \caption{ Ammolite's speedup over SMSD. On PubChem ID 23743178,
+    Ammolite's gains overs SMSD increase with database size, achieving a 12.5x
+    speedup on the full PubChem from October, 2013, which contains 47 million 
+    compounds.
+    }
+    \label{fig:ammoscale}
+\end{figure}
 
 \subsection{Application to metagenomics}
 
