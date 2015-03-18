@@ -141,13 +141,13 @@ Entropy-scaling search of massive biological data}
 
 \begin{abstract}
     \begin{itemize}
-        \item While biological data sets are growing dramatically, they tend to exhibit low entropy
+        \item While biological datasets are growing dramatically, they tend to exhibit low entropy
         \item We introduce a data structure that allows similarity search in time- and space-complexity asymptotically linear in entropy
         \item Using this data structure, we demonstrate at least an order of magnitude acceleration of omics search: chemogenomics, metagenomics, and protein structure search
     \end{itemize}
 \noindent\unskip\textbf{eTOC Blurb}
 \par\medskip\noindent\unskip\ignorespaces
-Massive data sets in biological systems often exhibit high redundancy and thus low entropy.
+Massive datasets in biological systems often exhibit high redundancy and thus low entropy.
 We have developed a data structure for similarity search whose complexity scales linearly in entropy.
 This approach allows us to dramatically accelerate analytical tools drawn from small molecule search, genomics, and protein structure search.
 \end{abstract}
@@ -158,7 +158,7 @@ This approach allows us to dramatically accelerate analytical tools drawn from s
 \section{Summary}
 { \bfseries
     The continual onslaught of new omics data has forced upon scientists the fortunate problem of having too much data to analyze.
-    Luckily, it turns out that many data sets exhibit well-defined structure that can be exploited for the design of 
+    Luckily, it turns out that many datasets exhibit well-defined structure that can be exploited for the design of 
 smarter analysis tools.
     We introduce an entropy-scaling data structure---which given a low fractal dimension database, scales in both time and space with the entropy of that underlying database---to perform similarity search, a fundamental operation in data science.
     Using these ideas, we present accelerated versions of standard tools for use by practitioners in the three domains of high-throughput drug screening, metagenomics, and protein structure search, none of which have any loss in specificity or significant loss in sensitivity:
@@ -172,7 +172,7 @@ Throughout all areas of data science, an explosion of data confronts
 researchers.
 In many fields, this increase is exponential in nature, outpacing Moore's and Kryder's laws on the respective doublings of transistors on a chip and long-term data storage density \cite{kahn2011future}.
 As such, the challenges posed by the massive influx of data cannot be solved by waiting for faster and larger capacity computers, but require instead the development of data structures and representations that exploit complex
-structure in the data set.
+structure in the dataset.
 
 Here, we focus on similarity search, where the task at hand is to find all entries in some database that are `similar,' or approximate matches, to some query item.
 Much like sorting is a primitive operation in computer science, similarity search is a fundamental operation in data science and lies at the heart of many other problems.
@@ -207,8 +207,8 @@ Specifically, if similarity is defined by a metric-like distance function (e.g.,
 Note that metric entropy is not to be confused with the notion of a distance metric.
 This data structure allows for minimal (or even zero) loss in recall, coupled
 with zero loss in specificity.
-These entropy-scaling data structures can in principle be used to organize nearly any large data set for faster and more space-efficient analysis,
-and we provide guidance as to how to determine their efficacy for any data set.
+These entropy-scaling data structures can in principle be used to organize nearly any large dataset for faster and more space-efficient analysis,
+and we provide guidance as to how to determine their efficacy for any dataset.
 Moreover, we demonstrate their utility on similarity search problems drawn from the three major biological ``big challenges of big data:'' pharmaceuticals, genomics, and protein structure \cite{marx2013biology}.
 Not only do these order-of-magnitude improvements in running time promise to enable new workflows for practitioners (e.g. fast first-pass computational drug screens and local analyses of sequencing data in remote field sites for real-time epidemic monitoring), but the general theory of entropy-scaling data structures that we introduce can be straightforwardly applied to accelerate other search tools.
 
@@ -234,14 +234,14 @@ We are interested in the similarity search problem of
 finding all points in a set that are close to (i.e., similar to) the query point.
 The basics of the data structure itself are presented in Figure \ref{fig:dataStructure}, but here we provide conceptual motivation.
 
-Let us first consider what it means for a large biological data set, considered as points in a high-dimensional space, to be highly redundant.
+Let us first consider what it means for a large biological dataset, considered as points in a high-dimensional space, to be highly redundant.
 Perhaps many of the points are exact duplicates; this easy scenario is trivially exploited by de-duplication and is already standard practice, such as
 the NR NCBI protein database \cite{pruitt2005ncbi}.
 Or maybe the points mostly live on a low-dimensional subspace; statistical tools such as Principal Component Analysis exploit this property in data analysis.
 Furthermore, if the dimension of the subspace is sufficiently low,
 it can be divided into cells, allowing quick similarity searches by looking only at nearby cells \cite{weber1998quantitative}.
 However, when the dimensionality of the subspace increases, cell search time 
-grows exponentially; additionally, in sparse data sets, most of the cells will 
+grows exponentially; additionally, in sparse datasets, most of the cells will 
 be empty, which wastes search time.
 
 \begin{figure}[p]
@@ -253,7 +253,7 @@ Although high-dimensional at a fine scale, at the coarser scale of covering sphe
     \label{fig:tree}
 \end{figure}
 
-More importantly, biological data sets generally do not live in low-dimensional subspaces.
+More importantly, biological datasets generally do not live in low-dimensional subspaces.
 Consider the instructive case of genomes along an evolutionary `tree of life' (Figure \ref{fig:tree}).
 Such a tree has many branches (though admixture merges branches back together),
 and looks nearly 1-dimensional locally, but it is globally of higher dimension.
@@ -309,7 +309,7 @@ and sometimes even what counts as a distinct data point is not entirely clear wi
 We show in the following that entropy-scaling data structures are robust to the variations presented by real data.
 Through the diversity of the applications we explore in this paper, we demonstrate that the general scheme works for massively accelerating similarity search in a set of different contexts.
 These applications are enabled by augmenting the data structure with domain-specific distance functions in different stages of the algorithm, as well as preprocessing to take advantage of domain-specific knowledge.
-We expect that so long as the data set exhibits both low entropy and low 
+We expect that so long as the dataset exhibits both low entropy and low 
 fractal dimension---and this is empirically true in biological systems---our 
 entropy-scaling data structure has the potential to achieve massive speedup 
 over more na\"ive methods and significant speedup over even other highly 
@@ -355,7 +355,7 @@ and the time required for each MCS operation, which scales with the size of the 
 It is worth noting that this pre-processing of molecular graphs can cause the 
 triangle inequality to be violated; while the distance function is a metric, the
 clustering does not respect that metric.
-Ammolite can be readily plugged in to existing analysis pipelines for 
+Ammolite can be readily plugged into existing analysis pipelines for 
 high-throughput drug screening.
 
 Our entropy-scaling data structure can be applied to PubChem because it has both low fractal
@@ -437,7 +437,7 @@ PubChem ID & Ammolite (hours) & Speedup \\
     \includegraphics[width=1\textwidth]{assets/ammolite-speedup.png}
     \caption{ Ammolite's speedup over SMSD. On PubChem ID 23743178,
     Ammolite's gains overs SMSD increase with database size, achieving a 12.5x
-    speedup on the full PubChem from October, 2013, which contains 47 million 
+    speedup on the full PubChem from October 2013, which contains 47 million 
     compounds.
     }
     \label{fig:ammoscale}
@@ -488,7 +488,7 @@ implementation provides an acceleration of BLASTX by a factor of up
 to 673.
 This application illustrates the potential of entropy-scaling data structures, while
 providing a useful tool for metagenomic research.
-It can be readily plugged in to existing analysis pipelines (e.g. for microbial 
+It can be readily plugged into existing analysis pipelines (e.g., for microbial 
 composition analysis using MEGAN).
 
 CaBLASTX is useful for two of the most common metagenomic analysis tasks. 
@@ -529,7 +529,7 @@ database, in which case metagenomic reads have already been
 assembled (Table~\ref{mgspeed}).
 We benchmarked caBLASTX vs. BLASTX on a dataset consisting of 22,778 assemblies
 from human gut microbiota, 3.1 megabases in total, searching against the NCBI's
-`NR' non-redundant protein database from September, 2014.
+`NR' non-redundant protein database from September 2014.
 The running time of BLASTX was 3235 minutes, compared to 123 minutes for 
 caBLASTX, a speedup of 26.3.
 In this instance, the query-side clustering of caBLASTX is not applicable, so
@@ -720,9 +720,9 @@ Empirically, however, for all of the queries we performed, we achieve $> 99.8\%$
 
 \section{Discussion}
 
-\textbf{The primary advance of entropy-scaling data structures is that they bound both time and space as functions of the data set entropy (albeit using two different notions of entropy).}
+\textbf{The primary advance of entropy-scaling data structures is that they bound both time and space as functions of the dataset entropy (albeit using two different notions of entropy).}
 In this paper, we have introduced an entropy-scaling data structure for accelerating approximate search,
-allowing search on large omics data sets to scale even as those data sets grow exponentially.
+allowing search on large omics datasets to scale even as those datasets grow exponentially.
 Although related to compressed and opportunistic data structures such as the compressed suffix array and the FM-index~\cite{grossi2005compressed, ferragina2000opportunistic} that solve the problem of 
 theoretically fast and scalable pattern matching,
 here we solve, theoretically and practically, the much more general similarity 
