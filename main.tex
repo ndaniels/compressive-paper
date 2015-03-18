@@ -527,7 +527,7 @@ while caBLASTX took 21 minutes, a speedup of 673x.
 CaBLASTX also sped up BLASTX in aligning assemblies thought to be exons to a protein
 database, in which case metagenomic reads have already been 
 assembled (Table~\ref{mgspeed}).
-We benchmarked caBLASTX vs. BLASTX on a dataset consisting of 22,778 assemblies
+We benchmarked caBLASTX versus BLASTX on a dataset consisting of 22,778 assemblies
 from human gut microbiota, 3.1 megabases in total, searching against the NCBI's
 `NR' non-redundant protein database from September 2014.
 The running time of BLASTX was 3235 minutes, compared to 123 minutes for 
@@ -631,7 +631,7 @@ For cosine distance, we generated databases with maximum cluster radii of 0.1, 0
 Then, for each query protein from the set \{\texttt{4rhv}, \texttt{1ake}, \texttt{1bmf}, \texttt{1rbp}\} (identified by PDB IDs), we ran both na\"ive and accelerated similarity searches with radii of $0.02i, \forall i \in \{0,\ldots,49\}$.
 This test was repeated 5 times for each measurement, and the ratio of average accelerated vs na\"ive times is shown in Figure \ref{fig:fragbag_cosine}.
 For Euclidean distance, we generated databases with maximum cluster radii of 10, 20, 25, 50, and 100.
-Again, for each query protein drawn from the same set, we compared the average over 5 runs of the ratio of average accelerated vs na\"ive times (Figure \ref{fig:fragbag_euclid}).
+Again, for each query protein drawn from the same set, we compared the average over five runs of the ratio of average accelerated versus na\"ive times (Figure \ref{fig:fragbag_euclid}).
 
 Not only is the acceleration highly dependent on both the search radius $r$ and the maximum cluster radius $r_c$,
 but the choice of query protein also affects the results.
