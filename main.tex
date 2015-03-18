@@ -327,9 +327,9 @@ wet-lab consideration, but even this screening can be time-consuming.
 PubChem~\cite{bolton2008pubchem}, a widely-used repository of molecular compound 
 structures, 
 has grown greatly since 2008. 
-In July, 2007, PubChem contained 10.3 million compounds.
-In October, 2013, PubChem contained roughly 47 million compounds, while
-in December, 2014 it contained 61.3 million compounds.
+In July 2007, PubChem contained 10.3 million compounds.
+In October 2013, PubChem contained roughly 47 million compounds, while
+in December 2014 it contained 61.3 million compounds.
 
 We designed this compression and search framework around one of the standard 
 techniques for high-throughput screening of potential drug compounds, the use 
@@ -350,8 +350,8 @@ distance metrics such as graph distance \cite{bunke1998graph}.
 To compress a molecule database, we project the space of small molecules onto a subspace by removing nodes and edges that do not participate in simple cycles
 (Figure S1).
 Clusters are exactly pre-images of of this projection operator (i.e.,~all molecules that are isomorphic after simplification form a cluster).
-Coarse search is performed by finding the MCS on this much smaller projection subspace. This increases speed both by reducing the required number of MCS operations 
-and by reducing the time required for each MCS operation, which scales with the size of the molecule.
+Coarse search is performed by finding the MCS on this much smaller projection subspace. This increases speed by reducing both the required number of MCS operations 
+and the time required for each MCS operation, which scales with the size of the molecule.
 It is worth noting that this pre-processing of molecular graphs can cause the 
 triangle inequality to be violated; while the distance function is a metric, the
 clustering does not respect that metric.
