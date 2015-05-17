@@ -142,13 +142,13 @@ Entropy-scaling search of massive biological data}
 \begin{abstract}
     \begin{itemize}
         \item While biological datasets are growing dramatically, they tend to exhibit low entropy
-        \item We introduce a data structure that allows similarity search in time- and space-complexity asymptotically linear in entropy
-        \item Using this data structure, we demonstrate at least an order of magnitude acceleration of omics search: chemogenomics, metagenomics, and protein structure search
+        \item We introduce a conceptual framework that allows similarity search in time- and space-complexity asymptotically linear in entropy
+        \item Using this framework, we demonstrate at least an order of magnitude acceleration of omics search: chemogenomics, metagenomics, and protein structure search
     \end{itemize}
 \noindent\unskip\textbf{eTOC Blurb}
 \par\medskip\noindent\unskip\ignorespaces
 Massive datasets in biological systems often exhibit high redundancy and thus low entropy.
-We have developed a data structure for similarity search whose complexity scales linearly in entropy.
+We have developed a framework for similarity search whose complexity scales linearly in entropy.
 This approach allows us to dramatically accelerate analytical tools drawn from small molecule search, genomics, and protein structure search.
 \end{abstract}
 
@@ -160,7 +160,7 @@ This approach allows us to dramatically accelerate analytical tools drawn from s
     The continual onslaught of new omics data has forced upon scientists the fortunate problem of having too much data to analyze.
     Luckily, it turns out that many datasets exhibit well-defined structure that can be exploited for the design of 
 smarter analysis tools.
-    We introduce an entropy-scaling data structure---which given a low fractal dimension database, scales in both time and space with the entropy of that underlying database---to perform similarity search, a fundamental operation in data science.
+    We introduce an entropy-scaling framework---which given a low fractal dimension database, scales in both time and space with the entropy of that underlying database---to perform similarity search, a fundamental operation in data science.
     Using these ideas, we present accelerated versions of standard tools for use by practitioners in the three domains of high-throughput drug screening, metagenomics, and protein structure search, none of which have any loss in specificity or significant loss in sensitivity:
     Ammolite, 12x speedup of small molecule similarity search with less than 4\% loss in sensitivity; CaBLASTX, 673x speedup of BLASTX with less than 5\% loss in sensitivity; and esFragBag, 10x speedup of FragBag with less than 0.2\% loss in sensitivity.
 
@@ -201,25 +201,25 @@ proteomics, using similar strategies \cite{daniels2013compressive}.
 Empirically, this compressive acceleration appears to scale almost linearly in the entropy of the database, often resulting in orders of magnitude better performance.
 
 In this paper, we generalize and formalize this approach by introducing 
-a mathematically rigorous class of entropy-scaling data structures for 
-omics similarity search: data structures that \textbf{provably} scale linearly in both time and space with the entropy of the database, and thus sublinearly with the entire database.
-Specifically, if similarity is defined by a metric-like distance function (e.g., edit or Hamming distance) and the database exhibits both low `metric entropy' and `fractal dimension', this data structure performs much better than na\"ive and even optimized methods.
+a mathematically rigorous entropy-scaling framework for 
+omics similarity search, allowing a family of data structures that \textbf{provably} scale linearly in both time and space with the entropy of the database, and thus sublinearly with the entire database.
+Specifically, if similarity is defined by a metric-like distance function (e.g., edit or Hamming distance) and the database exhibits both low `metric entropy' and `fractal dimension', entropy-scaling search performs much better than na\"ive and even optimized methods.
 Note that metric entropy is not to be confused with the notion of a distance metric.
-This data structure allows for minimal (or even zero) loss in recall, coupled
+This framework allows for minimal (or even zero) loss in recall, coupled
 with zero loss in specificity.
-These entropy-scaling data structures can in principle be used to organize nearly any large dataset for faster and more space-efficient analysis,
-and we provide guidance as to how to determine their efficacy for any dataset.
-Moreover, we demonstrate their utility on similarity search problems drawn from the three major biological ``big challenges of big data:'' pharmaceuticals, genomics, and protein structure \cite{marx2013biology}.
-Not only do these order-of-magnitude improvements in running time promise to enable new workflows for practitioners (e.g. fast first-pass computational drug screens and local analyses of sequencing data in remote field sites for real-time epidemic monitoring), but the general theory of entropy-scaling data structures that we introduce can be straightforwardly applied to accelerate other search tools.
+This entropy-scaling framework can in principle be used to organize nearly any large dataset in which certain properties hold for faster and more space-efficient analysis,
+and we provide guidance as to how to determine its efficacy for any dataset.
+Moreover, we demonstrate its utility on similarity search problems drawn from the three major biological ``big challenges of big data:'' pharmaceuticals, genomics, and protein structure \cite{marx2013biology}.
+Not only do these order-of-magnitude improvements in running time promise to enable new workflows for practitioners (e.g. fast first-pass computational drug screens and local analyses of sequencing data in remote field sites for real-time epidemic monitoring), but the general theory of entropy-scaling search that we introduce can be straightforwardly applied to accelerate other search tools.
 
 \section{Results}
 
-\subsection{Entropy-scaling data structure for similarity search}
+\subsection{Entropy-scaling similarity search}
 
 \begin{figure}[p]
     \centering
     \centerline{\includegraphics[width=8in]{assets/dataStructure.png}}
-    \caption{ Entropy-scaling data structure for similarity search. %
+    \caption{ Entropy-scaling framework for similarity search. %
             (a) The na\"ive approach tests each query against each database entry to find entries within distance $r$ of the query (inside the small green disc). %
             (b) By selecting appropriate cluster centers with maximum radius $r_c$ to partition the database, we can (c) first do a coarse search to find all cluster centers within distance $r+r_c$ of a query (larger green disc), %
  and then the (d) triangle inequality guarantees that a fine search over all corresponding cluster entries (blue polygonal regions) will suffice.}
@@ -232,7 +232,7 @@ For genomic sequences, this can be edit distance; for chemical graphs, Tanimoto
 distance; and for general vectors, Euclidean or cosine distance.
 We are interested in the similarity search problem of
 finding all points in a set that are close to (i.e., similar to) the query point.
-The basics of the data structure itself are presented in Figure \ref{fig:dataStructure}, but here we provide conceptual motivation.
+The basics of the framework itself are presented in Figure \ref{fig:dataStructure}, but here we provide conceptual motivation.
 
 Let us first consider what it means for a large biological dataset, considered as points in a high-dimensional space, to be highly redundant.
 Perhaps many of the points are exact duplicates; this easy scenario is trivially exploited by de-duplication and is already standard practice, such as
@@ -287,7 +287,7 @@ As an aside, note that the space-complexity actually scales with the sum of metr
 %Similarly, using these covering spheres, the database can be stored in a 
 %compressed manner (see Supplemental Methods for further details).
 
-Entropy-scaling data structures can be expected to provide a boost to 
+Entropy-scaling frameworks can be expected to provide a boost to 
 approximate search when fractal dimension is low (i.e., close to 1) and metric
 entropy is low.
 Specifically, the ratio $\frac{|D|}{k}$ provides an estimate of the acceleration factor
@@ -306,12 +306,12 @@ Sometimes the distance function is not a metric, so we lose the triangle inequal
 sometimes different distance functions can be used for the clustering versus search;
 and sometimes even what counts as a distinct data point is not entirely clear without domain knowledge (for example, long genomic sequences might be better broken into shorter subsequences).
 
-We show in the following that entropy-scaling data structures are robust to the variations presented by real data.
+We show in the following that entropy-scaling frameworks are robust to the variations presented by real data.
 Through the diversity of the applications we explore in this paper, we demonstrate that the general scheme works for massively accelerating similarity search in a set of different contexts.
-These applications are enabled by augmenting the data structure with domain-specific distance functions in different stages of the algorithm, as well as preprocessing to take advantage of domain-specific knowledge.
+These applications are enabled by augmenting the framework with domain-specific distance functions in different stages of the algorithm, as well as preprocessing to take advantage of domain-specific knowledge.
 We expect that so long as the dataset exhibits both low entropy and low 
 fractal dimension---and this is empirically true in biological systems---our 
-entropy-scaling data structure has the potential to achieve massive speedup 
+entropy-scaling framework has the potential to achieve massive speedup 
 over more na\"ive methods and significant speedup over even other highly 
 optimized methods.
 
@@ -358,7 +358,7 @@ clustering does not respect that metric.
 Ammolite can be readily plugged into existing analysis pipelines for 
 high-throughput drug screening.
 
-Our entropy-scaling data structure can be applied to PubChem because it has both low fractal
+Our entropy-scaling framework can be applied to PubChem because it has both low fractal
 dimension and low metric entropy.
 In particular, we determined the mean local fractal dimension of PubChem to be 
 approximately 0.2 in the neighborhood between 0.2 and 0.4 Tanimoto distance,
@@ -475,18 +475,18 @@ Although this is a problem already for major research centers, it is especially
 limiting for on-site analyses in more remote locations.
 In surveying the 2014 Ebola outbreak, scientists physically shipped samples on 
 dry ice to Harvard for sequencing and analysis \cite{gire2014genomic}.
-Even as sequencers become more mobile, lack of fast Internet connections in remote
-areas can make it impossible to centralize and expediate processing (viz.: the cloud);
+Even as sequencers become more mobile and can thus be brought on-site, lack of fast Internet connections in remote
+areas can make it impossible to centralize and expedite processing (viz.: the cloud);
 local processing on resource-constrained machines remains essential.
 Thus, a better-scaling and accurate version of BLASTX raises the possibility of 
 not only faster computing for large research centers, but also of performing
-entirely on-site sequencing and metagenomic analyses.
+entirely on-site sequencing and desktop metagenomic analyses.
 
-We have applied our entropy-scaling data structure to the problem of 
+We have applied our entropy-scaling framework to the problem of 
 metagenomic search and demonstrate caBLASTX, a method whose software 
 implementation provides an acceleration of BLASTX by a factor of up 
 to 673.
-This application illustrates the potential of entropy-scaling data structures, while
+This application illustrates the potential of entropy-scaling frameworks, while
 providing a useful tool for metagenomic research.
 It can be readily plugged into existing analysis pipelines (e.g., for microbial 
 composition analysis using MEGAN).
@@ -506,7 +506,7 @@ be amortized over future queries, so
 we expect this enhancement to provide a 
 constant factor improvement.
 
-Our entropy-scaling data structure can be applied to the NCBI's NR database because it, 
+Our entropy-scaling framework can be applied to the NCBI's NR database because it, 
 like PubChem, exhibits low fractal dimension and metric entropy.
 We determined the mean local fractal dimension of the NCBI's NR database, using 
 sequence identity of alignment as a distance function, to be approximately 1.6 
@@ -523,6 +523,7 @@ On a large-scale publicly-available database (Supplemental Methods), we found th
 (although similar to Diamond) at greater accuracy (Table~\ref{mgspeed}).
 Notably, the running time for BLASTX was 14,423 minutes, 
 while caBLASTX took 21 minutes, a speedup of 673x.
+We note that the time spent performing query-side clustering is included for caBLASTX here.
 
 CaBLASTX also sped up BLASTX in aligning assemblies thought to be exons to a protein
 database, in which case metagenomic reads have already been 
@@ -614,19 +615,19 @@ FragBag amenable to acceleration through entropy-scaling.
 By first verifying that the local fractal dimension of PDB FragBag frequency vectors is low in most regimes ($d \approx 2-3)$, Figure S3), we are given reason to think that this problem is amenable to entropy-scaling search.
 As an estimate of potential speedup, the ratio of PDB database size to metric 
 entropy at for the chosen cluster radii is on average approximately 10:1.
-We directly applied our entropy-scaling data structure without any additional 
+We directly applied our entropy-scaling framework without any additional 
 augmentation: esFragBag (entropy-scaling FragBag) is able to achieve an average
 factor of 10 speedup of the highly-optimized FragBag with less than 0.2\% loss 
 in sensitivity and no loss in specificity.
 
-For this last example, we intentionally approach the application of entropy-scaling data structures to FragBag in a blind manner,
+For this last example, we intentionally approach the application of entropy-scaling frameworks to FragBag in a blind manner,
 without using any domain-specific knowledge.
 Instead, we use the very same representation (bag of fragments) and distance functions (Euclidean and cosine distances)
 as FragBag, coupled with a greedy k-centers algorithm to generate the clustered representation.
 Note that this is in stark contrast to caBLASTX and Ammolite, which both exploit domain knowledge to further improve performance.
 Thus, esFragBag only involves extending an existing codebase with new database generation and similarity search functions.
 
-We investigate the increases in speed resulting from directly applying the entropy-scaling data structure for both Euclidean and cosine distances and found the acceleration is highly dependent on both the search radius and cluster radius (Figure \ref{fig:fragbag}).
+We investigate the increases in speed resulting from directly applying the entropy-scaling framework for both Euclidean and cosine distances and found the acceleration is highly dependent on both the search radius and cluster radius (Figure \ref{fig:fragbag}).
 For cosine distance, we generated databases with maximum cluster radii of 0.1, 0.2, 0.3, 0.4, and 0.5.
 Then, for each query protein from the set \{\texttt{4rhv}, \texttt{1ake}, \texttt{1bmf}, \texttt{1rbp}\} (identified by PDB IDs), we ran both na\"ive and accelerated similarity searches with radii of $0.02i, \forall i \in \{0,\ldots,49\}$.
 This test was repeated 5 times for each measurement, and the ratio of average accelerated vs na\"ive times is shown in Figure \ref{fig:fragbag_cosine}.
@@ -636,12 +637,12 @@ Again, for each query protein drawn from the same set, we compared the average o
 Not only is the acceleration highly dependent on both the search radius $r$ and the maximum cluster radius $r_c$,
 but the choice of query protein also affects the results.
 We suspect that this effect is due to the geometry of protein fragment frequency space being very `spiky' and `star-like'.
-Proteins that are near the core (and thus similar to many other proteins) show very little acceleration when our data structure is used because the majority of the database is nearby, whereas proteins in the periphery have fewer neighbors and are thus found much more quickly.
+Proteins that are near the core (and thus similar to many other proteins) show very little acceleration when our framework is used because the majority of the database is nearby, whereas proteins in the periphery have fewer neighbors and are thus found much more quickly.
 Changing the maximum cluster radius effectively makes more proteins peripheral proteins, but at the cost of overall acceleration.
 
 Naturally, as the search radius expands, it quickly becomes necessary to compare against nearly the entire database, destroying any acceleration.
 For the cosine space in particular, note that the maximum distance between any two points is $1$, so once the coarse search radius of $r+r_c \ge 1.0$, there cannot ever be any acceleration as the fine search encompasses the entire database.
-Similarly, once the coarse search encompasses all (or nearly all) the clusters in Euclidean space, the acceleration diminishes to 1x, and the overhead costs make the entropy-scaling data structure perform worse than a na\"ive search.
+Similarly, once the coarse search encompasses all (or nearly all) the clusters in Euclidean space, the acceleration diminishes to 1x, and the overhead costs make the entropy-scaling framework perform worse than a na\"ive search.
 However, as we are most interested in proteins that are very similar to the query, the low-radius behavior is of primary interest.
 In the low-radius regime, esFragBag demonstrates varying though substantial acceleration (2-30x, averaging $>$10x for both distance functions for the proteins chosen) over FragBag.
 
@@ -693,7 +694,7 @@ Whereas there is nearly 30x acceleration for \texttt{4rhv} in cosine space for l
         %\caption{}
     \end{subfigure}
     }
-    \caption{Scaling behavior of esFragBag. EsFragBag benchmarking data with parameters varied until the acceleration advantage of esFragBag disappears. As search radius increases, the fraction of the database returned by the coarse search increases, ultimately returning the whole database. Unsurprisingly, when returning the whole database in the coarse search results, there are no benefits to using entropy-scaling data structures. (a) Cosine distance gives on the whole better acceleration, but results in $>99.8\%$ sensitivity, whereas (b) Euclidean distance as a metric is guaranteed by the Triangle Inequality to get $100\%$ sensitivity.}
+    \caption{Scaling behavior of esFragBag. EsFragBag benchmarking data with parameters varied until the acceleration advantage of esFragBag disappears. As search radius increases, the fraction of the database returned by the coarse search increases, ultimately returning the whole database. Unsurprisingly, when returning the whole database in the coarse search results, there are no benefits to using entropy-scaling frameworks. (a) Cosine distance gives on the whole better acceleration, but results in $>99.8\%$ sensitivity, whereas (b) Euclidean distance as a metric is guaranteed by the Triangle Inequality to get $100\%$ sensitivity.}
     \label{fig:fragbag}
 \end{figure}
 
@@ -720,22 +721,25 @@ Empirically, however, for all of the queries we performed, we achieve $> 99.8\%$
 
 \section{Discussion}
 
-\textbf{The primary advance of entropy-scaling data structures is that they bound both time and space as functions of the dataset entropy (albeit using two different notions of entropy).}
-In this paper, we have introduced an entropy-scaling data structure for accelerating approximate search,
+\textbf{The primary advance of entropy-scaling frameworks is that they bound both time and space as functions of the dataset entropy (albeit using two different notions of entropy).}
+In this paper, we have introduced an entropy-scaling framework for accelerating approximate search,
 allowing search on large omics datasets to scale even as those datasets grow exponentially.
 Although related to compressed and opportunistic data structures such as the compressed suffix array and the FM-index~\cite{grossi2005compressed, ferragina2000opportunistic} that solve the problem of 
 theoretically fast and scalable pattern matching,
 here we solve, theoretically and practically, the much more general similarity 
 search problem.
 Additionally, our bounds are explicitly in terms of entropy: in the main paper we proved that runtime scales linearly with the entropy of the 
-database, but we also show in Supplemental Theory that under certain additional constraints, this entropy-scaling data structure permits a compressed 
+database, but we also show in Supplemental Theory that under certain additional constraints, this entropy-scaling framework permits a compressed 
 representation on disk.
 This compression is particularly applicable in the case of metagenomic analysis, where the collection of 
 read data presents a major problem for storage and transfer.
-Implementing this compression is feasible using existing software tools and 
-libraries such as Blocked GZip (BZGF).
+While we did not implement on-disk compression in any of our applications, 
+choosing instead to focus on search speed, implementing this compression is 
+feasible using existing software tools and libraries such as Blocked GZip 
+(BZGF); each cluster would be compressed separately on disk.
 
-Furthermore, we have justified and demonstrated the effectiveness of this data structure in
+Furthermore, we have justified and demonstrated the effectiveness of this 
+framework in
 three distinct areas of computational molecular biology, providing the
 following open-source software: Ammolite for
 small-molecule structure search, caBLASTX for metagenomic analysis, and esFragBag for protein structure search.
@@ -745,10 +749,10 @@ underlying methods can be easily incorporated into the original
 software that we are accelerating.
 In the case of metagenomic analysis, caBLASTX also compares favorably to recent 
 search tools, such as Diamond, that outperform BLASTX.
-It may be possible to apply entropy-scaling data
-structures to Diamond itself, achieving even greater speed gains, but
+It may be possible to apply an entropy-scaling framework to Diamond itself, 
+achieving even greater speed gains, but
 accuracy would then be limited to that of Diamond,
-as entropy-scaling data structures do not themselves 
+as entropy-scaling does not itself 
 improve accuracy.
 
 The reason for the speedup is the combination of low fractal dimension and low metric entropy.
@@ -765,18 +769,25 @@ subspaces.
 Furthermore, as is the case with genomes, the low-dimensional polytopes are also often connected (e.g., through evolutionary history); thus, collections of local projections become unwieldy.
 By using our clustering approach, we are able to take advantage of the existence of these low-dimensional polytopes for accelerated search without having to explicitly characterize each one.
 
-Entropy-scaling data structures for massive biological data have the great
+An entropy-scaling search tree is related to a metric ball tree~\cite{uhlmann1991satisfying}, although with different time complexity.
+Querying a metric ball tree requires $O(\log n)$ time, assuming the relatively uniform distribution of data points in a metric space.
+This is different from the nonuniform distribution under which entropy-scaling
+search behaves well.
+As future work, we will investigate further acceleration of coarse search by
+applying a metric ball tree to the cluster representatives themselves; this may reduce the coarse search time to $O(\log k)$.
+
+Entropy-scaling frameworks for massive biological data have the great
 advantage of becoming proportionately faster and space-efficient with the
 size of the available data.
-Although the component pieces (e.g., the clustering method chosen) of the data structure can be either standard (as in esFragBag) or novel (as in Ammolite), the key point is that these pieces are used in a larger framework to exploit the underlying complex structure of biological systems, enabling massive acceleration by scaling with entropy.
+Although the component pieces (e.g., the clustering method chosen) of the framework can be either standard (as in esFragBag) or novel (as in Ammolite), the key point is that these pieces are used in a larger framework to exploit the underlying complex structure of biological systems, enabling massive acceleration by scaling with entropy.
 We have demonstrated this scaling behavior for common problems drawn from
 metagenomics, cheminformatics, and protein structure search, but the general strategy can be applied
 directly or with simple domain knowledge to a vast array of other problems
 faced in data science.
-We anticipate that entropy-scaling data structures should be applicable beyond
+We anticipate that entropy-scaling frameworks should be applicable beyond
 the life sciences, wherever physical or empirical laws have constrained data to 
 a subspace of low entropy and fractal dimension.
-As biological data continues to accumulate, entropy-scaling data structures
+As biological data continues to accumulate, entropy-scaling frameworks
 will become critical to fully realizing the potential of compressive
 algorithms for biology. 
 
