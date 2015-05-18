@@ -299,11 +299,29 @@ Encoding each non-center point $p$ as a function of the nearest cluster center r
 Specifying the privileged points again requires $O(kl)$ bits, so together the total information-theoretic entropy is $O(kl + n r_c)$.
 In other words, not only is space complexity linear in metric entropy plus information-theoretic entropy, but information-theoretic entropy itself is also bounded by the low-dimensional coarse structure of the database.
 
-\subsubsection{Clustering time}
+\subsubsection{Clustering time complexity}
+Although clustering the database is a one-time cost that can further be amortized over future queries, we still require that cluster generation be tractable.
+Here we present a trivial
+$O(kn)$ algorithm for cluster generation with clusters of maximum radius $r_c$ that appears to work sufficiently well in practice (and is the algorithm used in esFragBag):
+\begin{itemize}
+    \item Initialize an empty set of cluster centers $C$. Let $\delta(x,C)$ be the distance from a point $x$ to $C$, defined to be $\infty$ if $C = \emptyset$.
+    \item Randomly order the $n$ entries of the database $D = \{d_1, \ldots, d_n  \}$
+    \item For $i = 1, \ldots n$,
+        \begin{itemize}
+            \item If $\delta(d_i,C) > r_c$, append $d_i$ to $C$.
+        \end{itemize}
+    \item For $i = 1, \ldots n$,
+        \begin{itemize}
+            \item Assign $d_i$ to the cluster represented by the nearest item in $C$.
+        \end{itemize}
+\end{itemize}
+Because we need to compare each of $n$ items against up to $k$ items in $C$ in each of the for loops, this trivial algorithm takes $O(kn)$ time.
 
-$O(kn)$ clustering time
-
-$O(k)$ update time (adding a new point).
+Additionally, updates can be performed in $O(k)$ time.
+For a new entry $d_{n+1}$, if $\delta(d_{n+1},C) \le r_c$, assign $d_{n+1}$ to the cluster represented by the nearest item in $C$.
+Otherwise, append $d_{n+1}$ to $C$ as a new cluster center.
+This clearly requires exactly $k$ comparisons to do.
+Note that with updates of this kind, items are no longer guaranteed to be assigned to the nearest cluster center; however, they are still guaranteed to be assigned to some cluster center within distance $r_c$, which is all that is needed for entropy-scaling to work.
 
 \subsection{Ammolite}
 
