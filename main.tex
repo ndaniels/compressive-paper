@@ -272,7 +272,21 @@ However, because the spheres have radius comparable to branch width, the tree is
 Thus, increasing the search radius for coarse search only linearly increases the number of points that need to be searched in a fine search.
 
 A similar analysis holds in the more general case.
-Given a database with fractal dimension $d$ and metric entropy $k$ at the scale $r_c$, we show in the Supplemental Methods that the time-complexity of similarity search on database $D$ for query $q$ with radius $r$ is
+The entropy-scaling frameworks we introduce can be expected to provide a boost to 
+approximate search when fractal dimension is low (i.e., close to 1) and metric
+entropy is low.
+Specifically, the ratio $\frac{|D|}{k}$ provides an estimate of the acceleration factor
+for just the coarse search component compared to a full linear search.
+Local fractal dimension around a data point can be computed by determining the
+number of other data points within two radii $r_1$ and $r_2$ of that point;
+given those point counts ($n_1$ and $n_2$, respectively), fractal dimension $d$
+is simply $d=\frac{\log (n_2 / n_1)}{ \log (r_2 / r_1)}$.
+Sampling this property over a dataset can provide a global average fractal 
+dimension.
+When we search a larger radius around a query, the number of points we encounter grows exponentially with the fractal dimension;
+low fractal dimension implies that this growth will not obviate the gains provided by an entropy-scaling data structure.
+
+More formally, given a database with fractal dimension $d$ and metric entropy $k$ at the scale $r_c$, we show in the Supplemental Methods that the time-complexity of similarity search on database $D$ for query $q$ with radius $r$ is
 \begin{gather*}
     O\Bigg(
     \underbrace{k}_{\textrm{metric entropy}} +
@@ -286,19 +300,6 @@ As an aside, note that the space-complexity actually scales with the sum of metr
 (Supplemental Methods: Theory).
 %Similarly, using these covering spheres, the database can be stored in a 
 %compressed manner (see Supplemental Methods for further details).
-
-Entropy-scaling frameworks can be expected to provide a boost to 
-approximate search when fractal dimension is low (i.e., close to 1) and metric
-entropy is low.
-Specifically, the ratio $\frac{|D|}{k}$ provides an estimate of the acceleration factor
-for just the coarse search component compared to a full linear search.
-Local fractal dimension around a data point can be computed by determining the
-number of other data points within two radii $r_1$ and $r_2$ of that point;
-given those point counts ($n_1$ and $n_2$, respectively), fractal dimension $d$
-is simply $d=\frac{\log (n_2 / n_1)}{ \log (r_2 / r_1)}$.
-Sampling this property over a dataset can provide a global average fractal 
-dimension; low fractal dimension will indicate that fine search time will not
-obviate the gains provided by an entropy-scaling data structure.
 
 We have presented the simplest such data to analyze for clarity of exposition.
 However, real data is generally messier.
