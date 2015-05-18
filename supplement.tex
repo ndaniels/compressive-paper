@@ -317,11 +317,16 @@ $O(kn)$ algorithm for cluster generation with clusters of maximum radius $r_c$ t
 \end{itemize}
 Because we need to compare each of $n$ items against up to $k$ items in $C$ in each of the for loops, this trivial algorithm takes $O(kn)$ time.
 
-Additionally, updates can be performed in $O(k)$ time.
+Additionally, insertions can be performed in $O(k)$ time.
 For a new entry $d_{n+1}$, if $\delta(d_{n+1},C) \le r_c$, assign $d_{n+1}$ to the cluster represented by the nearest item in $C$.
 Otherwise, append $d_{n+1}$ to $C$ as a new cluster center.
 This clearly requires exactly $k$ comparisons to do.
-Note that with updates of this kind, items are no longer guaranteed to be assigned to the nearest cluster center; however, they are still guaranteed to be assigned to some cluster center within distance $r_c$, which is all that is needed for entropy-scaling to work.
+Note that with insertions of this kind, items are no longer guaranteed to be assigned to the nearest cluster center; however, they are still guaranteed to be assigned to some cluster center within distance $r_c$, which is all that is needed for entropy-scaling to work.
+
+Deletions are slightly more complicated.
+If the entry to be deleted is not a cluster center, then removing it takes constant time.
+However, if it is a cluster center, we effectively have to remove the entire cluster and reinsert all the non-center elements, which will take $O(k \cdot \textrm{[size of cluster]})$.
+Thus, in expectation over a uniform random choice of item to be deleted, deletions can also be performed in $O(k)$ time.
 
 \subsection{Ammolite}
 
