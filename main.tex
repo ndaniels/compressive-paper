@@ -204,7 +204,8 @@ In this paper, we generalize and formalize this approach by introducing
 a mathematically rigorous entropy-scaling framework for 
 omics similarity search, allowing a family of data structures that \textbf{provably} scale linearly in both time and space with the entropy of the database, and thus sublinearly with the entire database.
 Specifically, if similarity is defined by a metric-like distance function (e.g., edit or Hamming distance) and the database exhibits both low `metric entropy' and `fractal dimension', entropy-scaling search performs much better than na\"ive and even optimized methods.
-Note that metric entropy is not to be confused with the notion of a distance metric.
+We will define both rigorously later, but intuitively, metric entropy measures how dissimilar the dataset is from itself and fractal dimension measures how the number of spheres needed to cover all points in a database scales with the radii of those spheres; note that metric entropy is not to be confused with the notion of a distance metric.
+
 This framework allows for minimal (or even zero) loss in recall, coupled
 with zero loss in specificity.
 This entropy-scaling framework can in principle be used to organize nearly any large dataset in which certain properties hold for faster and more space-efficient analysis,
