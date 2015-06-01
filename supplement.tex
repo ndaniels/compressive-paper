@@ -234,12 +234,14 @@ We first define the concept of metric entropy and entropy dimension in the usual
 Unfortunately, as $D$ is a finite, discrete, set, the given definision always gives $\dim_{\text{Hausdorff}}(D) = 0$.
 However, we are only interested in scaling behaviors around large radii, so instead we use:
 \begin{definition}
-    The fractal dimension $d$ of a set $D$ at a scale $[\rho_1,\rho_2]$ is given by
+    Define fractal dimension $d$ of a set $D$ at a scale $[\rho_1,\rho_2]$ by
     \[
-        d = \operatorname*{arg\,max}_{d^*} \{ N_\rho(D) \propto \rho^{-d^*} | \rho \in [\rho_1,\rho_2] \}.
+        %d = \operatorname*{arg\,min}_{d^*} \{ N_\rho(D) \le N_{\rho_1}(D) \rho^{-d^*} | \rho \in [\rho_1,\rho_2] \},
+        d =  \min_{\rho \in [\rho_1,\rho_2]} \left\{ \frac{ \log \frac{ N_\rho(D) }{N_{\rho_1}(D)}}{ \log \frac{\rho}{\rho_1}  } \right\}
     \]
 \end{definition}
-Intuitively, this just means that when we double the radius of a sphere around a point, the number of points in the larger sphere is roughly the number of points in the smaller sphere multiplied by $2^d$, or when we scale the radius by a factor of $\sigma$, the multiplication is by $\sigma^d$.
+Intuitively, this means that when we double the radii, the metric entropy, or number of covering spheres needed, decreases by a multiplicative factor of $2^d$.
+On average, this also means that when we double the radius of a sphere around a point, the number of points in the larger sphere is roughly the number of points in the smaller sphere multiplied by $2^d$, because otherwise the spheres could not cover the space.
 
 Recall that $k$ entries are selected as cluster centers for partitioning the database to result in clusters with maximum radius $r_c$.
 From the definition above, when setting $\rho = r_c$, it is trivial to verify $ k \le N_{r_c} (D)$.
