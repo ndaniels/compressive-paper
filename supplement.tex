@@ -239,6 +239,7 @@ However, we are only interested in scaling behaviors around large radii, so inst
         d = \operatorname*{arg\,max}_{d^*} \{ N_\rho(D) \propto \rho^{-d^*} | \rho \in [\rho_1,\rho_2] \}.
     \]
 \end{definition}
+Intuitively, this just means that when we double the radius of a sphere around a point, the number of points in the larger sphere is roughly the number of points in the smaller sphere multiplied by $2^d$, or when we scale the radius by a factor of $\sigma$, the multiplication is by $\sigma^d$.
 
 Recall that $k$ entries are selected as cluster centers for partitioning the database to result in clusters with maximum radius $r_c$.
 From the definition above, when setting $\rho = r_c$, it is trivial to verify $ k \le N_{r_c} (D)$.
@@ -252,11 +253,13 @@ As the time-complexity of similarity search is just the total of the coarse and 
 By the triangle inequality, $F \subset B_D(q,r+2r_c)$,
 so we can bound $|F| \le |B_D(q,r+2r_c)|$.
 Let the fractal dimension $D$ at the scale between $r_c$ and $2r_c + r$ be $d$.
+Recall that the local fractal dimension determines how many more points we hit when we scale the radius of a sphere.
 Then in expectation over possible queries $q$,
 \[
-    \left|B_D(q, r+2r_c)\right| \sim \left|B_D(q,r)\right|\left(\frac{r+2r_c}{r}\right)^d .
+    \left|B_D(q, r+2r_c)\right| \sim \left|B_D(q,r)\right|\left(\frac{r+2r_c}{r}\right)^d ,
 \]
-Roughly speaking, this scaling argument just says that doubling a search radius only increases the number of hits by a factor of at most $2^d$.
+because we are measuring the relative number of points found in spheres of radius $r$ vs radius $r+2r_c$ respectively.
+%Roughly speaking, this scaling argument just says that doubling a search radius only increases the number of hits by a factor of at most $2^d$.
 Thus, total search time is 
 \[
     O\left(k + \left|B_D(q,r)\right|\left(\frac{r+2r_c}{r}\right)^d \right).
