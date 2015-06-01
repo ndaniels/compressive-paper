@@ -634,7 +634,7 @@ Then, for each query protein from the set \{\texttt{4rhv}, \texttt{1ake}, \textt
 This test was repeated 5 times for each measurement, and the ratio of average accelerated vs na\"ive times is shown in Figure \ref{fig:fragbag_cosine}.
 For Euclidean distance, we generated databases with maximum cluster radii of 10, 20, 25, 50, and 100.
 Again, for each query protein drawn from the same set, we compared the average over five runs of the ratio of average accelerated versus na\"ive times (Figure \ref{fig:fragbag_euclid}).
-The cluster generation required anywhere from 65 to 23,714 seconds, depending on the choice of radii (See table \ref{tab:esfragbag_clustering}).
+The cluster generation required anywhere from 65 to 23,714 seconds, depending on the choice of radii (See table \ref{tab:esfragbag_clustering}) and no more than a small constant (<3) times as much memory as it takes to simply load the PDB database.
 \begin{table}
 \caption{Cluster generation time for esFragBag}
 \label{tab:esfragbag_clustering}
