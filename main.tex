@@ -800,12 +800,17 @@ subspaces.
 Furthermore, as is the case with genomes, the low-dimensional polytopes are also often connected (e.g., through evolutionary history); thus, collections of local projections become unwieldy.
 By using our clustering approach, we are able to take advantage of the existence of these low-dimensional polytopes for accelerated search without having to explicitly characterize each one.
 
-An entropy-scaling search tree is related to a metric ball tree~\cite{uhlmann1991satisfying}, although with different time complexity.
+An entropy-scaling search tree is also related to a metric ball tree~\cite{uhlmann1991satisfying}, although with different time complexity.
 Querying a metric ball tree requires $O(\log n)$ time, assuming the relatively uniform distribution of data points in a metric space.
 This is different from the nonuniform distribution under which entropy-scaling
 search behaves well.
 As future work, we will investigate further acceleration of coarse search by
 applying a metric ball tree to the cluster representatives themselves; this may reduce the coarse search time to $O(\log k)$.
+
+Other metric search trees can also be found in the database literature \cite{zezula2006similarity}, though they have never been applied to biological data science.
+The closest analogue to entropy-scaling search trees is the M-tree \cite{ciaccia1997deis,ciaccia1998cost}, which resembles a multi-level variation of our entropy-scaling search trees.
+However, the M-tree time-complexity analysis \cite{ciaccia1998cost} does not have a nice closed form and is more explicitly dependent on the exact distribution of points in the database.
+By novelly borrowing the concepts of metric entropy and fractal dimension for our analysis, we are able to give an easier to understand and more intuitive, if somewhat looser, bound on entropy-scaling search tree complexity.
 
 Entropy-scaling frameworks for massive biological data have the great
 advantage of becoming proportionately faster and space-efficient with the
