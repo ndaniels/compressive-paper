@@ -371,14 +371,14 @@ Because SMSD is not computationally tractable on the entire PubChem database,
 we benchmarked Ammolite against SMSD on a subset of 1 million molecules from PubChem.
 Since SMSD's running time should scale linearly with the size of the database, we extrapolated the
 running time of SMSD on a subset of 10 million molecules, as well as on the entire PubChem database.
-For these benchmarks, we used three query molecules with at least two cyclohexane rings, namely PubChem IDs 28250541, 1504670, and 23743178.
+For these benchmarks, we used five randomly-chosen query molecules with at least two rings (PubChem IDs 1504670, 19170294, 28250541, 4559889, and 55484477), as well as five medically-interesting molecules chosen by hand (adenosine triphosphate, clindamycin, erythromycin, teixobactin, and thalidomide).
 We also used SMSD as a gold standard against which we measured Ammolite's recall.
-As shown in Table~\ref{ammo1m}, Ammolite achieves at least 96\% recall with respect to SMSD.
-Furthermore, as shown in Tables~\ref{ammo10m} and \ref{ammo47m}, Ammolite's speed gains with respect to SMSD grow as the database grows.
-Figure~\ref{fig:ammoscale} illustrates this scaling for one query.
+As shown in Table~\ref{ammo1m}, Ammolite achieves an average of 92.5\% recall with respect to SMSD. This recall is brought down by one poorly-performing compound, PubChem ID 1504670, with only 62.5\% recall, but is otherwise over 80\%.
+Furthermore, as shown in Table~\ref{ammo47m}, Ammolite's speed gains with respect to SMSD grow as the database grows.
+% Figure~\ref{fig:ammoscale} illustrates this scaling for one query.
 
 \begin{table}
-\caption{Benchmarks of Ammolite vs. SMSD on databases of (a) 1 million molecules (b) 10 million molecules (c) All of PubChem (47 million molecules)}
+\caption{Benchmarks of Ammolite vs. SMSD on databases of (a) 1 million molecules (b) All of PubChem (47 million molecules)}
 
 
 \begin{subtable}{1\textwidth}
@@ -388,34 +388,32 @@ Figure~\ref{fig:ammoscale} illustrates this scaling for one query.
 \hline
 PubChem ID & SMSD (hours) & Ammolite (hours) & Speedup & Recall \\
 \hline
-28250541 & 43.3 & 12.2 & 3.5 & 100\% \\
+5957 (atp) & 4.4 & 0.14 & 31 & 81\% \\
 \hline
-1504670 & 8.1 & 3.6 & 2.3 & 96.3\% \\
+446598 (clindamycin) & 18.7 & 1.5 & 11.7 & 90\% \\
 \hline
-23743178 & 21.7 & 2.7 & 8.2 & 100\% \\
+12560 (erythromycin) & 849.6 & 3.0 & 279.2 & 91\% \\
 \hline
+86341926 (teixobactin) & 618.5 & 2.3 & 265.5 & 100\% \\
+\hline
+5426 (thalidomide) & 48.9 & 0.81 & 60.4 & 100\% \\
+\hline
+1504670 & 8.1 & 0.8 & 10.3 & 62.5\% \\
+\hline
+19170294 & 31.3 & 0.8 & 39.7 & 100\% \\
+\hline
+28250541 & 43.3 & 4.8 & 9.0 & 100\% \\
+\hline
+4559889 & 108.8 & 2.7 & 41.0 & 100\% \\
+\hline
+55484477 & 23.3 & 2.5 & 9.1 & 100\% \\
+\hline
+
 \end{tabular}
 \end{subtable}
 
 \vspace{1em}
 
-\begin{subtable}{1\textwidth}
-\caption{Ammolite benchmark on database of 10 million molecules}
-\label{ammo10m}
-\begin{tabular}{ccc}
-\hline
-PubChem ID & Ammolite (hours) & Speedup \\
-\hline
-28250541 & 97.7 & 3.2 \\
-\hline
-1504670 & 25.4 & 4.4 \\
-\hline
-23743178 & 21.3 & 10.2 \\
-% \hline
-\end{tabular}
-\end{subtable}
-
-\vspace{1em}
 
 \begin{subtable}{1\textwidth}
 \caption{Ammolite benchmark on entire PubChem database}
@@ -428,7 +426,25 @@ PubChem ID & Ammolite (hours) & Speedup \\
 % \hline
 % 1504670 & 3235 & 123 \\
 \hline
-23743178 & 81.5 & 12.5 \\
+5957 (atp) & 4.1 & 51.3 \\
+\hline
+446598 (clindamycin) & 28.4 & 14.5 \\
+\hline
+12560 (erythromycin) & 79.1 & 512.9 \\
+\hline
+86341926 (teixobactin) & 96.5 & 305.9 \\
+\hline
+5426 (thalidomide) & 29.2 & 80.0 \\
+\hline
+1504670 & 4.6 & 84.4 \\
+\hline
+19170294 & 6.0 & 247.4 \\
+\hline
+28250541 & 38.9 & 53.2\\
+\hline
+4559889 & 57.3 & 90.7 \\
+\hline
+55484477 & 35.5 & 31.4 \\
 \hline
 \end{tabular}
 \end{subtable}
@@ -438,7 +454,8 @@ PubChem ID & Ammolite (hours) & Speedup \\
     \centering
     \includegraphics[width=1\textwidth]{assets/ammolite-speedup.png}
     \caption{ Ammolite's speedup over SMSD. On PubChem ID 23743178,
-    Ammolite's gains overs SMSD increase with database size, achieving a 12.5x
+    Ammolite's gains overs SMSD increase with database size, achieving a 147x 
+    average
     speedup on the full PubChem from October 2013, which contains 47 million 
     compounds.
     }
@@ -521,20 +538,22 @@ and lends itself to clustering, has precedent~\cite{linial1997global}.
 To evaluate the run-time performance of caBLASTX, we tested it against
 BLASTX and two other top-performing tools: RapSearch2~\cite{zhao2012rapsearch2} and the recently-released
 Diamond~\cite{buchfink2014fast}.
-On a large-scale publicly-available database (Supplemental Methods), we found that caBLASTX provides substantial runtime improvements 
+On five read sets (ERR335622, ERR335625, ERR335631, ERR335635, ERR335636) totalling 207,623 151-nucleotide reads from 
+the American Gut Microbiome project, we found that caBLASTX provides 
+substantial runtime improvements 
 (although similar to Diamond) at greater accuracy (Table~\ref{mgspeed}).
-Notably, the running time for BLASTX was 14,423 minutes, 
-while caBLASTX took 21 minutes, a speedup of 673x.
-We note that the time spent performing query-side clustering is included for caBLASTX here.
+Notably, the mean running time for BLASTX was 58,215 minutes, 
+while caBLASTX took an average of 89 minutes, a speedup of 654x.
+We note that the time spent performing query-side clustering is included for caBLASTX here; without query-side clustering, caBLASTX takes 2,278 minutes, a speedup of 25x.
 
 CaBLASTX also sped up BLASTX in aligning assemblies thought to be exons to a protein
 database, in which case metagenomic reads have already been 
 assembled (Table~\ref{mgspeed}).
-We benchmarked caBLASTX versus BLASTX on a dataset consisting of 22,778 assemblies
-from human gut microbiota, 3.1 megabases in total, searching against the NCBI's
+We benchmarked caBLASTX versus BLASTX on a three sets of assembled sequences from the Human Gut Microbiome project (assemblies SRS013215, SRS048536, SRS078197) consisting of 49,041 assembled sequences
+from human gut microbiota, ~40 megabases in total, searching against the NCBI's
 `NR' non-redundant protein database from September 2014.
-The running time of BLASTX was 3235 minutes, compared to 123 minutes for 
-caBLASTX, a speedup of 26.3.
+The average running time of BLASTX was 4190 minutes, compared to 158 minutes for 
+caBLASTX, a speedup of 26.5.
 In this instance, the query-side clustering of caBLASTX is not applicable, so
 the performance gains are more modest.
 For both next-generation sequencing (NGS) reads and assemblies, Diamond had slightly faster running time than caBLASTX, albeit at the expense of accuracy, while RapSearch2 was slower.
@@ -544,34 +563,48 @@ For both next-generation sequencing (NGS) reads and assemblies, Diamond had slig
 \begin{subtable}{1\textwidth}
 \caption{Running time}
 \label{mgspeed}
-\begin{tabular}{ccccc}
+\tabcolsep=0.08cm
+\begin{tabular}{llllll}
 \hline
-dataset & BLASTX & caBLASTX & RapSearch2 & Diamond \\
+dataset & BLASTX & caBLASTX^1 & RapSearch2 & Diamond & caBLASTX^2 \\
 \hline
-NGS reads (sec) & 14423 & 21 & 51 & 13 \\
+NGS reads^3, min. ($\sigma$) & 58215 (1561.8) & 89 (7.0) & 206 (5.4) & 54 (1.1) & 2278 (102.7) \\
 \hline
-assemblies (sec) & 3235 & 123 & 194 & 50 \\
+assemblies^4, min. ($\sigma$) & 4190 (2105.3) & N/A & 242 (108.0) & 63.7 (26.5) & 158 (75.7) \\
 \hline
-\end{tabular}
+\end{tabular}\\{
+(1) caBLASTX with query-side clustering\\
+(2) caBLASTX without query-side clustering\\
+(3) American gut microbiome project read sets ERR335622, ERR335625, ERR335631, ERR335635, ERR335636\\
+(4) Human gut microbiome project assemblies SRS013215, SRS048536, SRS078197
+}
 \end{subtable}
 
 \begin{subtable}{1\textwidth}
 \caption{Accuracy against BLASTX}
 \label{mgacc}
-\begin{tabular}{ccccc}
+\tabcolsep=0.11cm
+\begin{tabular}{lllll}
 \hline
-dataset & BLASTX & caBLASTX & RapSearch2 & Diamond \\
+dataset & caBLASTX^1 & RapSearch2 & Diamond & caBLASTX^2 \\
 \hline
-NGS reads & 100\% & 95.7\% & 79.5\% & 76.9\% \\
+NGS reads^3 ($\sigma$) & 96.1\% (1.0) & 79.5\% (1.63) & 76.6\% (1.05) & 98.9\% (0.54) \\
 \hline
-assemblies & 100\% & 99.2\% & 87.7\% & 91.0\% \\
+assemblies^4 ($\sigma$) & N/A & 88.7\% (1.4) & 92.5\% (1.05) & 99.1\% (0.65)\\
 \hline
-\end{tabular}
+\end{tabular}\\{
+Percentage accuracy compared to BLASTX (which is 100\%)\\
+(1) caBLASTX with query-side clustering\\
+(2) caBLASTX without query-side clustering\\
+(3) American gut microbiome project read sets ERR335622, ERR335625, ERR335631, ERR335635, ERR335636\\
+(4) Human gut microbiome project assemblies SRS013215, SRS048536, SRS078197
+}
 \end{subtable}
 \end{table}
 
+
 As shown in Table~\ref{mgacc}, caBLASTX achieves substantially better accuracy
-than other methods: 99.2\% accuracy on assemblies and 95.7\% 
+than other methods: 99.1\% accuracy on assemblies and 96.1\% 
 accuracy even on the raw reads.
 Experiments validating accuracy treated BLASTX as a gold standard. 
 Since caBLASTX accelerates BLASTX
@@ -783,7 +816,7 @@ search tools, such as Diamond, that outperform BLASTX.
 It may be possible to apply an entropy-scaling framework to Diamond itself, 
 achieving even greater speed gains, but
 accuracy would then be limited to that of Diamond,
-as entropy-scaling does not itself 
+as entropy scaling does not itself 
 improve accuracy.
 
 The reason for the speedup is the combination of low fractal dimension and low metric entropy.
@@ -800,12 +833,19 @@ subspaces.
 Furthermore, as is the case with genomes, the low-dimensional polytopes are also often connected (e.g., through evolutionary history); thus, collections of local projections become unwieldy.
 By using our clustering approach, we are able to take advantage of the existence of these low-dimensional polytopes for accelerated search without having to explicitly characterize each one.
 
+A hierarchical clustering approach, rather than our flat clustering, might 
+produce further gains.
+The distance function used need not be the same for all levels of the 
+hierarchy; indeed, both the alphabet reduction employed in caBLASTX and the 
+molecule size heuristic in Ammolite can be thought of as initial versions of a multi-level or hierarchical clustering.
+
 An entropy-scaling search tree is also related to a metric ball tree~\cite{uhlmann1991satisfying}, although with different time complexity.
 Querying a metric ball tree requires $O(\log n)$ time, assuming the relatively uniform distribution of data points in a metric space.
 This is different from the nonuniform distribution under which entropy-scaling
 search behaves well.
 As future work, we will investigate further acceleration of coarse search by
 applying a metric ball tree to the cluster representatives themselves; this may reduce the coarse search time to $O(\log k)$.
+This, too, can be thought of as an additional level of clustering.
 
 Other metric search trees can also be found in the database literature \cite{zezula2006similarity}, though they have never been applied to biological data science.
 The closest analogue to entropy-scaling search trees is the M-tree \cite{ciaccia1997deis,ciaccia1998cost}, which resembles a multi-level variation of our entropy-scaling search trees.
@@ -860,8 +900,14 @@ the transformed query molecule was within the similarity score threshold---are
 then reconstructed, by following
 pointers to the removed atom and bond information, and recreating the 
 original molecules.
+Since the Tanimoto distance is used, we can bound the size of candidate 
+molecules based on the size of the query molecule and the desired Tanimoto 
+cutoff.
+Thus, a second level of clustering, at query time, based on molecule size, 
+allows further gains in run-time performance.
 Finally, the fine search is performed against these decompressed possible 
-hits.
+hits that are within the appropriate size range based on the Tanimoto distance
+cutoff.
 %Fine search is performed using MCS or fMCS, with user-defined parameters for 
 %bond and atom mismatches and similarity-score threshold.
 
@@ -872,7 +918,8 @@ different distance functions for clustering and search.
 For clustering, we rely on sequence identity, while for search, we use the
 E-value measure that is standard for BLAST.
 All benchmarks were performed with an E-value of $10^{-7}$, while the 
-caBLASTX coarse search uses an E-value of 1000.
+caBLASTX coarse search uses an E-value of 1000. 
+This seemingly surprisingly large coarse E-value is used because E-values are poorly behaved for short sequences; in sensitivity analysis, coarse E-values of 1 and 10 exhibited recall below 10\%, and an E-value of 100 exhibited recall below 60\%.
 Furthermore, during clustering (compression), we apply a preprocessing step that
 identifies subsequences to be treated as distinct points in the database.
 We apply a reversible alphabet reduction to the

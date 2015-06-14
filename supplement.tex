@@ -532,7 +532,8 @@ This is done so that the coarse search can rely on BLASTN (nucleotide BLAST) to
 search these sequences against the compressed protein database.
 
 For each coarse query representative (identified using a a coarse E-value of 
-1000, along with the BLASTN arguments \texttt{-task blastn-short -penalty -1}), 
+1000, along with the BLASTN arguments \texttt{-task blastn-short -penalty -1}; 
+these arguments are recommended by the NCBI BLAST+ manual when queries are short), 
 the set of coarse hits is used to
 reconstruct all corresponding sequences from the original database by following
 links to original sequence matches and applying their difference scripts.
