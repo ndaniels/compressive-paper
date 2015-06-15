@@ -370,7 +370,7 @@ The expected speedup is measured by the ratio of database size to metric entropy
 Because SMSD is not computationally tractable on the entire PubChem database,
 we benchmarked Ammolite against SMSD on a subset of 1 million molecules from PubChem.
 Since SMSD's running time should scale linearly with the size of the database, we extrapolated the
-running time of SMSD on a subset of 10 million molecules, as well as on the entire PubChem database.
+running time of SMSD to the entire PubChem database.
 For these benchmarks, we used five randomly-chosen query molecules with at least two rings (PubChem IDs 1504670, 19170294, 28250541, 4559889, and 55484477), as well as five medically-interesting molecules chosen by hand (adenosine triphosphate, clindamycin, erythromycin, teixobactin, and thalidomide).
 We also used SMSD as a gold standard against which we measured Ammolite's recall.
 As shown in Table~\ref{ammo1m}, Ammolite achieves an average of 92.5\% recall with respect to SMSD. This recall is brought down by one poorly-performing compound, PubChem ID 1504670, with only 62.5\% recall, but is otherwise over 80\%.
