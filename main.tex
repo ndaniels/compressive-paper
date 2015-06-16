@@ -162,7 +162,7 @@ This approach allows us to dramatically accelerate analytical tools drawn from s
 smarter analysis tools.
     We introduce an entropy-scaling framework---which given a low fractal dimension database, scales in both time and space with the entropy of that underlying database---to perform similarity search, a fundamental operation in data science.
     Using these ideas, we present accelerated versions of standard tools for use by practitioners in the three domains of high-throughput drug screening, metagenomics, and protein structure search, none of which have any loss in specificity or significant loss in sensitivity:
-    Ammolite, 12x speedup of small molecule similarity search with less than 4\% loss in sensitivity; CaBLASTX, 673x speedup of BLASTX with less than 5\% loss in sensitivity; and esFragBag, 10x speedup of FragBag with less than 0.2\% loss in sensitivity.
+    Ammolite, 150x speedup of small molecule similarity search with less than 7\% loss in sensitivity; CaBLASTX, 654x speedup of BLASTX with less than 5\% loss in sensitivity; and esFragBag, 10x speedup of FragBag with less than 0.2\% loss in sensitivity.
 
     Source code: \url{http://gems.csail.mit.edu} (username: cs; password: cs2015)
 }
@@ -354,6 +354,9 @@ To compress a molecule database, we project the space of small molecules onto a 
 Clusters are exactly pre-images of this projection operator (i.e.,~all molecules that are isomorphic after simplification form a cluster).
 Coarse search is performed by finding the MCS on this much smaller projection subspace. This increases speed by reducing both the required number of MCS operations 
 and the time required for each MCS operation, which scales with the size of the molecule.
+The time required to cluster a large database such as PubChem is, nonetheless, significant; clustering the 306GB PubChem required approximately 400 hours on a
+12-core Xeon X5690 running at 3.47GHz, and required 128GB RAM.
+However, this database can easily be appended to as new molecules become available, and the clustering time can be amortized over future queries.
 It is worth noting that this pre-processing of molecular graphs can cause the 
 triangle inequality to be violated; while the distance function is a metric, the
 clustering does not respect that metric.
