@@ -341,7 +341,7 @@ PubChem, and for quickly searching for
 similar molecular structures in compressed space.
 Ammolite demonstrates that entropy-scaling methods can be extended to data types that are not inherently sequence based.
 Ammolite is a practical 
-tool that provides approximately a factor of 10 speed-up with greater than 95\% accuracy compared to the popular SMSD~\cite{rahman2009small}.
+tool that provides approximately a factor of 150 speed-up with greater than 93\% accuracy compared to the popular SMSD~\cite{rahman2009small}.
 
 MCS-based search of molecule databases typically matches pairs of molecules by 
 Tanimoto distance~\cite{rahman2009small}. 
@@ -452,18 +452,18 @@ PubChem ID & Ammolite (hours) & Speedup \\
 \end{tabular}
 \end{subtable}
 \end{table}
-
-\begin{figure}[hbp]
-    \centering
-    \includegraphics[width=1\textwidth]{assets/ammolite-speedup.png}
-    \caption{ Ammolite's speedup over SMSD. On PubChem ID 23743178,
-    Ammolite's gains overs SMSD increase with database size, achieving a 147x 
-    average
-    speedup on the full PubChem from October 2013, which contains 47 million 
-    compounds.
-    }
-    \label{fig:ammoscale}
-\end{figure}
+%
+% \begin{figure}[hbp]
+%     \centering
+%     \includegraphics[width=1\textwidth]{assets/ammolite-speedup.png}
+%     \caption{ Ammolite's speedup over SMSD. On PubChem ID 23743178,
+%     Ammolite's gains overs SMSD increase with database size, achieving a 147x
+%     average
+%     speedup on the full PubChem from October 2013, which contains 47 million
+%     compounds.
+%     }
+%     \label{fig:ammoscale}
+% \end{figure}
 
 \subsection{Application to metagenomics}
 
