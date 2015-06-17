@@ -341,7 +341,7 @@ PubChem, and for quickly searching for
 similar molecular structures in compressed space.
 Ammolite demonstrates that entropy-scaling methods can be extended to data types that are not inherently sequence based.
 Ammolite is a practical 
-tool that provides approximately a factor of 150 speed-up with greater than 93\% accuracy compared to the popular SMSD~\cite{rahman2009small}.
+tool that provides approximately a factor of 150 speed-up with greater than 92\% accuracy compared to the popular SMSD~\cite{rahman2009small}.
 
 MCS-based search of molecule databases typically matches pairs of molecules by 
 Tanimoto distance~\cite{rahman2009small}. 
@@ -507,7 +507,7 @@ entirely on-site sequencing and desktop metagenomic analyses.
 We have applied our entropy-scaling framework to the problem of 
 metagenomic search and demonstrate caBLASTX, a method whose software 
 implementation provides an acceleration of BLASTX by a factor of up 
-to 673.
+to 654.
 This application illustrates the potential of entropy-scaling frameworks, while
 providing a useful tool for metagenomic research.
 It can be readily plugged into existing analysis pipelines (e.g., for microbial 
@@ -676,7 +676,7 @@ Then, for each query protein from the set \{\texttt{4rhv}, \texttt{1ake}, \textt
 This test was repeated 5 times for each measurement, and the ratio of average accelerated vs na\"ive times is shown in Figure \ref{fig:fragbag_cosine}.
 For Euclidean distance, we generated databases with maximum cluster radii of 10, 20, 25, 50, and 100.
 Again, for each query protein drawn from the same set, we compared the average over five runs of the ratio of average accelerated versus na\"ive times (Figure \ref{fig:fragbag_euclid}).
-The cluster generation required anywhere from 65 to 23,714 seconds, depending on the choice of radii (See table \ref{tab:esfragbag_clustering}) and no more than a small constant (<3) times as much memory as it takes to simply load the PDB database.
+The cluster generation required anywhere from 65 to 23,714 seconds, depending on the choice of radii (See table \ref{tab:esfragbag_clustering}) and no more than a small constant ($<3$) times as much memory as it takes to simply load the PDB database.
 \begin{table}
 \caption{Cluster generation time for esFragBag}
 \label{tab:esfragbag_clustering}
@@ -805,7 +805,7 @@ database, but we also show in Supplemental Theory that under certain additional 
 representation on disk.
 This compression is particularly applicable in the case of metagenomic analysis, where the collection of 
 read data presents a major problem for storage and transfer.
-While we did not implement on-disk compression in any of our applications, 
+While we did not optimize for on-disk compression in any of our applications, 
 choosing instead to focus on search speed, implementing this compression is 
 feasible using existing software tools and libraries such as Blocked GZip 
 (BZGF); each cluster would be compressed separately on disk.
