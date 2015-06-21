@@ -912,7 +912,7 @@ For clustering, we rely on sequence identity, while for search, we use the
 E-value measure that is standard for BLAST.
 All benchmarks were performed with an E-value of $10^{-7}$. For coarse search, MICA uses the DIAMOND argument \texttt{--top 60} in order to return all queries
 with a score within 60\% of the top hit.
-When MICA was tested using BLASTX for coarse, search, it used an E-value of 
+When MICA was tested using BLASTX for coarse search, it used an E-value of 
 1000.
 This seemingly surprisingly large coarse E-value is used because E-values are poorly behaved for short sequences; in sensitivity analysis, coarse E-values of 1 and 10 exhibited recall below 10\%, and an E-value of 100 exhibited recall below 60\%.
 Furthermore, during clustering (compression), we apply a preprocessing step that
