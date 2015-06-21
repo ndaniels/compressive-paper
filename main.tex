@@ -142,7 +142,7 @@ Entropy-scaling search of massive biological data}
 \begin{abstract}
     \begin{itemize}
         \item While biological datasets are growing dramatically, they tend to exhibit low entropy
-        \item We introduce a conceptual framework that allows similarity search in time- and space-complexity asymptotically linear in entropy
+        \item We introduce a conceptual framework that allows similarity search in time- and space-complexity that is asymptotically linear in entropy
         \item Using this framework, we demonstrate at least an order of magnitude acceleration of omics search: chemogenomics, metagenomics, and protein structure search
     \end{itemize}
 \noindent\unskip\textbf{eTOC Blurb}
@@ -191,7 +191,7 @@ hashing \cite{indyk1998approximate}, vector approximation
 \cite{weber1998quantitative}---involve the construction of data structures that admit a more efficient search operation.
 However, we note that as biological data increases, not only does the redundancy present in the data also increase~\cite{loh2012compressive}, but 
 internal structure (such as low fractal dimension) also becomes apparent.
-Existing general purpose methods do not explicitly exploit the particular 
+Existing general-purpose methods do not explicitly exploit the particular 
 properties of biological data to accelerate search (Supplemental Methods: 
 Theory).
 
@@ -354,6 +354,10 @@ To compress a molecule database, we project the space of small molecules onto a 
 Clusters are exactly pre-images of this projection operator (i.e.,~all molecules that are isomorphic after simplification form a cluster).
 Coarse search is performed by finding the MCS on this much smaller projection subspace. This increases speed by reducing both the required number of MCS operations 
 and the time required for each MCS operation, which scales with the size of the molecule.
+Further reduction in search time is accomplished by grouping clusters according
+to size of the molecules within; because Tanimoto distance relies on molecule
+size, clusters containing molecules significantly larger or smaller then the
+query need not be searched at all.
 The time required to cluster a large database such as PubChem is, nonetheless, significant; clustering the 306GB PubChem required approximately 400 hours on a
 12-core Xeon X5690 running at 3.47GHz, and required 128GB RAM.
 However, this database can easily be appended to as new molecules become available, and the clustering time can be amortized over future queries.
@@ -369,6 +373,8 @@ In particular, we determined the mean local fractal dimension of PubChem to be
 approximately 0.2 in the neighborhood between 0.2 and 0.4 Tanimoto distance,
 and approximately 1.9 in the neighborhood between 0.4 and 0.5.
 The expected speedup is measured by the ratio of database size to metric entropy, which for PubChem is approximately 11:1.
+This is not taking into account the clustering according to molecule size, which
+further reduces the search space.
 
 Because SMSD is not computationally tractable on the entire PubChem database,
 we benchmarked Ammolite against SMSD on a subset of 1 million molecules from PubChem.
