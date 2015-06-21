@@ -358,7 +358,7 @@ Clustering is computation- and memory-intensive; clustering the entire 306GiB Pu
 
 Ammolite is implemented in Java, and its source code is available on Github.
 
-\subsection{CaBLASTX}
+\subsection{MICA}
 
 \subsubsection{Alphabet Reduction}
 
@@ -370,7 +370,7 @@ amino-acid alphabet to 17, 10, or even 4 letters.
 More recently, \citet{zhao2012rapsearch2} and \citet{huson2013poor} applied a reduction to
 a 4-letter alphabet, termed a ``pseudoDNA'' alphabet, in sequence alignment.
 
-In this work, we extend the compression approach of 
+When using BLASTX for coarse search, we extend the compression approach of 
 \citet{daniels2013compressive} using a reversible alphabet reduction.
 We use the alphabet reduction of \citet{murphy2000simplified} to map the 
 standard amino
@@ -381,15 +381,17 @@ a second cluster, A, G, P, S, and T into a third cluster, and
 D, E, N, Q, K, R, H, B, and Z into a fourth cluster.
 By storing the offset of the original letter within each cluster, the original
 sequence can be reconstructed, making this a reversible reduction.
+This alphabet reduction is not used when using DIAMOND for coarse search, as
+DIAMOND already relies on its own alphabet reduction.
 
 \subsubsection{Database Compression}
 
 Given a protein sequence database to be compressed, we proceed as follows:
 \begin{enumerate}
         \item First, initialize a table of all possible $k$-mer seeds of
-        our 4-letter reduced alphabet, as well as a coarse database of
-        reduced-alphabet sequences, initially containing the reduced-alphabet
-        version of the first sequence in the input database.
+        our (possibly 4-letter reduced) alphabet, as well as a coarse database 
+        of sequences, initially containing the (possibly reduced-alphabet)
+        first sequence in the input database.
         %
         \item For each $k$-mer of the first sequence, store its position in the
         corresponding entry in the seed table.
@@ -457,7 +459,8 @@ Finally, in order to be able to recover the original sequence with its original
 amino acid identities, a \textit{difference script} is associated with each
 link.
 This difference script is a representation of the insertions, deletions, and
-substitutions resulting from the Needleman-Wunsch alignment, along with the
+substitutions resulting from the Needleman-Wunsch alignment, along with (if 
+alphabet reduction is used) the
 offset in each reduced-alphabet cluster needed to recover the original alphabet.
 Thus, for example, a valine (V) is in the cluster containing C, I, L, M, V, and 
 J.
@@ -470,7 +473,7 @@ clusters that less faithfully represented the BLOSUM62 matrix and the
 physicochemical properties of the constituent amino acids.
 
 Because of the seed table, compression is memory-intensive and CPU-intensive.
-Compressing the September, 2014 NCBI NR database required approximately 120 hours on a 12-core Xeon with 88GB RAM.
+Compressing the September, 2014 NCBI NR database required approximately 39 hours on a 12-core Xeon with 128GB RAM.
 
 
 
@@ -478,6 +481,7 @@ Compressing the September, 2014 NCBI NR database required approximately 120 hour
 
 Metagenomic reads are themselves nucleotide sequences, so no alphabet reduction
 is performed on them directly.
+When BLASTX is for coarse search, MICA relies on query-side clustering.
 Instead, metagenomic reads are compressed using the same approach as the
 protein database, without the alphabet reduction step and with a number of
 different parameters.
@@ -499,20 +503,12 @@ sequence identity.
 Specifically, for 202-nucleotide reads, for two sequences to cluster together,
 we require a 150-nucleotide ungapped region of at least 80\% sequence identity.
 
-In the future, we may consider first translating the reads, and performing
-clustering in the amino acid space (after alphabet reduction).
-This would have the advantage of allowing reads with insertions or deletions
-to cluster together, without causing reading-frame mismatches.
-However, gapped alignment is much slower than ungapped alignment,
-so the resulting cost of query clustering might negate speed gains.
-
 We note that unlike the compression of the database, which can be amortized 
 over future queries, the time spent clustering and compressing the queries 
 cannot be amortized.
 Thus, we would not refer to the query clustering as entropy-scaling, but it
 still provides a constant speed-up.
-For this reason, we include the time spent clustering and compressing queries in the search time for caBLASTX.
-
+For this reason, we include the time spent clustering and compressing queries in the search time for MICA.
 
 \subsubsection{Search}
 
@@ -521,7 +517,8 @@ comprises two phases.
 The first, \emph{coarse search}, considers only the coarse sequences---the
 representatives---resulting from compression of the protein database and the
 query set.
-Just as with standard BLASTX, each coarse nucleotide read is transformed into 
+When BLASTX is used for the coarse search, each coarse nucleotide read is 
+transformed into 
 each of the six possible amino acid sequences that could result from it (three 
 reading frames for both the sequence and its reverse complement).
 Then, each of these amino acid sequences is then reduced back to a four-letter
@@ -545,18 +542,24 @@ Thus, for each coarse query representative, there is now a subset of the
 metagenomic read set (the reads represented by that coarse query) and also a
 subset of the protein database (the candidates).
 
-The second phase, \emph{fine search}, uses standard BLASTX to translate each
+When DIAMOND is used for coarse search, instead of an E-value threshold, the
+argument \texttt{--top 60} is used; this causes DIAMOND to return all coarse
+hits whose score is within 60\% of the top-scoring hit.
+Without this argument, DIAMOND defaults to returning at most 25 hits for each
+query sequence, which would result in significant loss of recall.
+
+The second phase, \emph{fine search}, uses standard DIAMOND or BLASTX to translate each
 of these reads associated with a coarse query representative and search for
 hits only in the subset of the database comprising the candidates.
-This fine search phase relies on a user-specified E-value threshold (defaulting
-to BLASTX's default of 10) to filter hits.
+This fine search phase relies on a user-specified E-value threshold (or other
+user-specified parameters to DIAMOND or BLASTX) to filter hits.
 To ensure that E-value calculation is correct, BLASTX uses a corrected database
 size which is the size of the original, uncompressed protein database.
 
 \subsubsection{Benchmarking}
 
 Although our primary result is the direct acceleration of BLASTX using our
-entropy-scaling data structures, we also compared caBLASTX to 
+entropy-scaling data structures, we also compared MICA to 
 RapSearch2~\cite{zhao2012rapsearch2} version 2.22 and the November 29, 2014 
 version of Diamond~\cite{buchfink2014fast}.
 All tests were performed on a 12-core Intel Xeon X5690 running at 3.47GHz with
@@ -567,7 +570,7 @@ In all cases, an E-value threshold of \texttt{1e-7} was used.
 For the raw-read dataset, we filtered out reads starting or ending with 10 or 
 more no-calls ('N').
 
-CaBLASTX is implemented in Go, and its source code is available on Github.
+MICA is implemented in Go, and its source code is available on Github.
 
 \subsection{esFragBag}
 We took the existing FragBag method as a black box and by design did not do anything clever in esFragBag except apply the entropy-scaling similarity search data structure.
