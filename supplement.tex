@@ -480,8 +480,8 @@ Compressing the September, 2014 NCBI NR database required approximately 39 hours
 
 Metagenomic reads are themselves nucleotide sequences, so no alphabet reduction
 is performed on them directly.
-When BLASTX is for coarse search, MICA relies on query-side clustering.
-Instead, metagenomic reads are compressed using the same approach as the
+When BLASTX is used for coarse search, MICA relies on query-side clustering.
+Metagenomic reads are compressed using the same approach as the
 protein database, without the alphabet reduction step and with a number of
 different parameters.
 The difference scripts for metagenomic reads do not rely on the cluster offsets,
@@ -560,7 +560,7 @@ size which is the size of the original, uncompressed protein database.
 Although our primary result is the direct acceleration of BLASTX using our
 entropy-scaling data structures, we also compared MICA to 
 RapSearch2~\cite{zhao2012rapsearch2} version 2.22 and the November 29, 2014 
-version of Diamond~\cite{buchfink2014fast}.
+version of DIAMOND~\cite{buchfink2014fast}.
 All tests were performed on a 12-core Intel Xeon X5690 running at 3.47GHz with
 88GB RAM and hyperthreading; 24 threads were allowed for all programs.
 Diamond was run with the \texttt{--sensitive} option.
