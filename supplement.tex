@@ -573,8 +573,9 @@ MICA is implemented in Go, and its source code is available on Github.
 
 \subsection{esFragBag}
 We took the existing FragBag method as a black box and by design did not do anything clever in esFragBag except apply the entropy-scaling similarity search data structure.
+We used a Go language implementation of FragBag, written by Andrew Gallant.
 Additionally, we removed the sorting-by-distance feature of Andrew Gallant's 
-FragBag search function, which does not improve the all-matching results we 
+FragBag search implementation, which does not improve the all-matching results we 
 were interested in here---it lowers $k$-nearest neighbor search memory 
 requirements while dominating the running time of $\rho$-nearest neighbor, the 
 problem at hand.

@@ -520,7 +520,7 @@ This application illustrates the potential of entropy-scaling frameworks, while
 providing a useful tool for metagenomic research.
 It can be readily plugged into existing analysis pipelines (e.g., for microbial 
 composition analysis using MEGAN).
-MICA clustering of the September 17, 2014 NCBI NR database required 39 
+MICA clustering of the September 17, 2014 NCBI NR database (containing 49.3 million sequences) required 39 
 hours on a 12-core Xeon X5690 running at 3.47GHz; it used approximately 84GB of resident memory.
 
 Our entropy-scaling framework can be applied to the NCBI's NR database because it, 
@@ -644,7 +644,8 @@ Then, for each query protein from the set \{\texttt{4rhv}, \texttt{1ake}, \textt
 This test was repeated 5 times for each measurement, and the ratio of average accelerated vs na\"ive times is shown in Figure \ref{fig:fragbag_cosine}.
 For Euclidean distance, we generated databases with maximum cluster radii of 10, 20, 25, 50, and 100.
 Again, for each query protein drawn from the same set, we compared the average over five runs of the ratio of average accelerated versus na\"ive times (Figure \ref{fig:fragbag_euclid}).
-The cluster generation required anywhere from 65 to 23,714 seconds, depending on the choice of radii (See table \ref{tab:esfragbag_clustering}) and no more than a small constant ($<3$) times as much memory as it takes to simply load the PDB database.
+The cluster generation required anywhere from 65 to 23,714 seconds, depending on the choice of radii (See table \ref{tab:esfragbag_clustering}) and no more than a small constant ($<3$) times as much memory as it takes to simply load the PDB database (no more than 2GB RAM).
+Clustering used 20 threads on a 12-core Xeon X5690, while search used only one thread.
 \begin{table}
 \caption{Cluster generation time for esFragBag}
 \label{tab:esfragbag_clustering}
@@ -807,7 +808,7 @@ framework in
 three distinct areas of computational molecular biology, providing the
 following open-source software: Ammolite for
 small-molecule structure search, MICA for metagenomic analysis, and esFragBag for protein structure search.
-All of our software is open-source, and not only can the tools we are 
+All of our software is available under the GNU Public License, and not only can the tools we are 
 releasing be readily plugged into existing pipelines, but the code and 
 underlying methods can be easily incorporated into the original 
 software that we are accelerating.
@@ -945,7 +946,7 @@ Finally, a fine search was performed over the set $F$ to find all proteins withi
 \section{Author Contributions}
 Y.W.Y., N.M.D., and B.B. conceived the project.
 Y.W.Y., N.M.D., and B.B. developed the theoretical analyses
-N.M.D. and D.C.D. implemented and benchmarked caBLASTX.
+N.M.D. and D.C.D. implemented and benchmarked MICA.
 D.C.D. implemented and benchmarked Ammolite, with help from N.M.D. and Y.W.Y.
 Y.W.Y. implemented and benchmarked esFragBag, with help from N.M.D.
 B.B. guided all research and provided critical advice on the study.
