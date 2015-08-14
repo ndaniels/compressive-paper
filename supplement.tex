@@ -237,7 +237,7 @@ However, we are only interested in scaling behaviors around large radii, so inst
     Define fractal dimension $d$ of a set $D$ at a scale $[\rho_1,\rho_2]$ by
     \[
         %d = \operatorname*{arg\,min}_{d^*} \{ N_\rho(D) \le N_{\rho_1}(D) \rho^{-d^*} | \rho \in [\rho_1,\rho_2] \},
-        d =  \max_{\rho \in [\rho_1,\rho_2]} \left\{ \frac{ \log \frac{ N_\rho(D) }{N_{\rho_1}(D)}}{ \log \frac{\rho}{\rho_1}  } \right\}
+        d =  \max_{\rho \in [\rho_1,\rho_2]} \left\{ \frac{ \log \frac{ N_\rho(D) }{N_{\rho_1}(D)}}{ \log \frac{\rho_1}{\rho}  } \right\}
     \]
 \end{definition}
 Intuitively, this means that when we double the radii, the metric entropy, or number of covering spheres needed, decreases by a multiplicative factor of $2^d$.
