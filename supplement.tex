@@ -369,7 +369,8 @@ amino-acid alphabet to 17, 10, or even 4 letters.
 More recently, \citet{zhao2012rapsearch2} and \citet{huson2013poor} applied a reduction to
 a 4-letter alphabet, termed a ``pseudoDNA'' alphabet, in sequence alignment.
 
-When using BLASTX for coarse search, we extend the compression approach of 
+When using BLASTX for coarse search (which we call caBLASTX), we extend the 
+compression approach of 
 \citet{daniels2013compressive} using a reversible alphabet reduction.
 We use the alphabet reduction of \citet{murphy2000simplified} to map the 
 standard amino
@@ -480,7 +481,7 @@ Compressing the September, 2014 NCBI NR database required approximately 39 hours
 
 Metagenomic reads are themselves nucleotide sequences, so no alphabet reduction
 is performed on them directly.
-When BLASTX is used for coarse search, MICA relies on query-side clustering.
+When BLASTX is used for coarse search (caBLASTX), MICA relies on query-side clustering.
 Metagenomic reads are compressed using the same approach as the
 protein database, without the alphabet reduction step and with a number of
 different parameters.
@@ -508,6 +509,8 @@ cannot be amortized.
 Thus, we would not refer to the query clustering as entropy-scaling, but it
 still provides a constant speed-up.
 For this reason, we include the time spent clustering and compressing queries in the search time for MICA.
+When using DIAMOND for coarse search, MICA does not perform query-side 
+clustering, and instead relies on DIAMOND's indexing of the queries.
 
 \subsubsection{Search}
 
@@ -516,8 +519,8 @@ comprises two phases.
 The first, \emph{coarse search}, considers only the coarse sequences---the
 representatives---resulting from compression of the protein database and the
 query set.
-When BLASTX is used for the coarse search, each coarse nucleotide read is 
-transformed into 
+When BLASTX is used for the coarse search (caBLASTX), each coarse nucleotide 
+read is transformed into 
 each of the six possible amino acid sequences that could result from it (three 
 reading frames for both the sequence and its reverse complement).
 Then, each of these amino acid sequences is then reduced back to a four-letter
@@ -552,12 +555,13 @@ of these reads associated with a coarse query representative and search for
 hits only in the subset of the database comprising the candidates.
 This fine search phase relies on a user-specified E-value threshold (or other
 user-specified parameters to DIAMOND or BLASTX) to filter hits.
-To ensure that E-value calculation is correct, BLASTX uses a corrected database
+To ensure that E-value calculation is correct, the call to BLASTX uses a 
+corrected database
 size which is the size of the original, uncompressed protein database.
 
 \subsubsection{Benchmarking}
 
-Although our primary result is the direct acceleration of BLASTX using our
+Although our primary result is the direct acceleration of DIAMOND using our
 entropy-scaling data structures, we also compared MICA to 
 RapSearch2~\cite{zhao2012rapsearch2} version 2.22 and the November 29, 2014 
 version of DIAMOND~\cite{buchfink2014fast}.
