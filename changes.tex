@@ -1,0 +1,96 @@
+
+\documentclass[12pt]{letter}
+\setlength{\textwidth}{6.5 in}
+\setlength{\textheight}{8.0in}
+\setlength{\oddsidemargin}{0in}
+\setlength{\topmargin}{-0.1in}
+\addtolength{\textheight}{0.9in}
+%\addtolength{\voffset}{-.5in}
+%advance\textheight by 1.5in
+%\advance\topmargin by 1.0in
+\address{}
+\signature{\hspace*{.1in} Bonnie Berger \& Noah~M.~Daniels}
+
+\begin{document}
+\begin{letter}{}
+\opening{Dear Dr. Mak,}
+
+\medskip
+
+Thank you for the thoughtful and helpful edits and comments on our manuscript, ``Entropy-scaling search of massive biological data.''
+We believe we have addressed all reviewer comments; we summarize the changes in-line with reviewers' comments below.
+
+\emph{Reviewers' comments:}
+
+\emph{Reviewer \#1: SUMMARY}
+
+\emph{The authors introduce a framework for speeding up large-data search queries by
+relying on the low-entry nature of most real data. They show the framework's
+utility on 3 applications in bioinformatics, with good results.}
+
+\emph{In this version, the authors have addressed most of my previous comments, and I
+think improved the clarity of the manuscript by changing to the ``framework''
+terminology. }
+
+
+\emph{MINOR REVISIONS, SUGGESTIONS \& COMMENTS}
+
+\emph{1. The licenses for Amolite and esFragBag should be specified someplace (with
+their source code and ideally in the paper). Right now, MICA is licensed as
+GPL, and the manuscript says all the software is ``open source'', but somewhere
+an explict license should be present.}
+
+We now specify in the paper (and in the LICENSE in each software repository) that all software is licensed under the GPL.
+
+\emph{2. I still think the Ebola example is not too apt: these "resource constrained"
+local machines would have to have all of GenBank on them? I think the problem
+of getting computation into remote areas is an important one, and while MICA
+might solve some part of it (search speed), it says nothing about a central difficulty: 
+storing the data at, or getting the data to (or from) the remote areas to be searched in the first place. }
+
+Having GenBank (or more specifically, the NCBI's NR database) is not infeasible
+for even a low-end laptop today; the NCBI NR from June, 2015 compressed by MICA 
+is a 24GB download. In the scenario we discuss, along with 
+sequencing equipment (e.g. an Illumina MiSeq) the field site would receive a 
+high-end desktop computer.
+
+
+\emph{3. The NR database size (in terms of number of points) should be given.}
+
+This information has been incorporated.
+
+\emph{4. pg. 26: "in the data structure section, with no modifications.": I'm not
+sure which section this refers to.}
+
+We have clarified that this is the ``Entropy-scaling similarity search'' section.
+
+\emph{5. It isn't clear what "Andrew Gallant's FragBag search function" is.}
+
+This has been clarified.
+
+\emph{6. The MICA clustering approach still has a lot of parameters that are
+primarily unmotivated. This is likely ok for the application here, but it
+remains an open question how these parameters must be tuned as the target
+database changes.}
+
+We agree that MICA has many parameters to tune; many of its parameters are explained more fully in Daniels, et al. 2013.
+With esFragBag, we endeavored to explore some of parameter space, namely cluster radius and search radius.
+
+
+
+
+\emph{Reviewer \#2: The authors addressed all my concerns and I don't have further comments.}
+
+
+\emph{Reviewer \#3: From reply: "We have reported the requirements for each tool, and explained that Ammolite and MICA both use multiple threads." I see the note in the supplement that "24 threads were allowed for all programs" in the MICA/Diamond/BLASTX comparison, but I see no such statement in the main text or the supplement. It should be made clear to the reader in the main text that in all experiments, the programs are being compared are being run with the same number of worker threads. This is crucial since "speedup" across tools is not meaningful unless all tools use the same \# threads.}
+
+\emph{Wherever tools are compared, memory footprints should be reported. Right now, I see some text describing memory footprint of the clustering/preprocessing step in Ammolite and MICA. But I don't see any memory footprint for Ammonite or for any of the querying experiments for the three tools. Readers need a complete picture of the tradeoff, including memory usage. (note, I also don't see the table "showing time and memory for preprocessing for esFragBag with a variety of parameters" that the authors mention in their reply)}
+
+We have incorporated thread count and memory requirements in the manuscript.
+
+\emph{The caption for supp fig s3 is cut off at the bottom.}
+
+As figures and captions are now separate in the final submission, this has been addressed.
+
+\closing{\hspace*{.5in}Sincerely,}
+\end{letter} \end{document}

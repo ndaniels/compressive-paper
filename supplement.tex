@@ -114,7 +114,7 @@
 \begin{figure}[hbp]
     \centering
     \includegraphics[width=1\textwidth]{assets/ammolite-simplification.pdf}
-    \caption{ Ammolite's preprocessing during the clustering phase. Ammolite 
+    \caption{\textbf{(Related to Table 2)} Ammolite's preprocessing during the clustering phase. Ammolite 
     removes nodes and edges that do not participate in simple cycles, and 
     treats all edges as simple, unlabeled edges. In this example, both caffeine 
     and adenine become a purine-like graph structure. Note that the resulting 
@@ -127,48 +127,48 @@
     \centering
     \vspace{-10em}
     \centerline{
-    \begin{subfigure}[b]{3.4in}
+    \begin{subfigure}[b]{3.2in}
         \caption{Cosine distance}
         \label{fig:fragbag_fractal_cosine}
         \includegraphics[width=1\textwidth]{assets/4rhv_fractal_cosine.png}
     \end{subfigure}%
-    \begin{subfigure}[b]{3.4in}
+    \begin{subfigure}[b]{3.2in}
         \caption{Euclidean distance}
         \label{fig:fragbag_fractal_euclid}
         \includegraphics[width=1\textwidth]{assets/4rhv_fractal_euclid.png}
     \end{subfigure}
     }
     \centerline{
-    \begin{subfigure}[b]{3.4in}
+    \begin{subfigure}[b]{3.2in}
         \includegraphics[width=1\textwidth]{assets/1ake_fractal_cosine.png}
         %\caption{}
     \end{subfigure}%
-    \begin{subfigure}[b]{3.4in}
+    \begin{subfigure}[b]{3.2in}
         \includegraphics[width=1\textwidth]{assets/1ake_fractal_euclid.png}
         %\caption{}
     \end{subfigure}
     }
     \centerline{
-    \begin{subfigure}[b]{3.4in}
+    \begin{subfigure}[b]{3.2in}
         \includegraphics[width=1\textwidth]{assets/1bmf_fractal_cosine.png}
         %\caption{}
     \end{subfigure}%
-    \begin{subfigure}[b]{3.4in}
+    \begin{subfigure}[b]{3.2in}
         \includegraphics[width=1\textwidth]{assets/1bmf_fractal_euclid.png}
         %\caption{}
     \end{subfigure}
     }
     \centerline{
-    \begin{subfigure}[b]{3.4in}
+    \begin{subfigure}[b]{3.2in}
         \includegraphics[width=1\textwidth]{assets/1rbp_fractal_cosine.png}
         %\caption{}
     \end{subfigure}%
-    \begin{subfigure}[b]{3.4in}
+    \begin{subfigure}[b]{3.2in}
         \includegraphics[width=1\textwidth]{assets/1rbp_fractal_euclid.png}
         %\caption{}
     \end{subfigure}
     }
-    \caption{Local fractal dimension at different scales for the space of PDB FragBag frequency vectors. Each data point is defined by dimension $d = \frac{\log(n_2/n_1)}{\log(r_2/r_1)}$, where $n_1, n_2$ are the number of similarity search hits within radius respectively $r_1, r_2$, and $r_2 - r_1$ is the increment size of 0.01 for cosine distance and 1 for euclidean distance. In most regimes, local fractal dimension is consistently low, except for a large spike when radius expands to include the central cluster of proteins. esFragBag achieves the most acceleration when both output size is small and we remain in a low fractal dimension regime.}
+    \caption{\textbf{(Related to Figure 3)} Local fractal dimension at different scales for the space of PDB FragBag frequency vectors. Each data point is defined by dimension $d = \frac{\log(n_2/n_1)}{\log(r_2/r_1)}$, where $n_1, n_2$ are the number of similarity search hits within radius respectively $r_1, r_2$, and $r_2 - r_1$ is the increment size of 0.01 for cosine distance and 1 for euclidean distance. In most regimes, local fractal dimension is consistently low, except for a large spike when radius expands to include the central cluster of proteins. esFragBag achieves the most acceleration when both output size is small and we remain in a low fractal dimension regime.}
     \label{fig:fragbag_fractal}
 \end{figure}
 
