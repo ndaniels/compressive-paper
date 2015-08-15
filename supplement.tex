@@ -218,19 +218,14 @@ While compressed sensing has also been applied to the problem of finding a repre
 \textbf{The primary advance of entropy-scaling data structures is that they bound both space and time as functions of the data set entropy (albeit using two different notions of entropy).}
 
 \subsubsection{Unifying different notions of fractal dimension}
-In this paper, we make use of three different notions of fractal dimension, including the more intuitive formulation in the main paper, a more classical definition in this following section, and one from which our time-complexity bound directly follows.
-In order to both unify these different notions of fractal dimension and to allow us to prove our complexity bounds, we make two technical assumptions about the self-similarity of the data set.
-Roughly speaking, we require that the clusters look similar to each other for the cluster radii of interest, in terms of sizes.
+In this paper, we make use of two different notions of fractal dimension, including the more intuitive formulation in the main paper and a more classical definition in this following section.
+In order to both unify these different notions of fractal dimension and to allow us to prove our complexity bounds, we make a technical assumptions about the self-similarity of the data set.
+Roughly speaking, we require that the density of points be similar throughout the data set.
 
-For convenience of proof, the two technical assumptions will be that
-\begin{itemize}
-    \item For a given cluster radius, there is a choice of cluster centers such that all clusters have about the same number of points (which we will call cluster weight), up to a constant multiplicative factor of one another.
-    \item For a given radius, the distribution of the number of neighbors within that radius around any point has standard deviation less than a constant multiple of the mean number of neighbors.
-\end{itemize}
-Of course, these two conditions are closely related, but making each explicitly will make unifying our different notions of fractal dimension more straight-forward.
-
-Additionally, although these two particular formulations of cluster similarity may not be present in all data sets of interest, if the data set does not have some self-similarity, then the notion of fractal dimension start breaking down because the data set is no longer fractal like.
-It is far less convenient to try to define fractal dimension when fractal dimension varies widely in different parts of the space.
+More precisely, for a given radius, consider the number of neighbors about any point for that radius, which we will call the density around a point.
+We assume that for any given radius, the densities around all points are bounded within a constant multiplicative factor $\gamma$ of one another.
+This particular technical assumption is likely stronger than we need, but makes the following arguments much more convenient;
+we conjecture but do not prove here that so long as the distribution of densities has low variance, all our statements below also hold with high probability.
 We give special thanks to one of our commenters for having brought this subtlety to our attention.
 
 \subsubsection{Complexity bounds}
@@ -257,11 +252,11 @@ However, we are only interested in scaling behaviors around large radii, so inst
     \]
 \end{definition}
 Intuitively, this means that when we double the radii, the metric entropy, or number of covering spheres needed, decreases by a multiplicative factor of $2^d$.
-This definition of fractal dimension is very classical, but the reader will note very different in formulation from the intuitive one given in the main text.
-However, the two notions are related given the bounded cluster weight assumption we made.
+This definition of fractal dimension is classical, but the reader will note also different in formulation from the intuitive one given in the main text.
+However, the two notions are related given the bounded density assumption we made, from which immediately follows a bound on the number of points within each cluster.
 On average, when we double the radius of a sphere around a point, the number of points in the larger sphere is roughly the number of points in the smaller sphere multiplied by $2^d$, because otherwise the spheres could not cover the space.
 This latter behavior is what we measure when we talk about local fractal dimension around a point in the main paper.
-However, because the cluster weights must remain within a multiplicative constant of each other by assumption, not only is this true on average, but the increase in cluster weight has to be roughly uniform across all clusters.
+However, because the number of points within each cluster must remain within a multiplicative constant of each other by the bounded density assumption, not only is this true on average, but the increase in number of points within a cluster has to be roughly uniform across all clusters.
 Thus, this scaling behavior of points in a doubled sphere must be true everywhere in the data set, and thus we can connect the global average local fractal dimension alluded to in the main paper and measured for our data sets of interest to this more classical notion of fractal dimension based on covering spheres.
 
 Recall that $k$ entries are selected as cluster centers for partitioning the database to result in clusters with maximum radius $r_c$.
@@ -277,19 +272,26 @@ By the triangle inequality, $F \subset B_D(q,r+2r_c)$,
 so we can bound $|F| \le |B_D(q,r+2r_c)|$.
 Let the fractal dimension $D$ at the scale between $r_c$ and $2r_c + r$ be $d$.
 Recall that the local fractal dimension determines how many more points we hit when we scale the radius of a sphere.
-Then in expectation over possible queries $q$,
+Also, we use the density bound to give us that 
 \[
-    \left|B_D(q, r+2r_c)\right| \sim \left|B_D(q,r)\right|\left(\frac{r+2r_c}{r}\right)^d ,
+    \frac{1}{\gamma} \left|B_D(p,\rho)\right| \le \mathbb{E}_q \left|B_D(q,\rho)\right| \le \gamma  \left|B_D(p,\rho)\right|
 \]
-because we are measuring the relative number of points found in spheres of radius $r$ vs radius $r+2r_c$ respectively.
+for any choice of point $p$ and radius $\rho$.
+Then
+\begin{align}
+    \mathbb{E}_q \left[ \left|B_D(q, r+2r_c)\right| \right] &\le \gamma \left|B_D(p,r+2r_c)\right| \\
+                                             &\le \gamma \left|B_D(p,r)\right|\left(\frac{r+2r_c}{r}\right)^d \\
+                                             &\le \gamma^2 \mathbb{E}_q \left[ \left|B_D(q,r)\right| \right] \left(\frac{r+2r_c}{r}\right)^d ,
+\end{align}
+because we are measuring the relative number of points found in spheres of radius $r$ vs radius $r+2r_c$ respectively for some particular point $p$.
 %Roughly speaking, this scaling argument just says that doubling a search radius only increases the number of hits by a factor of at most $2^d$.
-Thus, total search time is 
+But $\gamma$ is a constant, and disappears in asymptotic notation. Thus, total search time is in expectation over points $q$
 \[
     O\left(k + \left|B_D(q,r)\right|\left(\frac{r+2r_c}{r}\right)^d \right).
 \]
 However, note that $k$ is linear in metric entropy and $|B_D(q,r)|$ is the output size, so similarity search can be performed in time linear to metric entropy and a polynomial factor of output size.
 Provided that the fractal dimension $d$ is small and $k$ is large, the search time will be dominated by the metric entropy component, which turns out to be the regime of greatest interest for us.
-We have thus proven bounds for the time-complexity of similarity search.
+We have thus proven bounds for the time-complexity of similarity search, given a self-similarity condition on the density of the dataset.
 
 \subsubsection{Space-complexity}
 Here we relate the space-complexity of our entropy-scaling similarity search data structure to information-theoretic entropy.
