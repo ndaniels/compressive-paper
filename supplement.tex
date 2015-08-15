@@ -261,7 +261,8 @@ This definition of fractal dimension is very classical, but the reader will note
 However, the two notions are related given the bounded cluster weight assumption we made.
 On average, when we double the radius of a sphere around a point, the number of points in the larger sphere is roughly the number of points in the smaller sphere multiplied by $2^d$, because otherwise the spheres could not cover the space.
 This latter behavior is what we measure when we talk about local fractal dimension around a point in the main paper.
-Additionally, we measure the global average fractal dimension of the data sets of interest, 
+However, because the cluster weights must remain within a multiplicative constant of each other by assumption, not only is this true on average, but the increase in cluster weight has to be roughly uniform across all clusters.
+Thus, this scaling behavior of points in a doubled sphere must be true everywhere in the data set, and thus we can connect the global average local fractal dimension alluded to in the main paper and measured for our data sets of interest to this more classical notion of fractal dimension based on covering spheres.
 
 Recall that $k$ entries are selected as cluster centers for partitioning the database to result in clusters with maximum radius $r_c$.
 From the definition above, when setting $\rho = r_c$, it is trivial to verify $ k \le N_{r_c} (D)$.
