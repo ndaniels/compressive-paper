@@ -199,7 +199,7 @@ More precisely, if a fraction $\alpha$ of the triples in $S$ do not satisfy the 
 As shown in the results, empirically, this loss in sensitivity appears to be low and can likely be ameliorated by increasing the coarse search radius.
 
 %We will prove in this section that 
-Provided the fractal dimension of the database is low, this data structure allows for similarity search queries in time roughly linear in the metric entropy of the database.
+Provided the fractal dimension of the database is low, and given a few technical assumptions on the distribution of points, this data structure allows for similarity search queries in time roughly linear in the metric entropy of the database.
 Additionally, without increasing the asymptotic time-complexity, this data structure can also be stored in an \textit{information theoretic} entropy-compressed form.
 %Further, as suggested by the last sentence, the metric entropy of the database can be related to the more typical information theoretic notion of entropy (see Supplemental Methods).
 %However, to do this, we will first need to build additional mathematical machinery and make precise our notions of `entropy' and `fractal dimension'.
@@ -217,8 +217,24 @@ While compressed sensing has also been applied to the problem of finding a repre
 
 \textbf{The primary advance of entropy-scaling data structures is that they bound both space and time as functions of the data set entropy (albeit using two different notions of entropy).}
 
+\subsubsection{Unifying different notions of fractal dimension}
+In this paper, we make use of three different notions of fractal dimension, including the more intuitive formulation in the main paper, a more classical definition in this following section, and one from which our time-complexity bound directly follows.
+In order to both unify these different notions of fractal dimension and to allow us to prove our complexity bounds, we make two technical assumptions about the self-similarity of the data set.
+Roughly speaking, we require that the clusters look similar to each other for the cluster radii of interest, in terms of sizes.
+
+For convenience of proof, the two technical assumptions will be that
+\begin{itemize}
+    \item For a given cluster radius, there is a choice of cluster centers such that all clusters have about the same number of points (which we will call cluster weight), up to a constant multiplicative factor of one another.
+    \item For a given radius, the distribution of the number of neighbors within that radius around any point has standard deviation less than a constant multiple of the mean number of neighbors.
+\end{itemize}
+Of course, these two conditions are closely related, but making each explicitly will make unifying our different notions of fractal dimension more straight-forward.
+
+Additionally, although these two particular formulations of cluster similarity may not be present in all data sets of interest, if the data set does not have some self-similarity, then the notion of fractal dimension start breaking down because the data set is no longer fractal like.
+It is far less convenient to try to define fractal dimension when fractal dimension varies widely in different parts of the space.
+We give special thanks to one of our commenters for having brought this subtlety to our attention.
+
 \subsubsection{Complexity bounds}
-We first define the concept of metric entropy and entropy dimension in the usual manner:
+We first define the concept of metric entropy and entropy dimension in the classical manner:
 \begin{definition}[\cite{tao2008product} Definition 6.1] 
     Let $X$ be a metric space, let $D$ be a subset of $X$, and let $\rho>0$ be a radius.
     \begin{itemize}
@@ -241,8 +257,11 @@ However, we are only interested in scaling behaviors around large radii, so inst
     \]
 \end{definition}
 Intuitively, this means that when we double the radii, the metric entropy, or number of covering spheres needed, decreases by a multiplicative factor of $2^d$.
-On average, this also means that when we double the radius of a sphere around a point, the number of points in the larger sphere is roughly the number of points in the smaller sphere multiplied by $2^d$, because otherwise the spheres could not cover the space.
+This definition of fractal dimension is very classical, but the reader will note very different in formulation from the intuitive one given in the main text.
+However, the two notions are related given the bounded cluster weight assumption we made.
+On average, when we double the radius of a sphere around a point, the number of points in the larger sphere is roughly the number of points in the smaller sphere multiplied by $2^d$, because otherwise the spheres could not cover the space.
 This latter behavior is what we measure when we talk about local fractal dimension around a point in the main paper.
+Additionally, we measure the global average fractal dimension of the data sets of interest, 
 
 Recall that $k$ entries are selected as cluster centers for partitioning the database to result in clusters with maximum radius $r_c$.
 From the definition above, when setting $\rho = r_c$, it is trivial to verify $ k \le N_{r_c} (D)$.
